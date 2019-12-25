@@ -1,7 +1,12 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <button 
+      id="test-btn"
+      class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+      Hello World
+    </button>
+
+    <HelloWorld msg="Welcome to Diff Machine"/>
   </div>
 </template>
 
