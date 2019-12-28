@@ -4,6 +4,7 @@
       {{title}}
     </div>
     <div class="bg-white px-2 py-2 border-2 border-gray-500 border-t-0">
+      <!-- content -->
       <slot></slot>
     </div>
   </div>

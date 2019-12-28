@@ -30,18 +30,7 @@
 
     <!-- Changes -->
     <SectionBox title="Changes">
-        <div class="flex">
-          <span class="flex-shrink pr-2">x</span>
-          <span class="flex-grow font-bold">app/src/main/longer/Bar.java</span>
-          <span class="flex-shrink pl-2 text-red-500">Deleted</span>
-          <span class="flex-shrink pl-2 text-green-500">+0</span>
-          <span class="flex-shrink pl-2 text-red-500">-546</span>
-        </div>
-        
-        <hr class="my-2" />
-
-        <!-- TODO: hide/show -->
-        <FileDiff />
+      <ChangeEntry></ChangeEntry>
     </SectionBox>
 
   </div>
@@ -49,12 +38,12 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import FileDiff from './components/FileDiff.vue';
+import ChangeEntry from './components/ChangeEntry.vue';
 import SectionBox from './components/SectionBox.vue';
 
 @Component({
   components: {
-    FileDiff,
+    ChangeEntry,
     SectionBox,
   },
 })
