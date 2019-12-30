@@ -15,12 +15,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import TextDiff from './TextDiff.vue';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import TextDiff from "./TextDiff.vue";
 
 @Component({
   components: {
-    TextDiff,
+    TextDiff
   }
 })
 export default class ChangeEntry extends Vue {

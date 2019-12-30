@@ -1,22 +1,24 @@
 <template>
-<div class="flex">
-  <div class="flex-auto">
-    <pre>
+  <div class="flex">
+    <div class="flex-auto">
+      <pre>
 + Hello
 + World
-    </pre>
-</div>
-  <div class="flex-auto">
-    <pre>
+    </pre
+      >
+    </div>
+    <div class="flex-auto">
+      <pre>
 - Foo
 - Bar
-    </pre>
+    </pre
+      >
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class TextDiff extends Vue {
