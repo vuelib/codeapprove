@@ -1,0 +1,61 @@
+[
+  {
+    "chunks": [
+      {
+        "content": "@@ -1,3 +1,5 @@",
+        "changes": [
+          {
+            "type": "normal",
+            "normal": true,
+            "ln1": 1,
+            "ln2": 1,
+            "content": " # github-api-sandbox "
+          },
+          {
+            "type": "normal",
+            "normal": true,
+            "ln1": 2,
+            "ln2": 2,
+            "content": " "
+          },
+          {
+            "type": "del",
+            "del": true,
+            "ln": 3,
+            "content": "-I like to test GitHub!"
+          },
+          {
+            "type": "add",
+            "add": true,
+            "ln": 3,
+            "content": "+I like to test GitHub! Again!"
+          },
+          {
+            "type": "add",
+            "add": true,
+            "ln": 4,
+            "content": "+"
+          },
+          {
+            "type": "add",
+            "add": true,
+            "ln": 5,
+            "content": "+And this is another line."
+          }
+        ],
+        "oldStart": 1,
+        "oldLines": 3,
+        "newStart": 1,
+        "newLines": 5
+      }
+    ],
+    "deletions": 1,
+    "additions": 3,
+    "from": "README.md",
+    "to": "README.md",
+    "index": [
+      "8997943..1138d69",
+      "100644"
+    ]
+  }
+]

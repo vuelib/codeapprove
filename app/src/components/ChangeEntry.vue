@@ -2,10 +2,10 @@
   <div>
     <div class="flex">
       <span class="flex-shrink pr-2">x</span>
-      <span class="flex-grow font-bold">app/src/main/longer/Bar.java</span>
-      <span class="flex-shrink pl-2 text-red-500">Deleted</span>
-      <span class="flex-shrink pl-2 text-green-500">+0</span>
-      <span class="flex-shrink pl-2 text-red-500">-546</span>
+      <span class="flex-grow font-bold">{{ diff.from }}</span>
+      <span class="flex-shrink pl-2 text-yellow-500">Changed</span>
+      <span class="flex-shrink pl-2 text-green-500">+{{ diff.additions }}</span>
+      <span class="flex-shrink pl-2 text-red-500">-{{ diff.deletions }}</span>
     </div>
 
     <!-- TODO: hide/show -->
@@ -24,7 +24,8 @@ import TextDiff from "./TextDiff.vue";
   }
 })
 export default class ChangeEntry extends Vue {
-  // @Prop() private msg!: string;
+  // TODO: Get data passed in
+  public diff = require("../../data/diff.json")[0];
 }
 </script>
 

@@ -3,9 +3,13 @@
     <!-- PR general info -->
     <div class="mb-4 relative">
       <h3 class="font-bold text-xl">
-        owner/repo (<a class="text-blue-500 hover:underline" href="#">#123</a>)
+        {{ pr.head.repo.full_name }}
+        (<a class="text-blue-500 hover:underline" href="#">#{{ pr.number }}</a
+        >)
       </h3>
-      <p>merge <code>ss-dev-branch</code> into <code>master</code></p>
+      <p>
+        merge <code>{{ pr.head.ref }}</code> into <code>{{ pr.base.ref }}</code>
+      </p>
 
       <span
         class="md:right-0 md:top-0 md:absolute bg-yellow-500 border-yellow-600 border-2 rounded-lg px-2 py-1"
@@ -34,13 +38,12 @@
     <!-- Changes -->
     <SectionBox title="Changes">
       <ChangeEntry></ChangeEntry>
-      <ChangeEntry></ChangeEntry>
     </SectionBox>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import ChangeEntry from "./components/ChangeEntry.vue";
 import SectionBox from "./components/SectionBox.vue";
 
@@ -50,7 +53,9 @@ import SectionBox from "./components/SectionBox.vue";
     SectionBox
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  public pr = require("../data/pr.json");
+}
 </script>
 
 <style lang="scss">
