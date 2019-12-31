@@ -38,9 +38,12 @@ export default class TextDiff extends Vue {
 
   // TODO: Number and marker shoud not be selectable
   fullLine(c: any): string {
-    return `${this.lineNumber(c)} ${this.lineMarker(c)} ${this.lineContent(c)}`;
+    return ` ${this.lineNumber(c)} ${this.lineMarker(c)} ${this.lineContent(
+      c
+    )}`;
   }
 
+  // TODO: this can't be the clean way to style by data...
   lineClass(c: any): string {
     if (c.type === "normal") {
       return "bg-gray-200";
@@ -53,7 +56,7 @@ export default class TextDiff extends Vue {
 
   lineMarker(c: any): string {
     if (c.type === "normal") {
-      return " ";
+      return "";
     } else if (c.type === "del") {
       return "-";
     } else {

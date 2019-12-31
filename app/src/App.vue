@@ -31,8 +31,10 @@
 
     <!-- PR description -->
     <SectionBox title="Description">
-      Adding a new feature, to use it first you <code>something</code> then you
-      <code>something else</code>.
+      <div class="p-2">
+        Adding a new feature, to use it first you <code>something</code> then
+        you <code>something else</code>.
+      </div>
     </SectionBox>
 
     <!-- Changes -->
