@@ -1,18 +1,18 @@
 <template>
-  <div class="flex">
+  <div class="flex overflow-hidden bg-yellow-100">
     <div class="flex-1">
       <DiffLine
         v-bind:key="change.content"
         v-for="change in leftChanges"
         v-bind:change="change"
-      ></DiffLine>
+      />
     </div>
     <div class="flex-1">
       <DiffLine
         v-bind:key="change.content"
         v-for="change in rightChanges"
         v-bind:change="change"
-      ></DiffLine>
+      />
     </div>
   </div>
 </template>

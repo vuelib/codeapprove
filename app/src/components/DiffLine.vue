@@ -18,7 +18,7 @@ export default class DiffLine extends Vue {
 
   public get classObject(): object {
     return {
-      "bg-gray-200": this.change.type === "normal",
+      // "bg-yellow-100": this.change.type === "normal",
       "bg-red-200": this.change.type === "del",
       "bg-green-200": this.change.type === "add"
     };

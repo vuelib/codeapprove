@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <p class="bold text-gray-800 text-lg my-2">{{ title }}</p>
+    <p class="font-bold text-gray-900 text-lg my-2">{{ title }}</p>
     <div class="rounded shadow bg-white border border-gray-400">
       <!-- content -->
       <slot></slot>

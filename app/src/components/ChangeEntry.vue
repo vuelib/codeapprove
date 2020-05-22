@@ -1,9 +1,12 @@
 <template>
   <div>
-    <div class="flex p-2 items-center">
+    <div class="flex p-2 font-bold items-center bg-gray-200">
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
-      <span class="flex-grow pl-2 font-bold">{{ diff.from }}</span>
-      <span class="flex-shrink pl-2 text-yellow-500">Changed</span>
+      <span class="flex-grow pl-2d">{{ diff.from }}</span>
+      <span
+        class="flex-shrink pl-2 pr-2 bg-yellow-500 text-yellow-800 rounded-lg"
+        >modified</span
+      >
       <span class="flex-shrink pl-2 text-green-500">+{{ diff.additions }}</span>
       <span class="flex-shrink pl-2 text-red-500">-{{ diff.deletions }}</span>
     </div>

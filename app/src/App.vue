@@ -12,7 +12,7 @@
       </p>
 
       <span
-        class="md:right-0 md:top-0 md:absolute bg-yellow-500 bold text-yellow-800 rounded-lg px-2 py-1"
+        class="md:right-0 md:top-0 md:absolute font-bold bg-yellow-500 text-yellow-800 rounded-lg px-2 py-1"
       >
         <font-awesome-icon icon="pause-circle" /> Pending
       </span>
@@ -41,6 +41,9 @@
 
     <!-- Changes -->
     <SectionBox title="Changes">
+      <!-- TODO: Make this a loop -->
+      <ChangeEntry />
+      <hr border border-gray-500 />
       <ChangeEntry />
     </SectionBox>
   </div>
