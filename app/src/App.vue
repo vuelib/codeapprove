@@ -12,18 +12,20 @@
       </p>
 
       <span
-        class="md:right-0 md:top-0 md:absolute bg-yellow-500 border-yellow-600 border-2 rounded-lg px-2 py-1"
+        class="md:right-0 md:top-0 md:absolute bg-yellow-500 bold text-yellow-800 rounded-lg px-2 py-1"
       >
-        Status: pending
+        <font-awesome-icon icon="pause-circle" /> Pending
       </span>
 
       <table class="table-auto mt-2">
         <tr>
-          <td class="font-bold pr-2">reviewers</td>
+          <td class="font-bold pr-2">
+            <font-awesome-icon icon="user-check" /> reviewers
+          </td>
           <td>johndoe, alicedoe</td>
         </tr>
         <tr>
-          <td class="font-bold pr-2">cc'ed</td>
+          <td class="font-bold pr-2"><font-awesome-icon icon="at" /> cc'ed</td>
           <td>billdoe</td>
         </tr>
       </table>
@@ -39,7 +41,7 @@
 
     <!-- Changes -->
     <SectionBox title="Changes">
-      <ChangeEntry></ChangeEntry>
+      <ChangeEntry />
     </SectionBox>
   </div>
 </template>
