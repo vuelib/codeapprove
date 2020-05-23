@@ -11,7 +11,8 @@ import {
   faUserCheck,
   faAt,
   faPaperPlane,
-  faCheck
+  faCheck,
+  faCodeBranch
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -23,7 +24,8 @@ library.add(
   faUserCheck,
   faAt,
   faPaperPlane,
-  faCheck
+  faCheck,
+  faCodeBranch
 );
 
 Vue.config.productionTip = false;
