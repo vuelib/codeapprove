@@ -3,8 +3,7 @@
     <div class="flex p-2 font-bold items-center bg-gray-200">
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <span class="flex-grow pl-2d">{{ diff.from }}</span>
-      <span
-        class="flex-shrink pl-2 pr-2 bg-yellow-500 text-yellow-800 rounded-lg"
+      <span class="flex-shrink pl-2 pr-2 bg-yellow-500 text-yellow-800 rounded"
         >modified</span
       >
       <span class="flex-shrink pl-2 text-green-500">+{{ diff.additions }}</span>

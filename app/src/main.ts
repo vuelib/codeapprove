@@ -9,12 +9,22 @@ import {
   faCaretDown,
   faPauseCircle,
   faUserCheck,
-  faAt
+  faAt,
+  faPaperPlane,
+  faCheck
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
-library.add(faCaretRight, faCaretDown, faPauseCircle, faUserCheck, faAt);
+library.add(
+  faCaretRight,
+  faCaretDown,
+  faPauseCircle,
+  faUserCheck,
+  faAt,
+  faPaperPlane,
+  faCheck
+);
 
 Vue.config.productionTip = false;
 
