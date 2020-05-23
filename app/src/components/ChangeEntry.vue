@@ -3,11 +3,15 @@
     <div class="flex p-2 font-bold items-center bg-gray-200">
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <span class="flex-grow pl-2d">{{ diff.from }}</span>
-      <span class="flex-shrink pl-2 pr-2 bg-yellow-500 text-yellow-800 rounded"
+      <span class="flex-shrink px-2 bg-yellow-400 text-yellow-800 rounded"
         >modified</span
       >
-      <span class="flex-shrink pl-2 text-green-500">+{{ diff.additions }}</span>
-      <span class="flex-shrink pl-2 text-red-500">-{{ diff.deletions }}</span>
+      <span class="flex-shrink mx-1 px-2 rounded bg-green-400 text-green-800"
+        >+{{ diff.additions }}</span
+      >
+      <span class="flex-shrink mx-1 px-2 rounded bg-red-400 text-red-800"
+        >-{{ diff.deletions }}</span
+      >
     </div>
     <TextDiff v-show="expanded" />
   </div>
