@@ -3,10 +3,11 @@
     <div class="flex-1">
       <template v-for="(change, index) in leftChanges">
         <DiffLine :key="change.content" :change="change" />
-        <CommentThread v-if="hasComment(index)" :key="index" />
+        <CommentThread :key="index" v-if="hasComment(index)" />
       </template>
     </div>
     <div class="flex-1">
+      <!-- TODO: Comments -->
       <DiffLine
         :key="change.content"
         v-for="change in rightChanges"
