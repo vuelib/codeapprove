@@ -28,7 +28,7 @@ import TextDiff from "./TextDiff.vue";
 })
 export default class ChangeEntry extends Vue {
   // TODO: Get data passed in
-  public diff = require("../../data/diff.json")[0];
+  public diff = require("../../../data/diff.json")[0];
   public expanded = true;
 
   public toggle() {

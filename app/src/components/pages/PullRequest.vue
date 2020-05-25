@@ -52,8 +52,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import ChangeEntry from "./ChangeEntry.vue";
-import SectionBox from "./SectionBox.vue";
+import ChangeEntry from "../elements/ChangeEntry.vue";
+import SectionBox from "../elements/SectionBox.vue";
 
 @Component({
   components: {
@@ -62,7 +62,7 @@ import SectionBox from "./SectionBox.vue";
   }
 })
 export default class PullRequest extends Vue {
-  public pr = require("../../data/pr.json");
+  public pr = require("../../../data/pr.json");
 }
 </script>
 

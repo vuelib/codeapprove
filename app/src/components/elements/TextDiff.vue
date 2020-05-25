@@ -30,7 +30,7 @@ import CommentThread from "./CommentThread.vue";
 })
 export default class TextDiff extends Vue {
   // TODO: Get data passed in
-  public diff = require("../../data/diff.json")[0];
+  public diff = require("../../../data/diff.json")[0];
   // TODO: What does multiple chunks mean?
   public changes = this.diff.chunks[0].changes;
 
