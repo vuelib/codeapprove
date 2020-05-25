@@ -3,33 +3,17 @@ import App from "./App.vue";
 
 import "./assets/styles/index.css";
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-  faCaretRight,
-  faCaretDown,
-  faPauseCircle,
-  faUserCheck,
-  faAt,
-  faPaperPlane,
-  faCheck,
-  faCodeBranch
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+// Font awesome icons
+import { initIconLibrary } from "./plugins/icons";
+initIconLibrary();
 
-Vue.component("font-awesome-icon", FontAwesomeIcon);
-library.add(
-  faCaretRight,
-  faCaretDown,
-  faPauseCircle,
-  faUserCheck,
-  faAt,
-  faPaperPlane,
-  faCheck,
-  faCodeBranch
-);
+// Router
+import { initRouter } from "./plugins/router";
+const router = initRouter();
 
 Vue.config.productionTip = false;
 
 new Vue({
-  render: h => h(App)
+  render: h => h(App),
+  router
 }).$mount("#app");

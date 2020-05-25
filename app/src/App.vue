@@ -9,8 +9,8 @@
       <span class="text-xl">DiffMachine</span>
     </div>
 
-    <!-- Page body -->
-    <PullRequest />
+    <!-- Page body from router -->
+    <router-view />
   </div>
 </template>
 
