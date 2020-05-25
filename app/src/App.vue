@@ -16,9 +16,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import ChangeEntry from "./components/ChangeEntry.vue";
-import SectionBox from "./components/SectionBox.vue";
-import PullRequest from "./components/PullRequest.vue";
+import ChangeEntry from "./components/elements/ChangeEntry.vue";
+import SectionBox from "./components/elements/SectionBox.vue";
+import PullRequest from "./components/pages/PullRequest.vue";
 
 @Component({
   components: {
