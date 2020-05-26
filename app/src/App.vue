@@ -3,10 +3,13 @@
     <!-- Page Header -->
     <div
       id="bar"
-      class="flex items-center shadow-md text-white font-bold py-4 px-8 bg-blue-500"
+      class="flex items-center shadow-md text-white font-bold py-4 px-8 bg-blue-800"
     >
       <font-awesome-icon icon="code-branch" size="lg" class="mr-4" />
-      <span class="text-xl">DiffMachine</span>
+      <span class="text-xl flex-grow">DiffMachine</span>
+      <router-link to="/signin"
+        ><span class="text-md">Sign In</span></router-link
+      >
     </div>
 
     <!-- Page body from router -->

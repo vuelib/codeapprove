@@ -11,11 +11,14 @@ import {
   faCheck,
   faCodeBranch
 } from "@fortawesome/free-solid-svg-icons";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export function initIconLibrary() {
   Vue.component("font-awesome-icon", FontAwesomeIcon);
+
   library.add(
+    // Regular icons
     faCaretRight,
     faCaretDown,
     faPauseCircle,
@@ -23,6 +26,9 @@ export function initIconLibrary() {
     faAt,
     faPaperPlane,
     faCheck,
-    faCodeBranch
+    faCodeBranch,
+
+    // Brand icons
+    faGithub
   );
 }
