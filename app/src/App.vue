@@ -7,9 +7,9 @@
     >
       <font-awesome-icon icon="code-branch" size="lg" class="mr-4" />
       <span class="text-xl flex-grow">DiffMachine</span>
-      <router-link to="/signin"
-        ><span class="text-md">Sign In</span></router-link
-      >
+      <router-link v-if="!signedIn" to="/signin" exact-active-class="hidden"
+        ><span class="text-md">Sign In</span>
+      </router-link>
     </div>
 
     <!-- Page body from router -->
@@ -23,12 +23,21 @@ import ChangeEntry from "./components/elements/ChangeEntry.vue";
 import SectionBox from "./components/elements/SectionBox.vue";
 import PullRequest from "./components/pages/PullRequest.vue";
 
+import { getModule } from "vuex-module-decorators";
+import AuthStore from "./store/modules/auth";
+
 @Component({
   components: {
     PullRequest
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  private authStore = getModule(AuthStore, this.$store);
+
+  get signedIn() {
+    return this.authStore.signedIn;
+  }
+}
 </script>
 
 <style lang="scss">
@@ -36,5 +45,9 @@ export default class App extends Vue {}
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.hidden {
+  display: none;
 }
 </style>

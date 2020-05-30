@@ -8,12 +8,15 @@ import { initIconLibrary } from "./plugins/icons";
 initIconLibrary();
 
 // Router
-import { initRouter } from "./plugins/router";
-const router = initRouter();
+import router from "./plugins/router";
+
+// Store
+import store from "./store";
 
 Vue.config.productionTip = false;
 
 new Vue({
   render: h => h(App),
-  router
+  router,
+  store
 }).$mount("#app");
