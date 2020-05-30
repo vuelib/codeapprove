@@ -14,7 +14,8 @@
 
         <!-- TODO: This is a nuts style -->
         <button
-          class="inline-flex items-center bg-gray-800 hover:bg-gray-900 border-gray-700 border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
+          @click.prevent="startSignIn()"
+          class="inline-flex items-center bg-gray-900 hover:bg-black border-gray-700 border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
         >
           <font-awesome-icon :icon="['fab', 'github']" size="lg" />
           <span class="ml-2 font-bold">Sign In with GitHub</span>
@@ -27,10 +28,27 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 
+import * as firebase from "firebase/app";
+import { auth } from "../../plugins/firebase";
+
 @Component({
   components: {}
 })
-export default class SignIn extends Vue {}
+export default class SignIn extends Vue {
+  public async startSignIn() {
+    const provider = new firebase.auth.GithubAuthProvider();
+    // TODO: Scopes
+    // provider.addScope('repo');
+
+    try {
+      const result = await auth().signInWithPopup(provider);
+      console.log(`Sign in success, user: ${JSON.stringify(result.user)}`);
+    } catch (error) {
+      console.warn(`Sign in failure: ${error}`);
+      // TODO: handle
+    }
+  }
+}
 </script>
 
 <style lang="scss">
