@@ -10,9 +10,11 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { getModule } from "vuex-module-decorators";
+
 import HeaderBar from "./components/elements/HeaderBar.vue";
 
-import { getModule } from "vuex-module-decorators";
+import { auth } from "./plugins/firebase";
 import AuthStore from "./store/modules/auth";
 
 @Component({
@@ -21,10 +23,17 @@ import AuthStore from "./store/modules/auth";
   }
 })
 export default class App extends Vue {
-  private authStore = getModule(AuthStore, this.$store);
+  authStore = getModule(AuthStore, this.$store);
+  authUnsub?: firebase.Unsubscribe = undefined;
 
-  get signedIn() {
-    return this.authStore.signedIn;
+  created() {
+    this.authUnsub = auth().onAuthStateChanged(user => {
+      this.authStore.setUser(user);
+    });
+  }
+
+  destroyed() {
+    this.authUnsub && this.authUnsub();
   }
 }
 </script>

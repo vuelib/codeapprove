@@ -45,10 +45,10 @@ export default class SignIn extends Vue {
     // TODO: Scopes
     // provider.addScope('repo');
 
-    // TODO: Where should we do this
+    // TODO: Should this be an action?
     try {
       const result = await auth().signInWithPopup(provider);
-      console.log(`Sign in success, user: ${JSON.stringify(result.user)}`);
+      console.log(`Sign in success`);
       this.$router.push("/pr");
     } catch (error) {
       console.warn(`Sign in failure: ${error}`);

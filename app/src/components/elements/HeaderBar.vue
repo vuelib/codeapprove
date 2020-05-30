@@ -21,23 +21,11 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import AuthStore from "../../store/modules/auth";
 
-import { auth } from "../../plugins/firebase";
-
 @Component
 export default class HeaderBar extends Vue {
   private authStore = getModule(AuthStore, this.$store);
 
-  created() {
-    // TODO: Where should this be?
-    auth().onAuthStateChanged(user => {
-      if (user) {
-        this.authStore.setSignedIn(true);
-      } else {
-        this.authStore.setSignedIn(false);
-      }
-    });
-  }
-
+  // TODO: Could this be mapState ?
   get signedIn() {
     return this.authStore.signedIn;
   }
