@@ -1,4 +1,5 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { auth } from "../../plugins/firebase";
 
 @Module({
   name: "auth"
@@ -7,12 +8,12 @@ export default class Auth extends VuexModule {
   signedIn = false;
 
   @Mutation
-  signIn() {
-    this.signedIn = true;
+  setSignedIn(x: boolean) {
+    this.signedIn = x;
   }
 
-  @Mutation
-  signOut() {
-    this.signedIn = false;
+  @Action
+  async startSignOut() {
+    await auth().signOut();
   }
 }

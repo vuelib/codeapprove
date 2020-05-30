@@ -8,6 +8,10 @@
     <router-link v-if="!signedIn" to="/signin" exact-active-class="hidden"
       ><span class="text-md">Sign In</span>
     </router-link>
+
+    <button v-if="signedIn" @click="signOut()">
+      <span class="text-md">Sign Out</span>
+    </button>
   </div>
 </template>
 
@@ -17,12 +21,30 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import AuthStore from "../../store/modules/auth";
 
+import { auth } from "../../plugins/firebase";
+
 @Component
 export default class HeaderBar extends Vue {
   private authStore = getModule(AuthStore, this.$store);
 
+  created() {
+    // TODO: Where should this be?
+    auth().onAuthStateChanged(user => {
+      if (user) {
+        this.authStore.setSignedIn(true);
+      } else {
+        this.authStore.setSignedIn(false);
+      }
+    });
+  }
+
   get signedIn() {
     return this.authStore.signedIn;
+  }
+
+  public async signOut() {
+    await this.authStore.startSignOut();
+    this.$router.push("/signin");
   }
 }
 </script>
