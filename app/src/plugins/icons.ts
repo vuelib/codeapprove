@@ -9,7 +9,8 @@ import {
   faAt,
   faPaperPlane,
   faCheck,
-  faCodeBranch
+  faCodeBranch,
+  faComment
 } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -27,6 +28,7 @@ export function initIconLibrary() {
     faPaperPlane,
     faCheck,
     faCodeBranch,
+    faComment,
 
     // Brand icons
     faGithub

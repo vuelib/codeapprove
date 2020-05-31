@@ -2,15 +2,13 @@
   <div class="flex overflow-hidden bg-yellow-100">
     <div class="flex-1">
       <template v-for="(change, index) in leftChanges">
-        <DiffLine :key="change.content" :change="change" />
-        <CommentThread :key="index" v-if="hasComment(index)" />
+        <DiffLine :key="index" :change="change" />
       </template>
     </div>
     <div class="flex-1">
-      <!-- TODO: Comments -->
       <DiffLine
-        :key="change.content"
-        v-for="change in rightChanges"
+        v-for="(change, index) in rightChanges"
+        :key="index"
         :change="change"
       />
     </div>
@@ -20,11 +18,11 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import DiffLine from "./DiffLine.vue";
-import CommentThread from "./CommentThread.vue";
+
+import { Change } from "../../model/types";
 
 @Component({
   components: {
-    CommentThread,
     DiffLine
   }
 })
@@ -32,20 +30,16 @@ export default class TextDiff extends Vue {
   // TODO: Get data passed in
   public diff = require("../../../data/diff.json")[0];
   // TODO: What does multiple chunks mean?
-  public changes = this.diff.chunks[0].changes;
-
-  public hasComment(line: number): boolean {
-    return line === 2;
-  }
+  public changes: Change[] = this.diff.chunks[0].changes;
 
   public get leftChanges() {
-    return this.changes.filter((c: any) => {
+    return this.changes.filter(c => {
       return c.type === "normal" || c.type === "del";
     });
   }
 
   public get rightChanges() {
-    return this.changes.filter((c: any) => {
+    return this.changes.filter(c => {
       return c.type === "normal" || c.type === "add";
     });
   }
