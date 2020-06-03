@@ -8,20 +8,23 @@ import * as firebase from "firebase/app";
   name: "auth"
 })
 export default class Auth extends VuexModule {
-  user: firebase.User | undefined | null = undefined;
+  public signInKnown: boolean = false;
+  public user: firebase.User | null = null;
 
   @Mutation
   setUser(u: firebase.User | null) {
     console.log(`auth.setUser(${u ? u.uid : u})`);
+    this.signInKnown = true;
     this.user = u;
+  }
+
+  get username(): string {
+    // TODO: real one from the api
+    return this.user!.providerData[0]!.displayName!;
   }
 
   get signedIn(): boolean {
     return !!this.user;
-  }
-
-  get signInKnown(): boolean {
-    return this.user !== undefined;
   }
 
   // TODO: Maybe this shouldn't be here if it doesn't directly touch the state

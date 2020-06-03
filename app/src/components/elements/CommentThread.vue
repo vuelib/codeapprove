@@ -1,43 +1,106 @@
 <template>
   <div class="border border-gray-400 bg-white">
-    <!-- <div class="flex p-2">
-      <img class="flex-shrink mr-4 mt-1" style="height: 32px; width: 32px;" />
-      <div class="flex-grow">
-        <div class="flex">
-          <span class="flex-grow font-bold">username</span>
-          <font-awesome-icon class="mx-1 text-gray-500" icon="check" />
-        </div>
-        <span>I think there will be a bug here if you do this.</span>
-      </div>
-    </div>
-    <hr class="border border-gray-200" /> -->
-    <div class="flex p-2">
-      <img class="flex-none mr-2" style="height: 32px; width: 32px;" />
-      <textarea
-        class="flex-grow py-1 px-2 mr-1 rounded border bg-gray-100 border-gray-300"
-        placeholder="Reply...?"
+    <div
+      v-if="resolved && !forceExpand"
+      class="flex items-center px-2 py-1 text-gray-600"
+    >
+      <span class="italic flex-grow">Comment resolved</span>
+      <font-awesome-icon
+        @click="forceExpand = true"
+        icon="eye"
+        class="hover:text-gray-800 cursor-pointer"
       />
     </div>
-    <div class="flex flex-row-reverse px-2 pb-2">
-      <button class="ml-2 btn btn-blue">
-        Send <font-awesome-icon icon="paper-plane" class="self-end mx-1" />
-      </button>
-      <button class="btn btn-red" @click.prevent="onCancel()">
-        Cancel
-      </button>
+    <div v-else>
+      <!-- Thread -->
+      <div v-for="(comment, index) in comments" :key="index" class="flex p-2">
+        <img class="flex-shrink mr-4 mt-1" style="height: 32px; width: 32px;" />
+        <div class="flex-grow">
+          <div class="flex">
+            <span class="flex-grow font-bold">{{ comment.username }}</span>
+          </div>
+          <span>{{ comment.text }}</span>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <!-- TODO: Handle focus out -->
+      <div @focusin="focused = true">
+        <div class="flex p-2">
+          <img
+            class="flex-none rounded mr-2"
+            :src="authModule.user.photoURL"
+            style="height: 32px; width: 32px;"
+          />
+          <textarea
+            class="flex-grow py-1 px-2 mr-1 rounded border bg-white border-gray-400"
+            v-model="draftComment"
+            rows="1"
+            placeholder="Reply...?"
+          />
+        </div>
+        <div
+          v-show="focused || comments.length === 0"
+          class="flex flex-row-reverse px-2 pb-2"
+        >
+          <button class="ml-2 btn btn-green" @click.prevent="onSubmit(true)">
+            Send + Resolve
+            <font-awesome-icon icon="check" class="self-end mx-1" />
+          </button>
+          <button class="ml-2 btn btn-blue" @click.prevent="onSubmit(false)">
+            Send
+          </button>
+          <button class="btn btn-red" @click.prevent="onCancel()">
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { getModule } from "vuex-module-decorators";
+import AuthModule from "../../store/modules/auth";
+import * as firebase from "firebase/app";
+
+interface Comment {
+  username: string;
+  text: string;
+}
 
 @Component({})
 export default class CommentThread extends Vue {
-  // TODO: Data
+  authModule = getModule(AuthModule, this.$store);
+
+  focused = false;
+  forceExpand = false;
+
+  // TODO: Real state
+  resolved = false;
+  comments: Comment[] = [];
+
+  draftComment: string = "";
+
+  public onSubmit(resolved: boolean) {
+    this.comments.push({
+      username: this.authModule.username,
+      text: this.draftComment
+    });
+
+    this.resolved = resolved;
+    this.draftComment = "";
+    this.focused = false;
+  }
 
   public onCancel() {
-    this.$emit("cancel");
+    if (this.comments.length > 0) {
+      this.focused = false;
+    } else {
+      // TODO: Should the v-show even be external?
+      this.$emit("cancel");
+    }
   }
 }
 </script>
@@ -67,5 +130,13 @@ export default class CommentThread extends Vue {
 
 .btn-red:hover {
   @apply bg-red-400;
+}
+
+.btn-green {
+  @apply border-green-500 text-green-500;
+}
+
+.btn-green:hover {
+  @apply bg-green-500;
 }
 </style>
