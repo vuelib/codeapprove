@@ -7,7 +7,7 @@ import * as firebase from "firebase/app";
 @Module({
   name: "auth"
 })
-export default class Auth extends VuexModule {
+export default class AuthModule extends VuexModule {
   public signInKnown: boolean = false;
   public user: firebase.User | null = null;
 
@@ -21,6 +21,12 @@ export default class Auth extends VuexModule {
   get username(): string {
     // TODO: real one from the api
     return this.user!.providerData[0]!.displayName!;
+  }
+
+  get photoURL(): string {
+    // TODO: Ever null?
+    // TODO: Make a CDN-cached API to get this from GitHub
+    return this.user!.photoURL!;
   }
 
   get signedIn(): boolean {

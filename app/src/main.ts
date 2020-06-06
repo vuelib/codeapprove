@@ -4,14 +4,14 @@ import App from "./App.vue";
 import "./assets/styles/index.css";
 
 // Font awesome icons
-import { initIconLibrary } from "./plugins/icons";
+import { initIconLibrary } from "@/plugins/icons";
 initIconLibrary();
 
 // Router
-import router from "./plugins/router";
+import router from "@/plugins/router";
 
 // Store
-import store from "./store";
+import store from "@/store";
 
 Vue.config.productionTip = false;
 

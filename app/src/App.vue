@@ -14,7 +14,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 
-import HeaderBar from "./components/elements/HeaderBar.vue";
+import HeaderBar from "@/components/elements/HeaderBar.vue";
 
 import { auth } from "./plugins/firebase";
 import AuthStore from "./store/modules/auth";

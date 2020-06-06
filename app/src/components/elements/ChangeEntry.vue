@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import TextDiff from "./TextDiff.vue";
+import TextDiff from "@/components/elements/TextDiff.vue";
 
 @Component({
   components: {

@@ -52,8 +52,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import ChangeEntry from "../elements/ChangeEntry.vue";
-import SectionBox from "../elements/SectionBox.vue";
+import ChangeEntry from "@/components/elements/ChangeEntry.vue";
+import SectionBox from "@/components/elements/SectionBox.vue";
 
 @Component({
   components: {

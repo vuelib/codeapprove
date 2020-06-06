@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import DiffLine from "./DiffLine.vue";
+import DiffLine from "@/components/elements/DiffLine.vue";
 
 import { Change } from "../../model/types";
 

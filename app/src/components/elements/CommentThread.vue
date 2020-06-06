@@ -14,12 +14,12 @@
     <div v-else>
       <!-- Thread -->
       <div v-for="(comment, index) in comments" :key="index" class="flex p-2">
-        <img class="flex-shrink mr-4 mt-1" style="height: 32px; width: 32px;" />
+        <img class="flex-none avatar mt-1 mr-4" :src="comment.photoURL" />
         <div class="flex-grow">
-          <div class="flex">
-            <span class="flex-grow font-bold">{{ comment.username }}</span>
-          </div>
-          <span>{{ comment.text }}</span>
+          <p class="font-bold">
+            {{ comment.username }}
+          </p>
+          <p>{{ comment.text }}</p>
         </div>
       </div>
 
@@ -27,13 +27,9 @@
       <!-- TODO: Handle focus out -->
       <div @focusin="focused = true">
         <div class="flex p-2">
-          <img
-            class="flex-none rounded mr-2"
-            :src="authModule.user.photoURL"
-            style="height: 32px; width: 32px;"
-          />
+          <img class="flex-none avatar mr-4" :src="authModule.user.photoURL" />
           <textarea
-            class="flex-grow py-1 px-2 mr-1 rounded border bg-white border-gray-400"
+            class="flex-grow py-1 px-2 rounded border bg-white border-gray-400"
             v-model="draftComment"
             rows="1"
             placeholder="Reply...?"
@@ -44,11 +40,11 @@
           class="flex flex-row-reverse px-2 pb-2"
         >
           <button class="ml-2 btn btn-green" @click.prevent="onSubmit(true)">
-            Send + Resolve
+            Save + Resolve
             <font-awesome-icon icon="check" class="self-end mx-1" />
           </button>
           <button class="ml-2 btn btn-blue" @click.prevent="onSubmit(false)">
-            Send
+            Save
           </button>
           <button class="btn btn-red" @click.prevent="onCancel()">
             Cancel
@@ -62,11 +58,14 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
-import AuthModule from "../../store/modules/auth";
 import * as firebase from "firebase/app";
+
+import AuthModule from "../../store/modules/auth";
+import { auth } from "../../plugins/firebase";
 
 interface Comment {
   username: string;
+  photoURL: string;
   text: string;
 }
 
@@ -86,6 +85,7 @@ export default class CommentThread extends Vue {
   public onSubmit(resolved: boolean) {
     this.comments.push({
       username: this.authModule.username,
+      photoURL: this.authModule.photoURL,
       text: this.draftComment
     });
 
@@ -106,6 +106,12 @@ export default class CommentThread extends Vue {
 </script>
 
 <style scoped lang="postcss">
+.avatar {
+  @apply rounded;
+  height: 32px;
+  width: 32px;
+}
+
 .btn {
   @apply px-2 py-1;
   @apply rounded shadow border;
