@@ -19,7 +19,7 @@
           <p class="font-bold">
             {{ comment.username }}
           </p>
-          <p>{{ comment.text }}</p>
+          <div v-html="renderMd(comment.text)"></div>
         </div>
       </div>
 
@@ -28,12 +28,23 @@
       <div @focusin="focused = true">
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="authModule.user.photoURL" />
-          <textarea
-            class="flex-grow py-1 px-2 rounded border bg-white border-gray-400"
-            v-model="draftComment"
-            rows="1"
-            placeholder="Reply...?"
-          />
+          <div
+            class="flex-grow relative py-1 px-2 rounded border bg-white border-gray-400"
+          >
+            <font-awesome-icon
+              @click="renderDraft = !renderDraft"
+              :icon="renderDraft ? 'keyboard' : 'magic'"
+              class="absolute m-1 right-0 text-gray-600 hover:text-gray-800 cursor-pointer"
+            />
+            <textarea
+              class="w-full"
+              v-if="!renderDraft"
+              v-model="draftComment"
+              rows="1"
+              placeholder="Reply...?"
+            />
+            <div class="w-full" v-else v-html="renderMd(draftComment)"></div>
+          </div>
         </div>
         <div
           v-show="focused || comments.length === 0"
@@ -72,17 +83,18 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import * as firebase from "firebase/app";
+import marked from "marked";
 
-import { Thread, ThreadArgs, CommentArgs } from "../../model/review";
+import { Thread, ThreadArgs, Comment, CommentArgs } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
 
-interface Comment {
-  username: string;
-  photoURL: string;
-  text: string;
-}
+// TODO: Can I centralize this somewhere?
+marked.setOptions({
+  gfm: true,
+  breaks: true
+});
 
 @Component({})
 export default class CommentThread extends Vue {
@@ -95,6 +107,7 @@ export default class CommentThread extends Vue {
   // TODO: This should be passed in from somewhere
   thread: Thread | null = null;
 
+  renderDraft = false;
   draftComment: string = "";
 
   get resolved(): boolean {
@@ -107,6 +120,10 @@ export default class CommentThread extends Vue {
     }
 
     return this.reviewModule.comments(this.thread.id);
+  }
+
+  public renderMd(text: string) {
+    return marked(text);
   }
 
   public async onSubmit(resolve?: boolean) {
@@ -142,6 +159,7 @@ export default class CommentThread extends Vue {
 
     // Reset local state
     this.draftComment = "";
+    this.renderDraft = false;
     this.focused = false;
     if (resolve === true) {
       this.forceExpand = false;
