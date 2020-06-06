@@ -29,21 +29,23 @@
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="authModule.user.photoURL" />
           <div
-            class="flex-grow relative py-1 px-2 rounded border bg-white border-gray-400"
+            :class="{ border: !renderDraft, 'border-gray-400': !renderDraft }"
+            class="flex-grow relative py-1 px-2 rounded bg-white"
           >
             <font-awesome-icon
+              v-show="typing"
               @click="renderDraft = !renderDraft"
               :icon="renderDraft ? 'keyboard' : 'magic'"
               class="absolute m-1 right-0 text-gray-600 hover:text-gray-800 cursor-pointer"
             />
             <textarea
               class="w-full overflow-hidden"
-              :style="{ height: textAreaHeight }"
               v-show="!renderDraft"
               v-model="draftComment"
-              rows="1"
+              :rows="typing ? '4' : '1'"
               placeholder="Reply...?"
-              @keydown="autoResizeTextArea"
+              @focus="textFocus = true"
+              @blur="textFocus = false"
             />
             <div
               class="w-full"
@@ -113,9 +115,13 @@ export default class CommentThread extends Vue {
   // TODO: This should be passed in from somewhere
   thread: Thread | null = null;
 
+  textFocus = false;
   renderDraft = false;
-  textAreaHeight = "auto";
   draftComment: string = "";
+
+  get typing() {
+    return this.textFocus || this.draftComment.length > 0;
+  }
 
   get resolved(): boolean {
     return this.thread != null && this.thread.resolved;
@@ -127,11 +133,6 @@ export default class CommentThread extends Vue {
     }
 
     return this.reviewModule.comments(this.thread.id);
-  }
-
-  public autoResizeTextArea(e: any) {
-    const el: HTMLElement = e.target;
-    this.textAreaHeight = `${el.scrollHeight}px`;
   }
 
   public renderMd(text: string) {
@@ -170,7 +171,6 @@ export default class CommentThread extends Vue {
     }
 
     // Reset local state
-    this.textAreaHeight = "auto";
     this.draftComment = "";
     this.renderDraft = false;
     this.focused = false;
