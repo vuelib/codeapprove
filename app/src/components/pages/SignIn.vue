@@ -32,13 +32,13 @@ import * as firebase from "firebase/app";
 import { auth } from "../../plugins/firebase";
 
 import { getModule } from "vuex-module-decorators";
-import AuthStore from "../../store/modules/auth";
+import AuthModule from "../../store/modules/auth";
 
 @Component({
   components: {}
 })
 export default class SignIn extends Vue {
-  authStore = getModule(AuthStore, this.$store);
+  authModule = getModule(AuthModule, this.$store);
 
   public async startSignIn() {
     const provider = new firebase.auth.GithubAuthProvider();

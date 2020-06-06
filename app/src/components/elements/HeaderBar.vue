@@ -19,19 +19,19 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 
 import { getModule } from "vuex-module-decorators";
-import AuthStore from "../../store/modules/auth";
+import AuthModule from "../../store/modules/auth";
 
 @Component
 export default class HeaderBar extends Vue {
-  private authStore = getModule(AuthStore, this.$store);
+  private authModule = getModule(AuthModule, this.$store);
 
   // TODO: Could this be mapState ?
   get signedIn() {
-    return this.authStore.signedIn;
+    return this.authModule.signedIn;
   }
 
   public async signOut() {
-    await this.authStore.startSignOut();
+    await this.authModule.startSignOut();
     this.$router.push("/signin");
   }
 }

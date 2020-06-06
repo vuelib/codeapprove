@@ -5,20 +5,25 @@ export interface Review {
   comments: Comment[];
 }
 
-export interface Thread {
-  id: string;
-
+export interface ThreadArgs {
   // TODO: It's much more complex than this
+  file: string;
   side: "left" | "right";
   line: number;
 }
 
-export interface Comment {
+export interface Thread extends ThreadArgs {
+  id: string;
+}
+
+export interface CommentArgs {
+  username: string;
+  photoURL: string;
+  text: string;
+}
+
+export interface Comment extends CommentArgs {
   id: string;
   threadId: string;
   timestamp: string;
-
-  username: string;
-  profileURL: string;
-  text: string;
 }

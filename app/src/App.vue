@@ -17,7 +17,7 @@ import { getModule } from "vuex-module-decorators";
 import HeaderBar from "@/components/elements/HeaderBar.vue";
 
 import { auth } from "./plugins/firebase";
-import AuthStore from "./store/modules/auth";
+import AuthModule from "./store/modules/auth";
 
 @Component({
   components: {
@@ -25,12 +25,12 @@ import AuthStore from "./store/modules/auth";
   }
 })
 export default class App extends Vue {
-  authStore = getModule(AuthStore, this.$store);
+  authModule = getModule(AuthModule, this.$store);
   authUnsub?: firebase.Unsubscribe = undefined;
 
   created() {
     this.authUnsub = auth().onAuthStateChanged(user => {
-      this.authStore.setUser(user);
+      this.authModule.setUser(user);
     });
   }
 

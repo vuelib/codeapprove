@@ -60,7 +60,9 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import * as firebase from "firebase/app";
 
+import { Thread, ThreadArgs, CommentArgs } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
+import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
 
 interface Comment {
@@ -72,23 +74,44 @@ interface Comment {
 @Component({})
 export default class CommentThread extends Vue {
   authModule = getModule(AuthModule, this.$store);
+  reviewModule = getModule(ReviewModule, this.$store);
 
   focused = false;
   forceExpand = false;
 
   // TODO: Real state
   resolved = false;
-  comments: Comment[] = [];
+  thread: Thread | null = null;
 
   draftComment: string = "";
 
-  public onSubmit(resolved: boolean) {
-    this.comments.push({
+  get comments(): Comment[] {
+    if (!this.thread) {
+      return [];
+    }
+
+    return this.reviewModule.comments(this.thread.id);
+  }
+
+  public async onSubmit(resolved: boolean) {
+    if (!this.thread) {
+      // TODO: This should come in from the outside
+      const args: ThreadArgs = {
+        file: "README.md",
+        side: "left",
+        line: 1
+      };
+      this.thread = await this.reviewModule.newThread({ args });
+    }
+
+    const args: CommentArgs = {
       username: this.authModule.username,
       photoURL: this.authModule.photoURL,
       text: this.draftComment
-    });
+    };
+    await this.reviewModule.newComment({ threadId: this.thread.id, args });
 
+    // Reset local state
     this.resolved = resolved;
     this.draftComment = "";
     this.focused = false;
