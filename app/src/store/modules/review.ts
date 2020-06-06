@@ -37,11 +37,20 @@ export default class ReviewModule extends VuexModule {
     this.review.comments.push(comment);
   }
 
+  @Mutation
+  public setThreadResolved(opts: { threadId: string; resolved: boolean }) {
+    const thread = this.review.threads.find(x => x.id === opts.threadId);
+    if (thread) {
+      thread.resolved = opts.resolved;
+    }
+  }
+
   @Action
   public newThread(opts: { args: ThreadArgs }): Thread {
     console.log(`newThread(${JSON.stringify(opts)})`);
     const thread: Thread = {
       id: uuid.v4(),
+      resolved: false,
       ...opts.args
     };
 

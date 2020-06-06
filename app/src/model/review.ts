@@ -14,6 +14,7 @@ export interface ThreadArgs {
 
 export interface Thread extends ThreadArgs {
   id: string;
+  resolved: boolean;
 }
 
 export interface CommentArgs {

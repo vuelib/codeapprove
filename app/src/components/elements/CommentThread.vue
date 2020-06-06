@@ -39,11 +39,24 @@
           v-show="focused || comments.length === 0"
           class="flex flex-row-reverse px-2 pb-2"
         >
-          <button class="ml-2 btn btn-green" @click.prevent="onSubmit(true)">
+          <button
+            v-if="!resolved"
+            class="ml-2 btn btn-green"
+            @click.prevent="onSubmit(true)"
+          >
             Save + Resolve
             <font-awesome-icon icon="check" class="self-end mx-1" />
           </button>
-          <button class="ml-2 btn btn-blue" @click.prevent="onSubmit(false)">
+          <button
+            v-else
+            class="ml-2 btn btn-green"
+            @click.prevent="onSubmit(false)"
+          >
+            Save + Reopen
+            <font-awesome-icon icon="exclamation" class="self-end mx-1" />
+          </button>
+
+          <button class="ml-2 btn btn-blue" @click.prevent="onSubmit()">
             Save
           </button>
           <button class="btn btn-red" @click.prevent="onCancel()">
@@ -79,11 +92,14 @@ export default class CommentThread extends Vue {
   focused = false;
   forceExpand = false;
 
-  // TODO: Real state
-  resolved = false;
+  // TODO: This should be passed in from somewhere
   thread: Thread | null = null;
 
   draftComment: string = "";
+
+  get resolved(): boolean {
+    return this.thread != null && this.thread.resolved;
+  }
 
   get comments(): Comment[] {
     if (!this.thread) {
@@ -93,7 +109,7 @@ export default class CommentThread extends Vue {
     return this.reviewModule.comments(this.thread.id);
   }
 
-  public async onSubmit(resolved: boolean) {
+  public async onSubmit(resolve?: boolean) {
     if (!this.thread) {
       // TODO: This should come in from the outside
       const args: ThreadArgs = {
@@ -109,12 +125,27 @@ export default class CommentThread extends Vue {
       photoURL: this.authModule.photoURL,
       text: this.draftComment
     };
-    await this.reviewModule.newComment({ threadId: this.thread.id, args });
+
+    // Add comment
+    await this.reviewModule.newComment({
+      threadId: this.thread.id,
+      args
+    });
+
+    // If resolution state specified, set that
+    if (resolve != undefined) {
+      this.reviewModule.setThreadResolved({
+        threadId: this.thread.id,
+        resolved: resolve
+      });
+    }
 
     // Reset local state
-    this.resolved = resolved;
     this.draftComment = "";
     this.focused = false;
+    if (resolve === true) {
+      this.forceExpand = false;
+    }
   }
 
   public onCancel() {

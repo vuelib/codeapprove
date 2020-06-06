@@ -12,7 +12,8 @@ import {
   faCodeBranch,
   faComment,
   faEye,
-  faEyeSlash
+  faEyeSlash,
+  faExclamation
 } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -33,6 +34,7 @@ export function initIconLibrary() {
     faComment,
     faEye,
     faEyeSlash,
+    faExclamation,
 
     // Brand icons
     faGithub
