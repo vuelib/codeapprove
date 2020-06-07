@@ -51,7 +51,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import CommentThread from "./CommentThread.vue";
-import { Change } from "../../model/types";
+import parseDiff from "parse-diff";
 
 type Side = "left" | "right";
 
@@ -61,7 +61,7 @@ type Side = "left" | "right";
   }
 })
 export default class DiffLine extends Vue {
-  @Prop() public change!: Change;
+  @Prop() public change!: parseDiff.Change;
 
   public hovered: { [s in Side]: boolean } = {
     left: false,
@@ -126,10 +126,14 @@ export default class DiffLine extends Vue {
   }
 
   public lineNumber(side: Side): number {
+    if (this.change.type === "add" || this.change.type === "del") {
+      return this.change.ln;
+    }
+
     if (side === "left") {
-      return this.change.ln1 || this.change.ln!;
+      return this.change.ln1;
     } else {
-      return this.change.ln2 || this.change.ln!;
+      return this.change.ln2;
     }
   }
 }
