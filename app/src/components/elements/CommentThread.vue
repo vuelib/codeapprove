@@ -19,7 +19,7 @@
           <p class="font-bold">
             {{ comment.username }}
           </p>
-          <div v-html="renderMd(comment.text)"></div>
+          <MarkdownContent :content="comment.text" />
         </div>
       </div>
 
@@ -47,11 +47,11 @@
               @focus="textFocus = true"
               @blur="textFocus = false"
             />
-            <div
+            <MarkdownContent
               class="w-full"
               v-if="renderDraft"
-              v-html="renderMd(draftComment)"
-            ></div>
+              :content="draftComment"
+            />
           </div>
         </div>
         <div
@@ -91,20 +91,18 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import * as firebase from "firebase/app";
-import marked from "marked";
 
+import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import { Thread, ThreadArgs, Comment, CommentArgs } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
 
-// TODO: Can I centralize this somewhere?
-marked.setOptions({
-  gfm: true,
-  breaks: true
-});
-
-@Component({})
+@Component({
+  components: {
+    MarkdownContent
+  }
+})
 export default class CommentThread extends Vue {
   authModule = getModule(AuthModule, this.$store);
   reviewModule = getModule(ReviewModule, this.$store);
@@ -133,10 +131,6 @@ export default class CommentThread extends Vue {
     }
 
     return this.reviewModule.comments(this.thread.id);
-  }
-
-  public renderMd(text: string) {
-    return marked(text);
   }
 
   public async onSubmit(resolve?: boolean) {
