@@ -43,9 +43,10 @@
     <!-- Changes -->
     <SectionBox title="Changes">
       <!-- TODO: Make this a loop -->
-      <ChangeEntry />
-      <hr border border-gray-500 />
-      <ChangeEntry />
+      <template v-for="(diff, index) in diffs">
+        <ChangeEntry :key="`${index}-change`" :diff="diff" />
+        <!-- <hr v-if="index < diffs.length - 1" :key="`${index}-hr`" class="border border-gray-500" /> -->
+      </template>
     </SectionBox>
   </div>
 </template>
@@ -55,6 +56,9 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 import SectionBox from "@/components/elements/SectionBox.vue";
 
+import * as github from "../../plugins/github";
+import parseDiff from "parse-diff";
+
 @Component({
   components: {
     ChangeEntry,
@@ -63,6 +67,17 @@ import SectionBox from "@/components/elements/SectionBox.vue";
 })
 export default class PullRequest extends Vue {
   public pr = require("../../../data/pr.json");
+  public diffs: parseDiff.File[] = [];
+
+  async mounted() {
+    // TODO: Where should I load this?
+    this.diffs = await github.getDiff(
+      "hatboysam",
+      "diffmachine",
+      "ss-old-code",
+      "master"
+    );
+  }
 }
 </script>
 

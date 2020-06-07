@@ -1,17 +1,10 @@
 <template>
-  <div class="flex overflow-hidden bg-yellow-100">
-    <div class="flex-1">
-      <template v-for="(change, index) in leftChanges">
-        <DiffLine :key="index" :change="change" />
-      </template>
-    </div>
-    <div class="flex-1">
-      <DiffLine
-        v-for="(change, index) in rightChanges"
-        :key="index"
-        :change="change"
-      />
-    </div>
+  <div class="overflow-hidden bg-yellow-100">
+    <DiffLine
+      v-for="(change, index) in changes"
+      :key="index"
+      :change="change"
+    />
   </div>
 </template>
 
@@ -20,6 +13,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import DiffLine from "@/components/elements/DiffLine.vue";
 
 import { Change } from "../../model/types";
+import parseDiff from "parse-diff";
 
 @Component({
   components: {
@@ -27,22 +21,10 @@ import { Change } from "../../model/types";
   }
 })
 export default class TextDiff extends Vue {
-  // TODO: Get data passed in
-  public diff = require("../../../data/diff.json")[0];
+  @Prop({ required: true }) public diff!: parseDiff.File;
+
   // TODO: What does multiple chunks mean?
   public changes: Change[] = this.diff.chunks[0].changes;
-
-  public get leftChanges() {
-    return this.changes.filter(c => {
-      return c.type === "normal" || c.type === "del";
-    });
-  }
-
-  public get rightChanges() {
-    return this.changes.filter(c => {
-      return c.type === "normal" || c.type === "add";
-    });
-  }
 }
 </script>
 
