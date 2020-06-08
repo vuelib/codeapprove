@@ -10,6 +10,7 @@ export async function getDiff(
   head: string
 ) {
   // TODO: Should I be using octokit?
+  // https://stackoverflow.com/a/49778096
   const url = `https://api.github.com/repos/${org}/${repo}/compare/${base}...${head}`;
   const res = await ax.get(url, {
     headers: {

@@ -10,18 +10,32 @@
         >-{{ diff.deletions }}</span
       >
     </div>
-    <TextDiff v-show="expanded" :diff="diff" />
+    <div v-if="expanded" class="overflow-hidden bg-yellow-100">
+      <template v-for="(chunk, i) in this.diff.chunks">
+        <div
+          :key="`chunk-${i}-content`"
+          class="py-1 px-4 bg-blue-100 text-blue-500"
+        >
+          <pre>{{ chunk.content }}</pre>
+        </div>
+        <DiffLine
+          v-for="(change, j) in changes"
+          :key="`chunk-${i}-change-${j}`"
+          :change="change"
+        />
+      </template>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import TextDiff from "@/components/elements/TextDiff.vue";
+import DiffLine from "@/components/elements/DiffLine.vue";
 import parseDiff from "parse-diff";
 
 @Component({
   components: {
-    TextDiff
+    DiffLine
   }
 })
 export default class ChangeEntry extends Vue {
@@ -31,6 +45,11 @@ export default class ChangeEntry extends Vue {
 
   public toggle() {
     this.expanded = !this.expanded;
+  }
+
+  get changes() {
+    // TODO: Multiple chunks
+    return this.diff.chunks[0].changes;
   }
 
   get icon() {
