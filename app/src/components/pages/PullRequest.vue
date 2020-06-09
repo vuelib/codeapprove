@@ -42,10 +42,8 @@
 
     <!-- Changes -->
     <SectionBox title="Changes">
-      <!-- TODO: Make this a loop -->
       <template v-for="(diff, index) in diffs">
         <ChangeEntry :key="`${index}-change`" :diff="diff" />
-        <!-- <hr v-if="index < diffs.length - 1" :key="`${index}-hr`" class="border border-gray-500" /> -->
       </template>
     </SectionBox>
   </div>
@@ -74,8 +72,8 @@ export default class PullRequest extends Vue {
     this.diffs = await github.getDiff(
       "hatboysam",
       "diffmachine",
-      "ss-old-code",
-      "master"
+      "c42f4578",
+      "19aca319"
     );
   }
 }
