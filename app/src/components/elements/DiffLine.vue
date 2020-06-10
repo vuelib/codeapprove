@@ -1,57 +1,83 @@
 <template>
-  <tr>
+  <div class="w-full">
     <!-- Left -->
-    <td :class="bgClass(left)">
-      <code class="line-number">{{ lineNumber("left", left) }}</code>
-    </td>
-    <td
-      class="relative"
+    <div
+      class="ib relative w-1/2"
       :class="bgClass(left)"
       @mouseenter="hovered.left = true"
       @mouseleave="hovered.left = false"
     >
-      <code class="line-marker">{{ lineMarker(left) }}</code>
-      <pre class="line-content">{{ lineContent(left) }}</pre>
+      <div class="ib line-number-gutter">
+        <code class="line-number">{{ lineNumber("left", left) }}</code>
+      </div>
+      <div class="ib">
+        <code class="line-marker">{{ lineMarker(left) }}</code>
+        <pre class="line-content">{{ lineContent(left) }}</pre>
+      </div>
+
       <button
         v-show="hovered.left"
-        @click="beginDrafting('left')"
+        @click="drafting.left = true"
         class="comment-button"
       >
         <font-awesome-icon icon="comment" />
       </button>
-    </td>
+    </div>
 
     <!-- Right -->
-    <td :class="bgClass(right)">
-      <code class="line-number">{{ lineNumber("right", right) }}</code>
-    </td>
-    <td
-      class="relative"
+    <div
+      class="ib relative w-1/2"
       :class="bgClass(right)"
       @mouseenter="hovered.right = true"
       @mouseleave="hovered.right = false"
     >
-      <code class="line-marker">{{ lineMarker(right) }}</code>
-      <pre class="line-content">{{ lineContent(right) }}</pre>
+      <div class="ib line-number-gutter">
+        <code class="line-number">{{ lineNumber("right", right) }}</code>
+      </div>
+      <div class="ib">
+        <code class="line-marker">{{ lineMarker(right) }}</code>
+        <pre class="line-content">{{ lineContent(right) }}</pre>
+      </div>
+
       <button
         v-show="hovered.right"
-        @click="beginDrafting('right', true)"
+        @click="drafting.right = true"
         class="comment-button"
       >
         <font-awesome-icon icon="comment" />
       </button>
-    </td>
-  </tr>
+    </div>
+
+    <!-- Left comments -->
+    <CommentThread
+      v-if="drafting.left"
+      class="ib w-1/2"
+      @cancel="drafting.left = false"
+    />
+    <div v-if="drafting.left && !drafting.right" class="ib w-1/2"></div>
+
+    <!-- Right comments -->
+    <div v-if="drafting.right && !drafting.left" class="ib w-1/2"></div>
+    <CommentThread
+      v-if="drafting.right"
+      class="ib w-1/2"
+      @cancel="drafting.right = false"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import parseDiff from "parse-diff";
 
+import CommentThread from "@/components/elements/CommentThread.vue";
+
 type Side = "left" | "right";
 
 @Component({
-  components: {}
+  components: {
+    CommentThread
+  }
 })
 export default class DiffLine extends Vue {
   @Prop() public left?: parseDiff.Change;
@@ -62,9 +88,10 @@ export default class DiffLine extends Vue {
     right: false
   };
 
-  public beginDrafting(side: Side) {
-    this.$emit("drafting", { side });
-  }
+  public drafting: { [s in Side]: boolean } = {
+    left: false,
+    right: false
+  };
 
   public bgClass(change?: parseDiff.Change): string {
     if (!change) {
@@ -124,6 +151,10 @@ export default class DiffLine extends Vue {
 </script>
 
 <style scoped lang="postcss">
+.ib {
+  @apply inline-block;
+}
+
 .no-select {
   user-select: none;
 }
@@ -132,12 +163,18 @@ export default class DiffLine extends Vue {
   @apply inline-block whitespace-pre-wrap;
 }
 
+.line-number-gutter {
+  min-width: 3rem;
+  text-align: right;
+}
+
 .line-number {
-  @apply overflow-hidden text-center no-select pl-2;
+  @apply px-2 no-select overflow-hidden;
 }
 
 .line-marker {
-  @apply inline-block w-4 pr-2 text-center no-select;
+  @apply inline-block px-1 text-center no-select;
+  min-width: 1rem;
 }
 
 .comment-button {

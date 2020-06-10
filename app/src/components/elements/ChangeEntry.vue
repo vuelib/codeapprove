@@ -11,56 +11,20 @@
       >
     </div>
     <div v-if="expanded" class="overflow-hidden bg-yellow-100">
-      <table class="table-fixed w-full">
-        <colgroup>
-          <col width="50" />
-          <col />
-          <col width="50" />
-          <col />
-        </colgroup>
+      <template v-for="(chunk, i) in this.diff.chunks">
+        <div class="w-full" :key="`chunk-${i}`">
+          <pre class="w-full py-1 px-4 bg-blue-100 text-blue-500">{{
+            chunk.content
+          }}</pre>
+        </div>
 
-        <template v-for="(chunk, i) in this.diff.chunks">
-          <tr :key="`chunk-${i}`">
-            <td colspan="4">
-              <pre class="w-full py-1 px-4 bg-blue-100 text-blue-500">{{
-                chunk.content
-              }}</pre>
-            </td>
-          </tr>
-
-          <!-- TODO: We have to do all this terrible drafting state stuff because we can't have multiple rows in DiffLine -->
-          <template v-for="(pair, j) in changePairs(chunk)">
-            <DiffLine
-              :key="`chunk-${i}-change-${j}`"
-              :left="pair.left"
-              :right="pair.right"
-              @drafting="setDrafting($event.side, i, j, true)"
-            />
-
-            <!-- Left comment -->
-            <tr
-              :key="`chunk-${i}-comment-${j}-left`"
-              v-if="isDrafting('left', i, j)"
-            >
-              <td colspan="2">
-                <CommentThread @cancel="setDrafting('left', i, j, false)" />
-              </td>
-              <td colspan="2"></td>
-            </tr>
-
-            <!-- Right comment -->
-            <tr
-              :key="`chunk-${i}-comment-${j}-right`"
-              v-if="isDrafting('right', i, j)"
-            >
-              <td colspan="2"></td>
-              <td colspan="2">
-                <CommentThread @cancel="setDrafting('right', i, j, false)" />
-              </td>
-            </tr>
-          </template>
-        </template>
-      </table>
+        <DiffLine
+          v-for="(pair, j) in changePairs(chunk)"
+          :key="`chunk-${i}-change-${j}`"
+          :left="pair.left"
+          :right="pair.right"
+        />
+      </template>
     </div>
   </div>
 </template>
@@ -86,8 +50,10 @@ export default class ChangeEntry extends Vue {
   @Prop() diff!: parseDiff.File;
 
   public expanded = true;
-  public drafting: Set<string> = new Set();
 
+  /**
+   * Zip the list of changes from a chunk into an array of pairs ready to be diffed side-by-side.
+   */
   public changePairs(chunk: parseDiff.Chunk): ChangePair[] {
     const res: ChangePair[] = [];
 
@@ -122,23 +88,6 @@ export default class ChangeEntry extends Vue {
     }
 
     return res;
-  }
-
-  public isDrafting(side: string, i: number, j: number): boolean {
-    const key = `${i}-${j}-${side}`;
-    return this.drafting.has(key);
-  }
-
-  public setDrafting(side: string, i: number, j: number, state: boolean) {
-    const key = `${i}-${j}-${side}`;
-
-    // Terrible reactivity trick
-    if (state) {
-      this.drafting = new Set(this.drafting.add(key));
-    } else {
-      this.drafting.delete(key);
-      this.drafting = new Set(this.drafting);
-    }
   }
 
   public toggle() {
