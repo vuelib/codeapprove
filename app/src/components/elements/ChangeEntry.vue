@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="rounded my-2 border border-gray-400">
     <div class="flex p-2 font-bold items-center bg-gray-200">
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <span class="flex-grow pl-2d">{{ diff.from }}</span>

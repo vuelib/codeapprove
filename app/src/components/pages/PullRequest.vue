@@ -33,34 +33,32 @@
     </div>
 
     <!-- PR description -->
-    <SectionBox title="Description">
-      <div class="p-2">
-        Adding a new feature, to use it first you <code>something</code> then
-        you <code>something else</code>.
-      </div>
-    </SectionBox>
+    <p class="font-bold text-gray-900 text-lg my-2">Description</p>
+    <div>
+      Adding a new feature, to use it first you <code>something</code> then you
+      <code>something else</code>.
+    </div>
 
     <!-- Changes -->
-    <SectionBox title="Changes">
-      <template v-for="(diff, index) in diffs">
-        <ChangeEntry :key="`${index}-change`" :diff="diff" />
-      </template>
-    </SectionBox>
+    <p class="font-bold text-gray-900 text-lg my-2">Changes</p>
+    <ChangeEntry
+      v-for="(diff, index) in diffs"
+      :key="`${index}-change`"
+      :diff="diff"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
-import SectionBox from "@/components/elements/SectionBox.vue";
 
 import * as github from "../../plugins/github";
 import parseDiff from "parse-diff";
 
 @Component({
   components: {
-    ChangeEntry,
-    SectionBox
+    ChangeEntry
   }
 })
 export default class PullRequest extends Vue {
