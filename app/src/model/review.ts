@@ -1,3 +1,5 @@
+export type Side = "left" | "right";
+
 export interface Review {
   // TODO: Pr metadata
 
@@ -8,7 +10,7 @@ export interface Review {
 export interface ThreadArgs {
   // TODO: It's much more complex than this
   file: string;
-  side: "left" | "right";
+  side: Side;
   line: number;
 }
 
@@ -27,4 +29,12 @@ export interface Comment extends CommentArgs {
   id: string;
   threadId: string;
   timestamp: string;
+}
+
+export function threadMatch(thread: Thread, args: ThreadArgs): boolean {
+  return (
+    args.file === thread.file &&
+    args.line === thread.line &&
+    args.side === thread.side
+  );
 }

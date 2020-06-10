@@ -61,7 +61,7 @@
           <button
             v-if="!resolved"
             class="ml-2 btn btn-green"
-            @click.prevent="onSubmit(true)"
+            @click.prevent="addComment(true)"
           >
             Save + Resolve
             <font-awesome-icon icon="check" class="self-end mx-1" />
@@ -69,13 +69,13 @@
           <button
             v-else
             class="ml-2 btn btn-green"
-            @click.prevent="onSubmit(false)"
+            @click.prevent="addComment(false)"
           >
             Save + Reopen
             <font-awesome-icon icon="exclamation" class="self-end mx-1" />
           </button>
 
-          <button class="ml-2 btn btn-blue" @click.prevent="onSubmit()">
+          <button class="ml-2 btn btn-blue" @click.prevent="addComment()">
             Save
           </button>
           <button class="btn btn-red" @click.prevent="onCancel()">
@@ -93,7 +93,14 @@ import { getModule } from "vuex-module-decorators";
 import * as firebase from "firebase/app";
 
 import MarkdownContent from "@/components/elements/MarkdownContent.vue";
-import { Thread, ThreadArgs, Comment, CommentArgs } from "../../model/review";
+import { AddCommentEvent, ADD_COMMENT_EVENT } from "../../model/events";
+import {
+  Thread,
+  ThreadArgs,
+  Comment,
+  CommentArgs,
+  Side
+} from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
@@ -104,18 +111,27 @@ import { auth } from "../../plugins/firebase";
   }
 })
 export default class CommentThread extends Vue {
+  @Prop() side!: Side;
+  @Prop() line!: number;
+
+  @Prop() threadId?: string;
+
   authModule = getModule(AuthModule, this.$store);
   reviewModule = getModule(ReviewModule, this.$store);
 
-  focused = false;
-  forceExpand = false;
-
-  // TODO: This should be passed in from somewhere
   thread: Thread | null = null;
 
+  focused = false;
+  forceExpand = false;
   textFocus = false;
   renderDraft = false;
   draftComment: string = "";
+
+  updated() {
+    if (this.threadId) {
+      this.thread = this.reviewModule.threadById(this.threadId);
+    }
+  }
 
   get typing() {
     return this.textFocus || this.draftComment.length > 0;
@@ -133,36 +149,18 @@ export default class CommentThread extends Vue {
     return this.reviewModule.comments(this.thread.id);
   }
 
-  public async onSubmit(resolve?: boolean) {
-    if (!this.thread) {
-      // TODO: This should come in from the outside
-      const args: ThreadArgs = {
-        file: "README.md",
-        side: "left",
-        line: 1
-      };
-      this.thread = await this.reviewModule.newThread({ args });
-    }
-
-    const args: CommentArgs = {
-      username: this.authModule.username,
-      photoURL: this.authModule.photoURL,
-      text: this.draftComment
+  public async addComment(resolve?: boolean) {
+    const event: AddCommentEvent = {
+      content: this.draftComment,
+      side: this.side,
+      line: this.line,
+      resolve
     };
 
-    // Add comment
-    await this.reviewModule.newComment({
-      threadId: this.thread.id,
-      args
-    });
+    // Note: this emits from the PARENT which means DiffLine emits the event
+    this.$parent.$emit(ADD_COMMENT_EVENT, event);
 
-    // If resolution state specified, set that
-    if (resolve != undefined) {
-      this.reviewModule.setThreadResolved({
-        threadId: this.thread.id,
-        resolved: resolve
-      });
-    }
+    // TODO: Need some kind of "pending" state until the thing hits the server
 
     // Reset local state
     this.draftComment = "";
@@ -177,7 +175,6 @@ export default class CommentThread extends Vue {
     if (this.comments.length > 0) {
       this.focused = false;
     } else {
-      // TODO: Should the v-show even be external?
       this.$emit("cancel");
     }
   }

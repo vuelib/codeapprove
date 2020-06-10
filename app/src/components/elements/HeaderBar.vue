@@ -25,7 +25,6 @@ import AuthModule from "../../store/modules/auth";
 export default class HeaderBar extends Vue {
   private authModule = getModule(AuthModule, this.$store);
 
-  // TODO: Could this be mapState ?
   get signedIn() {
     return this.authModule.signedIn;
   }

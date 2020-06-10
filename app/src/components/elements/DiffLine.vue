@@ -8,7 +8,7 @@
       @mouseleave="hovered.left = false"
     >
       <div class="ib line-number-gutter">
-        <code class="line-number">{{ lineNumber("left", left) }}</code>
+        <code class="line-number">{{ lineNumberString("left") }}</code>
       </div>
       <div class="ib">
         <code class="line-marker">{{ lineMarker(left) }}</code>
@@ -16,7 +16,7 @@
       </div>
 
       <button
-        v-show="hovered.left"
+        v-show="left && hovered.left"
         @click="drafting.left = true"
         class="comment-button"
       >
@@ -32,7 +32,7 @@
       @mouseleave="hovered.right = false"
     >
       <div class="ib line-number-gutter">
-        <code class="line-number">{{ lineNumber("right", right) }}</code>
+        <code class="line-number">{{ lineNumberString("right") }}</code>
       </div>
       <div class="ib">
         <code class="line-marker">{{ lineMarker(right) }}</code>
@@ -40,7 +40,7 @@
       </div>
 
       <button
-        v-show="hovered.right"
+        v-show="right && hovered.right"
         @click="drafting.right = true"
         class="comment-button"
       >
@@ -52,6 +52,9 @@
     <CommentThread
       v-if="drafting.left"
       class="ib w-1/2"
+      :side="'left'"
+      :line="lineNumber('left', left)"
+      :threadId="threadId('left')"
       @cancel="drafting.left = false"
     />
     <div v-if="drafting.left && !drafting.right" class="ib w-1/2"></div>
@@ -61,6 +64,9 @@
     <CommentThread
       v-if="drafting.right"
       class="ib w-1/2"
+      :side="'right'"
+      :line="lineNumber('right', right)"
+      :threadId="threadId('right')"
       @cancel="drafting.right = false"
     />
   </div>
@@ -68,9 +74,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { getModule } from "vuex-module-decorators";
 import parseDiff from "parse-diff";
 
 import CommentThread from "@/components/elements/CommentThread.vue";
+import ReviewModule from "../../store/modules/review";
+import { ThreadArgs, Thread } from "../../model/review";
 
 type Side = "left" | "right";
 
@@ -80,8 +89,13 @@ type Side = "left" | "right";
   }
 })
 export default class DiffLine extends Vue {
+  @Prop() public leftFile!: string;
+  @Prop() public rightFile!: string;
+
   @Prop() public left?: parseDiff.Change;
   @Prop() public right?: parseDiff.Change;
+
+  reviewModule = getModule(ReviewModule, this.$store);
 
   public hovered: { [s in Side]: boolean } = {
     left: false,
@@ -92,6 +106,23 @@ export default class DiffLine extends Vue {
     left: false,
     right: false
   };
+
+  public threadId(side: Side): string | undefined {
+    const change = side === "left" ? this.left : this.right;
+    if (!change) {
+      return undefined;
+    }
+
+    const file = side === "left" ? this.leftFile : this.rightFile;
+    const args: ThreadArgs = {
+      file,
+      side,
+      line: this.lineNumber(side, change)
+    };
+
+    const thread: Thread | null = this.reviewModule.threadByArgs(args);
+    return thread ? thread.id : undefined;
+  }
 
   public bgClass(change?: parseDiff.Change): string {
     if (!change) {
@@ -133,18 +164,24 @@ export default class DiffLine extends Vue {
     return change.content.substring(1);
   }
 
-  public lineNumber(side: Side, change?: parseDiff.Change): string {
+  public lineNumberString(side: Side): string {
+    let change = side === "left" ? this.left : this.right;
+
     if (!change) {
       return "";
     }
 
+    return `${this.lineNumber(side, change)}`;
+  }
+
+  public lineNumber(side: Side, change: parseDiff.Change): number {
     switch (change.type) {
       case "add":
-        return `${change.ln}`;
+        return change.ln;
       case "del":
-        return `${change.ln}`;
+        return change.ln;
       default:
-        return side === "left" ? `${change.ln1}` : `${change.ln2}`;
+        return side === "left" ? change.ln1 : change.ln2;
     }
   }
 }

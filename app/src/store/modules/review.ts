@@ -5,7 +5,8 @@ import {
   Comment,
   CommentArgs,
   Thread,
-  ThreadArgs
+  ThreadArgs,
+  threadMatch
 } from "@/model/review";
 
 // TODO: Namespacing?
@@ -22,6 +23,18 @@ export default class ReviewModule extends VuexModule {
   get comments() {
     return (threadId: string) => {
       return this.review.comments.filter(x => x.threadId === threadId);
+    };
+  }
+
+  get threadById() {
+    return (threadId: string) => {
+      return this.review.threads.find(x => x.id === threadId) || null;
+    };
+  }
+
+  get threadByArgs() {
+    return (args: ThreadArgs) => {
+      return this.review.threads.find(t => threadMatch(t, args)) || null;
     };
   }
 
