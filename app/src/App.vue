@@ -50,6 +50,16 @@ export default class App extends Vue {
 .btn {
   @apply px-2 py-1;
   @apply rounded shadow border;
+  @apply bg-white;
+}
+
+.btn-small {
+  /** TODO: This should be applied to all icon buttons! */
+  @apply flex flex-row items-center;
+  @apply text-sm;
+  @apply px-1;
+  padding-top: 1px;
+  padding-bottom: 1px;
 }
 
 .btn:hover {

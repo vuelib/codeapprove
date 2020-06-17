@@ -15,7 +15,9 @@ import {
   faEyeSlash,
   faExclamation,
   faMagic,
-  faKeyboard
+  faKeyboard,
+  faPlus,
+  faMinus
 } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -39,6 +41,8 @@ export function initIconLibrary() {
     faExclamation,
     faMagic,
     faKeyboard,
+    faPlus,
+    faMinus,
 
     // Brand icons
     faGithub

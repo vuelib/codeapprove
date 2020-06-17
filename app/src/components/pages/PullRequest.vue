@@ -19,6 +19,20 @@
       </span>
     </div>
 
+    <!-- TODO: Make this work -->
+    <div
+      class="flex flex-row items-center rounded border border-yellow-500 bg-yellow-200 my-4 py-3"
+    >
+      <span class="ml-4 font-bold text-yellow-800"
+        ><font-awesome-icon icon="paper-plane" class="mr-1" /> You have 7 unsent
+        drafts</span
+      >
+      <span class="flex-grow"><!-- spacer --></span>
+      <button class="btn btn-red ml-2">Discard</button>
+      <button class="btn btn-blue ml-2">Send</button>
+      <button class="btn btn-green ml-2 mr-2">Send + Approve</button>
+    </div>
+
     <!-- Description, reviewers, etc -->
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-4 p-4 rounded border border-gray-400">
@@ -55,12 +69,25 @@
     </div>
 
     <!-- Changes -->
-    <p class="font-bold text-gray-900 text-lg my-2">Changes</p>
-    <ChangeEntry
-      v-for="(diff, index) in diffs"
-      :key="`${index}-change`"
-      :diff="diff"
-    />
+    <div class="mt-8">
+      <div class="flex flex-row items-center">
+        <span class="font-bold text-lg">Changes</span>
+        <span class="flex-grow"><!-- spacer --></span>
+
+        <!-- TODO: Make these work -->
+        <button class="btn btn-small btn-blue ml-2">
+          Expand <font-awesome-icon icon="plus" class="ml-1" />
+        </button>
+        <button class="btn btn-small btn-blue ml-2">
+          Collapse <font-awesome-icon icon="minus" class="ml-1" />
+        </button>
+      </div>
+      <ChangeEntry
+        v-for="(diff, index) in diffs"
+        :key="`${index}-change`"
+        :diff="diff"
+      />
+    </div>
   </div>
 </template>
 
