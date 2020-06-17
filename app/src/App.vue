@@ -40,10 +40,44 @@ export default class App extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="postcss">
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.btn {
+  @apply px-2 py-1;
+  @apply rounded shadow border;
+}
+
+.btn:hover {
+  @apply shadow-none;
+  @apply border-white text-white;
+}
+
+.btn-blue {
+  @apply border-blue-500 text-blue-500;
+}
+
+.btn-blue:hover {
+  @apply bg-blue-500;
+}
+
+.btn-red {
+  @apply border-red-400 text-red-400;
+}
+
+.btn-red:hover {
+  @apply bg-red-400;
+}
+
+.btn-green {
+  @apply border-green-500 text-green-500;
+}
+
+.btn-green:hover {
+  @apply bg-green-500;
 }
 </style>

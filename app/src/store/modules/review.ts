@@ -20,7 +20,7 @@ export default class ReviewModule extends VuexModule {
     comments: []
   };
 
-  get comments() {
+  get commentsByThread() {
     return (threadId: string) => {
       return this.review.comments.filter(x => x.threadId === threadId);
     };

@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import * as firebase from "firebase/app";
 
@@ -113,7 +113,6 @@ import { auth } from "../../plugins/firebase";
 export default class CommentThread extends Vue {
   @Prop() side!: Side;
   @Prop() line!: number;
-
   @Prop() threadId?: string;
 
   authModule = getModule(AuthModule, this.$store);
@@ -127,7 +126,16 @@ export default class CommentThread extends Vue {
   renderDraft = false;
   draftComment: string = "";
 
+  mounted() {
+    this.checkThread();
+  }
+
   updated() {
+    this.checkThread();
+  }
+
+  // TODO: This smells
+  private checkThread() {
     if (this.threadId) {
       this.thread = this.reviewModule.threadById(this.threadId);
     }
@@ -146,7 +154,7 @@ export default class CommentThread extends Vue {
       return [];
     }
 
-    return this.reviewModule.comments(this.thread.id);
+    return this.reviewModule.commentsByThread(this.thread.id);
   }
 
   public async addComment(resolve?: boolean) {
@@ -186,39 +194,5 @@ export default class CommentThread extends Vue {
   @apply rounded;
   height: 32px;
   width: 32px;
-}
-
-.btn {
-  @apply px-2 py-1;
-  @apply rounded shadow border;
-}
-
-.btn:hover {
-  @apply shadow-none;
-  @apply border-white text-white;
-}
-
-.btn-blue {
-  @apply border-blue-500 text-blue-500;
-}
-
-.btn-blue:hover {
-  @apply bg-blue-500;
-}
-
-.btn-red {
-  @apply border-red-400 text-red-400;
-}
-
-.btn-red:hover {
-  @apply bg-red-400;
-}
-
-.btn-green {
-  @apply border-green-500 text-green-500;
-}
-
-.btn-green:hover {
-  @apply bg-green-500;
 }
 </style>

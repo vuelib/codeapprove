@@ -50,19 +50,25 @@
 
     <!-- Left comments -->
     <CommentThread
-      v-if="drafting.left"
+      v-if="showComments('left')"
       class="ib w-1/2"
       :side="'left'"
       :line="lineNumber('left', left)"
       :threadId="threadId('left')"
       @cancel="drafting.left = false"
     />
-    <div v-if="drafting.left && !drafting.right" class="ib w-1/2"></div>
+    <div
+      v-if="showComments('left') && !showComments('right')"
+      class="ib w-1/2"
+    ></div>
 
     <!-- Right comments -->
-    <div v-if="drafting.right && !drafting.left" class="ib w-1/2"></div>
+    <div
+      v-if="showComments('right') && !showComments('left')"
+      class="ib w-1/2"
+    ></div>
     <CommentThread
-      v-if="drafting.right"
+      v-if="showComments('right')"
       class="ib w-1/2"
       :side="'right'"
       :line="lineNumber('right', right)"
@@ -106,6 +112,15 @@ export default class DiffLine extends Vue {
     left: false,
     right: false
   };
+
+  public showComments(side: Side) {
+    return this.drafting[side] || this.hasComments(side);
+  }
+
+  public hasComments(side: Side) {
+    const threadId = this.threadId(side);
+    return threadId && this.reviewModule.commentsByThread(threadId).length > 0;
+  }
 
   public threadId(side: Side): string | undefined {
     const change = side === "left" ? this.left : this.right;
