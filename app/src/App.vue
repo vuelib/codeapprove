@@ -2,6 +2,7 @@
   <div id="app">
     <!-- Page Header -->
     <HeaderBar />
+    <ProgressBar />
 
     <!-- Page body from router -->
     <div class="grid grid-cols-12">
@@ -15,13 +16,15 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 
 import HeaderBar from "@/components/elements/HeaderBar.vue";
+import ProgressBar from "@/components/elements/ProgressBar.vue";
 
 import { auth } from "./plugins/firebase";
 import AuthModule from "./store/modules/auth";
 
 @Component({
   components: {
-    HeaderBar
+    HeaderBar,
+    ProgressBar
   }
 })
 export default class App extends Vue {

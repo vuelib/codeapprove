@@ -1,6 +1,5 @@
 <template>
-  <div class="py-4 px-4">
-    <!-- PR general info -->
+  <div v-if="loaded" class="py-4 px-4">
     <div class="mb-4 relative">
       <h3 class="font-bold text-xl">
         {{ pr.head.repo.full_name }}
@@ -61,10 +60,7 @@
       </div>
 
       <div class="col-span-8 p-4 rounded border border-gray-400">
-        <p>
-          Adding a new feature, to use it first you <code>something</code> then
-          you <code>something else</code>.
-        </p>
+        <MarkdownContent :content="pr.body" />
       </div>
     </div>
 
@@ -94,32 +90,47 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
+import { PullsGetResponseData } from "@octokit/types";
+
 import parseDiff from "parse-diff";
 
+import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 
 import * as github from "../../plugins/github";
 import ReviewModule from "../../store/modules/review";
+import UIModule from "../../store/modules/ui";
 
 @Component({
   components: {
-    ChangeEntry
+    ChangeEntry,
+    MarkdownContent
   }
 })
 export default class PullRequest extends Vue {
-  public pr = require("../../../data/pr.json");
+  public loading = true;
+  public pr: PullsGetResponseData | null = null;
   public diffs: parseDiff.File[] = [];
 
   private reviewModule = getModule(ReviewModule, this.$store);
+  private uiModule = getModule(UIModule, this.$store);
 
   async mounted() {
-    // TODO: Where should I load this?
-    this.diffs = await github.getDiff(
+    this.uiModule.beginLoading();
+    const { pr, diffs } = await github.getPullRequest(
       "hatboysam",
       "diffmachine",
-      "c42f4578",
-      "19aca319"
+      5
     );
+    this.uiModule.endLoading();
+
+    console.log(pr);
+    this.pr = pr;
+    this.diffs = diffs;
+  }
+
+  get loaded() {
+    return this.pr != null;
   }
 
   get numThreads() {
