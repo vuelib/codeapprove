@@ -1,22 +1,25 @@
-import * as axios from "axios";
+import { Octokit } from "@octokit/rest";
 import parse from "parse-diff";
 
-const ax = axios.default;
+const octokit = new Octokit();
 
 export async function getDiff(
-  org: string,
+  owner: string,
   repo: string,
   base: string,
-  head: string
+  head: string,
 ) {
-  // TODO: Should I be using octokit?
-  // https://stackoverflow.com/a/49778096
-  const url = `https://api.github.com/repos/${org}/${repo}/compare/${base}...${head}`;
-  const res = await ax.get(url, {
+  const res = await octokit.repos.compareCommits({
+    owner,
+    repo,
+    base,
+    head,
     headers: {
-      Accept: "application/vnd.github.v3.diff"
+      accept: "application/vnd.github.v3.diff"
     }
   });
 
-  return parse(res.data);
+  // The strange header changes the response type
+  const data = res.data as unknown as string;
+  return parse(data);
 }
