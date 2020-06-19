@@ -117,16 +117,16 @@ export default class PullRequest extends Vue {
 
   async mounted() {
     this.uiModule.beginLoading();
-    const { pr, diffs } = await github.getPullRequest(
-      "hatboysam",
-      "diffmachine",
-      5
-    );
-    this.uiModule.endLoading();
 
-    console.log(pr);
-    this.pr = pr;
-    this.diffs = diffs;
+    github
+      .getPullRequest("hatboysam", "diffmachine", 5)
+      .then(({ pr, diffs }) => {
+        this.pr = pr;
+        this.diffs = diffs;
+      })
+      .then(() => {
+        this.uiModule.endLoading();
+      });
   }
 
   get loaded() {

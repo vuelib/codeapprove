@@ -15,6 +15,12 @@ import store from "@/store";
 
 Vue.config.productionTip = false;
 
+// Enable performance tracing in dev
+if (process.env.NODE_ENV !== "production") {
+  Vue.config.devtools = true;
+  Vue.config.performance = true;
+}
+
 new Vue({
   render: h => h(App),
   router,

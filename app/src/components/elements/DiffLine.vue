@@ -54,7 +54,7 @@
       class="ib w-1/2"
       :side="'left'"
       :line="lineNumber('left', left)"
-      :threadId="threadId('left')"
+      :threadId="threads['left']"
       @cancel="drafting.left = false"
     />
     <div
@@ -72,7 +72,7 @@
       class="ib w-1/2"
       :side="'right'"
       :line="lineNumber('right', right)"
-      :threadId="threadId('right')"
+      :threadId="threads['right']"
       @cancel="drafting.right = false"
     />
   </div>
@@ -85,7 +85,7 @@ import parseDiff from "parse-diff";
 
 import CommentThread from "@/components/elements/CommentThread.vue";
 import ReviewModule from "../../store/modules/review";
-import { ThreadArgs, Thread } from "../../model/review";
+import { Comment, ThreadArgs, Thread } from "../../model/review";
 
 type Side = "left" | "right";
 
@@ -103,6 +103,16 @@ export default class DiffLine extends Vue {
 
   reviewModule = getModule(ReviewModule, this.$store);
 
+  public threads: { [s in Side]: string | null } = {
+    left: null,
+    right: null
+  };
+
+  public comments: { [s in Side]: Comment[] } = {
+    left: [],
+    right: []
+  };
+
   public hovered: { [s in Side]: boolean } = {
     left: false,
     right: false
@@ -113,19 +123,36 @@ export default class DiffLine extends Vue {
     right: false
   };
 
+  mounted() {
+    // TODO: Need to restore comment reactivity when starting a new thread.
+    this.loadThreads();
+  }
+
+  private loadThreads() {
+    this.threads.left = this.threadId("left");
+    this.threads.right = this.threadId("right");
+
+    if (this.threads.left) {
+      this.comments.left = this.reviewModule.commentsByThread(
+        this.threads.left
+      );
+    }
+
+    if (this.threads.right) {
+      this.comments.right = this.reviewModule.commentsByThread(
+        this.threads.right
+      );
+    }
+  }
+
   public showComments(side: Side) {
-    return this.drafting[side] || this.hasComments(side);
+    return this.drafting[side] || this.comments[side].length > 0;
   }
 
-  public hasComments(side: Side) {
-    const threadId = this.threadId(side);
-    return threadId && this.reviewModule.commentsByThread(threadId).length > 0;
-  }
-
-  public threadId(side: Side): string | undefined {
+  public threadId(side: Side): string | null {
     const change = side === "left" ? this.left : this.right;
     if (!change) {
-      return undefined;
+      return null;
     }
 
     const file = side === "left" ? this.leftFile : this.rightFile;
@@ -135,8 +162,9 @@ export default class DiffLine extends Vue {
       line: this.lineNumber(side, change)
     };
 
+    // TODO: Seriously need to optimize this!  Should be calculated inside out
     const thread: Thread | null = this.reviewModule.threadByArgs(args);
-    return thread ? thread.id : undefined;
+    return thread ? thread.id : null;
   }
 
   public bgClass(change?: parseDiff.Change): string {

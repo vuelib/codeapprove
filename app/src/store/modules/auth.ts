@@ -20,7 +20,11 @@ export default class AuthModule extends VuexModule {
 
   get username(): string {
     // TODO: real one from the api
-    return this.user!.providerData[0]!.displayName!;
+    if (this.user) {
+      return this.user.providerData[0]!.displayName!;
+    }
+
+    return "unknown";
   }
 
   get photoURL(): string {

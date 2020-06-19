@@ -13,7 +13,7 @@
       >
     </div>
     <div v-show="expanded" class="overflow-hidden bg-yellow-100">
-      <template v-for="(chunk, i) in this.diff.chunks">
+      <template v-for="({ chunk, pairs }, i) in this.chunks">
         <div
           class="w-full border-b border-t border-blue-200"
           :key="`chunk-${i}`"
@@ -24,10 +24,10 @@
         </div>
 
         <DiffLine
-          v-for="(pair, j) in changePairs(chunk)"
+          v-for="(pair, j) in pairs"
           :key="`chunk-${i}-change-${j}`"
-          :leftFile="fileName('left')"
-          :rightFile="fileName('right')"
+          :leftFile="leftFile"
+          :rightFile="rightFile"
           :left="pair.left"
           :right="pair.right"
           @add-comment="onAddComment(chunk, pair, $event)"
@@ -53,6 +53,11 @@ interface ChangePair {
   right?: parseDiff.Change;
 }
 
+interface ChunkData {
+  chunk: parseDiff.Chunk;
+  pairs: ChangePair[];
+}
+
 @Component({
   components: {
     DiffLine
@@ -61,13 +66,23 @@ interface ChangePair {
 export default class ChangeEntry extends Vue {
   @Prop() diff!: parseDiff.File;
 
-  public expanded = true;
+  public expanded = false;
+
+  public chunks: ChunkData[] = [];
+
+  public leftFile = this.diff.from || "unknown";
+  public rightFile = this.diff.to || "unknown";
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
 
-  public fileName(side: Side): string {
-    return side === "left" ? this.diff.from! : this.diff.to!;
+  mounted() {
+    this.chunks = this.diff.chunks.map(chunk => {
+      return {
+        chunk,
+        pairs: ChangeEntry.changePairs(chunk)
+      };
+    });
   }
 
   public async onAddComment(
@@ -75,9 +90,7 @@ export default class ChangeEntry extends Vue {
     pair: ChangePair,
     event: AddCommentEvent
   ) {
-    console.log("ChangeEntry:onAddComment", event);
-
-    const file = this.fileName(event.side);
+    const file = event.side === "left" ? this.leftFile : this.rightFile;
     const threadArgs: ThreadArgs = {
       file,
       side: event.side,
@@ -112,8 +125,10 @@ export default class ChangeEntry extends Vue {
 
   /**
    * Zip the list of changes from a chunk into an array of pairs ready to be diffed side-by-side.
+   *
+   * TODO: Move this out to a static utility.
    */
-  public changePairs(chunk: parseDiff.Chunk): ChangePair[] {
+  public static changePairs(chunk: parseDiff.Chunk): ChangePair[] {
     const res: ChangePair[] = [];
 
     let i = 0;
