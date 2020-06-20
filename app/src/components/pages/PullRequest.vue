@@ -78,10 +78,12 @@
           Collapse <font-awesome-icon icon="minus" class="ml-1" />
         </button>
       </div>
+
       <ChangeEntry
         v-for="(diff, index) in diffs"
         :key="`${index}-change`"
-        :diff="diff"
+        :meta="getMetadata(diff)"
+        :chunks="renderChunkData(diff)"
       />
     </div>
   </div>
@@ -100,6 +102,11 @@ import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 import * as github from "../../plugins/github";
 import ReviewModule from "../../store/modules/review";
 import UIModule from "../../store/modules/ui";
+import {
+  getFileMetadata,
+  renderPairs,
+  zipChangePairs
+} from "../../plugins/diff";
 
 @Component({
   components: {
@@ -118,10 +125,11 @@ export default class PullRequest extends Vue {
   async mounted() {
     this.uiModule.beginLoading();
 
+    // TODO: can use await
     github
       .getPullRequest("hatboysam", "diffmachine", 5)
       .then(({ pr, diffs }) => {
-        this.pr = pr;
+        this.pr = Object.freeze(pr);
         this.diffs = diffs;
       })
       .then(() => {
@@ -139,6 +147,21 @@ export default class PullRequest extends Vue {
 
   get numUnresolvedThreads() {
     return this.reviewModule.review.threads.filter(x => !x.resolved).length;
+  }
+
+  private getMetadata(diff: parseDiff.File) {
+    return Object.freeze(getFileMetadata(diff));
+  }
+
+  private renderChunkData(diff: parseDiff.File) {
+    // TODO: Freeze the whole thing
+    return diff.chunks.map(chunk => {
+      return Object.freeze({
+        chunk,
+        // TODO: Render and zip all at once
+        pairs: renderPairs(zipChangePairs(chunk))
+      });
+    });
   }
 }
 </script>

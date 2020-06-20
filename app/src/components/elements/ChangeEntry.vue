@@ -4,15 +4,20 @@
       class="flex p-2 font-bold items-center bg-gray-200 border-b border-gray-400"
     >
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
-      <span class="flex-grow pl-2d">{{ diff.from }}</span>
+      <!-- TODO: Show both file names when it's renamed -->
+      <span class="flex-grow pl-2d">{{ meta.from }}</span>
       <span class="flex-shrink mx-1 px-2 rounded bg-green-400 text-green-800"
-        >+{{ diff.additions }}</span
+        >+{{ meta.additions }}</span
       >
       <span class="flex-shrink mx-1 px-2 rounded bg-red-400 text-red-800"
-        >-{{ diff.deletions }}</span
+        >-{{ meta.deletions }}</span
       >
     </div>
-    <div v-show="expanded" class="overflow-hidden bg-yellow-100">
+    <div
+      v-if="eager || expanded"
+      v-show="expanded"
+      class="overflow-hidden bg-yellow-100"
+    >
       <template v-for="({ chunk, pairs }, i) in this.chunks">
         <div
           class="w-full border-b border-t border-blue-200"
@@ -26,11 +31,10 @@
         <DiffLine
           v-for="(pair, j) in pairs"
           :key="`chunk-${i}-change-${j}`"
-          :leftFile="leftFile"
-          :rightFile="rightFile"
-          :left="pair.left"
-          :right="pair.right"
-          @add-comment="onAddComment(chunk, pair, $event)"
+          :leftFile="meta.from"
+          :rightFile="meta.to"
+          :rendered="pair"
+          @add-comment="onAddComment(chunk, $event)"
         />
       </template>
     </div>
@@ -43,19 +47,23 @@ import { getModule } from "vuex-module-decorators";
 import parseDiff from "parse-diff";
 
 import DiffLine from "@/components/elements/DiffLine.vue";
+
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { AddCommentEvent } from "../../model/events";
-import { ThreadArgs, Thread, CommentArgs, Side } from "../../model/review";
 
-interface ChangePair {
-  left?: parseDiff.Change;
-  right?: parseDiff.Change;
-}
+import { ThreadArgs, Thread, CommentArgs, Side } from "../../model/review";
+import {
+  ChangePair,
+  zipChangePairs,
+  renderPairs,
+  RenderedChangePair,
+  FileMetadata
+} from "../../plugins/diff";
 
 interface ChunkData {
   chunk: parseDiff.Chunk;
-  pairs: ChangePair[];
+  pairs: RenderedChangePair[];
 }
 
 @Component({
@@ -64,39 +72,25 @@ interface ChunkData {
   }
 })
 export default class ChangeEntry extends Vue {
-  @Prop() diff!: parseDiff.File;
+  @Prop() meta!: FileMetadata;
+  @Prop() chunks!: ChunkData[];
 
+  // TODO: This should depend on the number of additions and the file name
+  public eager = false;
   public expanded = false;
-
-  public chunks: ChunkData[] = [];
-
-  public leftFile = this.diff.from || "unknown";
-  public rightFile = this.diff.to || "unknown";
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
 
-  mounted() {
-    this.chunks = this.diff.chunks.map(chunk => {
-      return {
-        chunk,
-        pairs: ChangeEntry.changePairs(chunk)
-      };
-    });
-  }
-
-  public async onAddComment(
-    chunk: parseDiff.Chunk,
-    pair: ChangePair,
-    event: AddCommentEvent
-  ) {
-    const file = event.side === "left" ? this.leftFile : this.rightFile;
+  public async onAddComment(chunk: parseDiff.Chunk, event: AddCommentEvent) {
+    const file = event.side === "left" ? this.meta.from : this.meta.to;
     const threadArgs: ThreadArgs = {
       file,
       side: event.side,
       line: event.line
     };
 
+    // TODO: Doing this inside the comment thread may help reactivity?
     let thread: Thread | null = this.reviewModule.threadByArgs(threadArgs);
     if (!thread) {
       thread = await this.reviewModule.newThread({ args: threadArgs });
@@ -123,49 +117,11 @@ export default class ChangeEntry extends Vue {
     }
   }
 
-  /**
-   * Zip the list of changes from a chunk into an array of pairs ready to be diffed side-by-side.
-   *
-   * TODO: Move this out to a static utility.
-   */
-  public static changePairs(chunk: parseDiff.Chunk): ChangePair[] {
-    const res: ChangePair[] = [];
-
-    let i = 0;
-    while (i < chunk.changes.length) {
-      const change = chunk.changes[i];
-
-      // Del followed by add means the lines "match"
-      if (i < chunk.changes.length - 1) {
-        const next = chunk.changes[i + 1];
-        if (change.type === "del" && next.type === "add") {
-          res.push({
-            left: change,
-            right: next
-          });
-
-          // Extra increment
-          i += 2;
-          continue;
-        }
-      }
-
-      if (change.type === "del") {
-        res.push({ left: change, right: undefined });
-      } else if (change.type === "add") {
-        res.push({ left: undefined, right: change });
-      } else {
-        res.push({ left: change, right: change });
-      }
-
-      i++;
-    }
-
-    return res;
-  }
-
   public toggle() {
     this.expanded = !this.expanded;
+    if (this.expanded) {
+      this.eager = true;
+    }
   }
 
   get icon() {

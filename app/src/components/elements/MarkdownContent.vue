@@ -1,5 +1,5 @@
 <template>
-  <div v-html="renderMd(content)" class="md"></div>
+  <div v-html="htmlContent" class="md"></div>
 </template>
 
 <script lang="ts">
@@ -15,8 +15,10 @@ marked.setOptions({
 export default class MarkdownContent extends Vue {
   @Prop() content!: string;
 
-  public renderMd(text: string) {
-    return marked(text);
+  public htmlContent = "";
+
+  mounted() {
+    this.htmlContent = marked(this.content);
   }
 }
 </script>

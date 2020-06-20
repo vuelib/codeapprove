@@ -2,79 +2,71 @@
   <div class="w-full">
     <!-- Left -->
     <div
-      class="ib relative w-1/2"
-      :class="bgClass(left)"
+      class="ib relative w-1/2 align-top"
+      :class="bgClass(rendered.left)"
       @mouseenter="hovered.left = true"
       @mouseleave="hovered.left = false"
     >
       <div class="ib line-number-gutter">
-        <code class="line-number">{{ lineNumberString("left") }}</code>
+        <code class="line-number">{{ lineNumberString(rendered.left) }}</code>
       </div>
       <div class="ib">
-        <code class="line-marker">{{ lineMarker(left) }}</code>
-        <pre class="line-content">{{ lineContent(left) }}</pre>
+        <code class="line-marker">{{ rendered.left.marker }}</code>
+        <pre class="line-content">{{ rendered.left.content }}</pre>
       </div>
 
       <button
-        v-show="left && hovered.left"
+        v-show="!rendered.left.empty && hovered.left && !showComments('left')"
         @click="drafting.left = true"
         class="comment-button"
       >
         <font-awesome-icon icon="comment" />
       </button>
+
+      <CommentThread
+        v-if="showComments('left')"
+        class="w-full"
+        :side="'left'"
+        :line="rendered.left.number"
+        :threadId="threads['left']"
+        @cancel="drafting.left = false"
+      />
     </div>
 
     <!-- Right -->
     <div
-      class="ib relative w-1/2"
-      :class="bgClass(right)"
+      class="ib relative w-1/2 align-top border-l border-gray-300"
+      :class="bgClass(rendered.right)"
       @mouseenter="hovered.right = true"
       @mouseleave="hovered.right = false"
     >
       <div class="ib line-number-gutter">
-        <code class="line-number">{{ lineNumberString("right") }}</code>
+        <code class="line-number">{{ lineNumberString(rendered.right) }}</code>
       </div>
       <div class="ib">
-        <code class="line-marker">{{ lineMarker(right) }}</code>
-        <pre class="line-content">{{ lineContent(right) }}</pre>
+        <code class="line-marker">{{ rendered.right.marker }}</code>
+        <pre class="line-content">{{ rendered.right.content }}</pre>
       </div>
 
       <button
-        v-show="right && hovered.right"
+        v-show="
+          !rendered.right.empty && hovered.right && !showComments('right')
+        "
         @click="drafting.right = true"
         class="comment-button"
       >
         <font-awesome-icon icon="comment" />
       </button>
+
+      <CommentThread
+        v-if="showComments('right')"
+        class="w-full"
+        :side="'right'"
+        :line="rendered.right.number"
+        :threadId="threads['right']"
+        @cancel="drafting.right = false"
+      />
     </div>
-
-    <!-- Left comments -->
-    <CommentThread
-      v-if="showComments('left')"
-      class="ib w-1/2"
-      :side="'left'"
-      :line="lineNumber('left', left)"
-      :threadId="threads['left']"
-      @cancel="drafting.left = false"
-    />
-    <div
-      v-if="showComments('left') && !showComments('right')"
-      class="ib w-1/2"
-    ></div>
-
-    <!-- Right comments -->
-    <div
-      v-if="showComments('right') && !showComments('left')"
-      class="ib w-1/2"
-    ></div>
-    <CommentThread
-      v-if="showComments('right')"
-      class="ib w-1/2"
-      :side="'right'"
-      :line="lineNumber('right', right)"
-      :threadId="threads['right']"
-      @cancel="drafting.right = false"
-    />
   </div>
 </template>
 
@@ -86,6 +78,11 @@ import parseDiff from "parse-diff";
 import CommentThread from "@/components/elements/CommentThread.vue";
 import ReviewModule from "../../store/modules/review";
 import { Comment, ThreadArgs, Thread } from "../../model/review";
+import {
+  RenderedChangePair,
+  renderChange,
+  RenderedChange
+} from "../../plugins/diff";
 
 type Side = "left" | "right";
 
@@ -97,9 +94,7 @@ type Side = "left" | "right";
 export default class DiffLine extends Vue {
   @Prop() public leftFile!: string;
   @Prop() public rightFile!: string;
-
-  @Prop() public left?: parseDiff.Change;
-  @Prop() public right?: parseDiff.Change;
+  @Prop() public rendered!: RenderedChangePair;
 
   reviewModule = getModule(ReviewModule, this.$store);
 
@@ -150,8 +145,8 @@ export default class DiffLine extends Vue {
   }
 
   public threadId(side: Side): string | null {
-    const change = side === "left" ? this.left : this.right;
-    if (!change) {
+    const change = side === "left" ? this.rendered.left : this.rendered.right;
+    if (change.empty) {
       return null;
     }
 
@@ -159,7 +154,7 @@ export default class DiffLine extends Vue {
     const args: ThreadArgs = {
       file,
       side,
-      line: this.lineNumber(side, change)
+      line: change.number
     };
 
     // TODO: Seriously need to optimize this!  Should be calculated inside out
@@ -167,11 +162,7 @@ export default class DiffLine extends Vue {
     return thread ? thread.id : null;
   }
 
-  public bgClass(change?: parseDiff.Change): string {
-    if (!change) {
-      return "";
-    }
-
+  public bgClass(change: RenderedChange): string {
     switch (change.type) {
       case "del":
         return "bg-red-200";
@@ -182,50 +173,12 @@ export default class DiffLine extends Vue {
     }
   }
 
-  public lineMarker(change?: parseDiff.Change): string {
-    if (!change) {
-      return " ";
-    }
-
-    switch (change.type) {
-      case "del":
-        return "-";
-      case "add":
-        return "+";
-      default:
-        return " ";
-    }
-  }
-
-  public lineContent(change?: parseDiff.Change): string {
-    if (!change) {
+  public lineNumberString(change: RenderedChange): string {
+    if (change.empty) {
       return "";
     }
 
-    // Remove the + or the - from the start
-    // TODO: Why is this the case for "normal" lines
-    return change.content.substring(1);
-  }
-
-  public lineNumberString(side: Side): string {
-    let change = side === "left" ? this.left : this.right;
-
-    if (!change) {
-      return "";
-    }
-
-    return `${this.lineNumber(side, change)}`;
-  }
-
-  public lineNumber(side: Side, change: parseDiff.Change): number {
-    switch (change.type) {
-      case "add":
-        return change.ln;
-      case "del":
-        return change.ln;
-      default:
-        return side === "left" ? change.ln1 : change.ln2;
-    }
+    return change.number.toString();
   }
 }
 </script>

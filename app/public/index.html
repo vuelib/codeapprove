@@ -13,5 +13,25 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <script>
+      // TODO: Remove this
+      function perfSummary(measureName) {
+          const perf = performance.getEntriesByName(measureName);
+          const count = perf.length;
+          const sum = perf.reduce((acc, curr) => acc + curr.duration, 0)
+          return {
+            name: measureName,
+            sum,
+            count,
+            avg: sum / count
+          }
+      }
+
+      function componentPerf(component) {
+        console.log(perfSummary("vue <" + component + "> init"));
+        console.log(perfSummary("vue <" + component + "> render"));
+        console.log(perfSummary("vue <" + component + "> patch"));
+      }
+    </script>
   </body>
 </html>
