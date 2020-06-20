@@ -104,6 +104,7 @@ import {
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
+import * as events from "../../plugins/events";
 
 @Component({
   components: {
@@ -129,10 +130,24 @@ export default class CommentThread extends Vue {
   draftComment: string = "";
 
   mounted() {
-    // TODO: This is where the reactivity dies. How do we react to new comments and stuff?
+    events.onNewComment(this.onNewComment);
+    this.loadComments();
+  }
+
+  destroyed() {
+    events.offNewComment(this.onNewComment);
+  }
+
+  private loadComments() {
     if (this.threadId) {
       this.thread = this.reviewModule.threadById(this.threadId);
       this.comments = this.reviewModule.commentsByThread(this.threadId);
+    }
+  }
+
+  private onNewComment(event: events.NewCommentEvent) {
+    if (event.threadId === this.threadId) {
+      this.loadComments();
     }
   }
 
@@ -145,8 +160,8 @@ export default class CommentThread extends Vue {
   }
 
   public async addComment(resolve?: boolean) {
-    // Make a new thread id here ... just need the file name
-
+    // TODO: the only reason this event has to be bubbled up is because we don't have the file name
+    //       here when it's a new thread.
     const event: AddCommentEvent = {
       content: this.draftComment,
       side: this.side,

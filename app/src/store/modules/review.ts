@@ -6,8 +6,9 @@ import {
   CommentArgs,
   Thread,
   ThreadArgs,
-  threadMatch,
+  threadMatch
 } from "@/model/review";
+import * as events from "../../plugins/events";
 
 // TODO: Namespacing?
 @Module({
@@ -51,6 +52,9 @@ export default class ReviewModule extends VuexModule {
   public pushComment(comment: Comment) {
     console.log(`pushComment(${comment.id})`);
     this.review.comments.push(comment);
+
+    // TODO: Is there a way I could automate this?
+    events.emitNewComment({ threadId: comment.threadId });
   }
 
   @Mutation

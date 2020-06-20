@@ -105,7 +105,6 @@ export default class DiffLine extends Vue {
   };
 
   mounted() {
-    // TODO: We get the threads IDs here but the comments never reload
     this.loadComments();
   }
 
