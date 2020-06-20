@@ -24,7 +24,7 @@
         class="w-full"
         :side="'left'"
         :line="rendered.left.number"
-        :threadId="threads['left']"
+        :threadId="getThreadId('left')"
         @cancel="drafting.left = false"
       />
     </div>
@@ -55,7 +55,7 @@
         class="w-full"
         :side="'right'"
         :line="rendered.right.number"
-        :threadId="threads['right']"
+        :threadId="getThreadId('right')"
         @cancel="drafting.right = false"
       />
     </div>
@@ -63,13 +63,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import parseDiff from "parse-diff";
 
 import CommentThread from "@/components/elements/CommentThread.vue";
 import ReviewModule from "../../store/modules/review";
-import { Comment, ThreadArgs, Thread } from "../../model/review";
+import { Comment, ThreadArgs, Thread, ThreadPair } from "../../model/review";
 import {
   RenderedChangePair,
   renderChange,
@@ -84,16 +84,10 @@ type Side = "left" | "right";
   }
 })
 export default class DiffLine extends Vue {
-  @Prop() public leftFile!: string;
-  @Prop() public rightFile!: string;
+  @Prop() public threads!: ThreadPair;
   @Prop() public rendered!: RenderedChangePair;
 
   reviewModule = getModule(ReviewModule, this.$store);
-
-  public threads: { [s in Side]: string | null } = {
-    left: null,
-    right: null
-  };
 
   public comments: { [s in Side]: Comment[] } = {
     left: [],
@@ -111,47 +105,33 @@ export default class DiffLine extends Vue {
   };
 
   mounted() {
-    // TODO: Need to restore comment reactivity when starting a new thread.
-    this.loadThreads();
+    // TODO: We get the threads IDs here but the comments never reload
+    this.loadComments();
   }
 
-  private loadThreads() {
-    this.threads.left = this.threadId("left");
-    this.threads.right = this.threadId("right");
-
-    if (this.threads.left) {
-      this.comments.left = this.reviewModule.commentsByThread(
-        this.threads.left
-      );
-    }
-
-    if (this.threads.right) {
-      this.comments.right = this.reviewModule.commentsByThread(
-        this.threads.right
-      );
-    }
+  public loadComments() {
+    this.comments = {
+      left: this.getComments("left"),
+      right: this.getComments("right")
+    };
   }
 
   public showComments(side: Side) {
     return this.drafting[side] || this.comments[side].length > 0;
   }
 
-  public threadId(side: Side): string | null {
-    const change = side === "left" ? this.rendered.left : this.rendered.right;
-    if (change.empty) {
-      return null;
+  public getComments(side: Side) {
+    const threadId = this.getThreadId(side);
+    if (threadId != null) {
+      return this.reviewModule.commentsByThread(threadId);
     }
+    return [];
+  }
 
-    const file = side === "left" ? this.leftFile : this.rightFile;
-    const args: ThreadArgs = {
-      file,
-      side,
-      line: change.number
-    };
-
+  public getThreadId(side: Side): string | null {
     // TODO: Seriously need to optimize this!  Should be calculated inside out
-    const thread: Thread | null = this.reviewModule.threadByArgs(args);
-    return thread ? thread.id : null;
+    const thread = side === "left" ? this.threads.left : this.threads.right;
+    return thread === null ? null : thread.id;
   }
 
   public bgClass(change: RenderedChange): string {

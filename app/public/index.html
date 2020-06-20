@@ -14,16 +14,32 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
     <script>
-      // TODO: Remove this
+      // ===================================
+      // TODO: Remove this script from main
+      // ===================================
+
+      function median(values){
+        values.sort((a, b) => a - b);
+        var half = Math.floor(values.length / 2);
+
+        if (values.length % 2) {
+          return values[half];
+        }
+        return (values[half - 1] + values[half]) / 2.0;
+      }
+
       function perfSummary(measureName) {
           const perf = performance.getEntriesByName(measureName);
-          const count = perf.length;
-          const sum = perf.reduce((acc, curr) => acc + curr.duration, 0)
+          const durs = perf.map(x => x.duration);
+          const count = durs.length;
+          const total = durs.reduce((acc, curr) => acc + curr, 0).toFixed(2);
+
           return {
             name: measureName,
-            sum,
             count,
-            avg: sum / count
+            total,
+            median: median(durs).toFixed(2),
+            max: Math.max(...durs).toFixed(2)
           }
       }
 

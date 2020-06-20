@@ -31,9 +31,8 @@
         <DiffLine
           v-for="(pair, j) in pairs"
           :key="`chunk-${i}-change-${j}`"
-          :leftFile="meta.from"
-          :rightFile="meta.to"
           :rendered="pair"
+          :threads="getThreads(pair)"
           @add-comment="onAddComment(chunk, $event)"
         />
       </template>
@@ -52,7 +51,13 @@ import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { AddCommentEvent } from "../../model/events";
 
-import { ThreadArgs, Thread, CommentArgs, Side } from "../../model/review";
+import {
+  ThreadArgs,
+  Thread,
+  CommentArgs,
+  Side,
+  ThreadPair
+} from "../../model/review";
 import {
   ChangePair,
   zipChangePairs,
@@ -81,6 +86,25 @@ export default class ChangeEntry extends Vue {
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
+
+  public getThreads(pair: RenderedChangePair): ThreadPair {
+    const leftArgs: ThreadArgs = {
+      side: "left",
+      file: this.meta.from,
+      line: pair.left.number
+    };
+
+    const rightArgs: ThreadArgs = {
+      side: "right",
+      file: this.meta.to,
+      line: pair.right.number
+    };
+
+    return {
+      left: this.reviewModule.threadByArgs(leftArgs),
+      right: this.reviewModule.threadByArgs(rightArgs)
+    };
+  }
 
   public async onAddComment(chunk: parseDiff.Chunk, event: AddCommentEvent) {
     const file = event.side === "left" ? this.meta.from : this.meta.to;

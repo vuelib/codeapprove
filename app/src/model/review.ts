@@ -31,6 +31,11 @@ export interface Comment extends CommentArgs {
   timestamp: string;
 }
 
+export interface ThreadPair {
+  left: Thread | null;
+  right: Thread | null;
+}
+
 export function threadMatch(thread: Thread, args: ThreadArgs): boolean {
   return (
     args.file === thread.file &&

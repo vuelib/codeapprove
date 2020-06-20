@@ -113,7 +113,9 @@ import { auth } from "../../plugins/firebase";
 export default class CommentThread extends Vue {
   @Prop() side!: Side;
   @Prop() line!: number;
-  @Prop() threadId?: string;
+  @Prop() threadId!: string;
+
+  comments: Comment[] = [];
 
   authModule = getModule(AuthModule, this.$store);
   reviewModule = getModule(ReviewModule, this.$store);
@@ -127,17 +129,10 @@ export default class CommentThread extends Vue {
   draftComment: string = "";
 
   mounted() {
-    this.checkThread();
-  }
-
-  updated() {
-    this.checkThread();
-  }
-
-  // TODO: This smells
-  private checkThread() {
+    // TODO: This is where the reactivity dies. How do we react to new comments and stuff?
     if (this.threadId) {
       this.thread = this.reviewModule.threadById(this.threadId);
+      this.comments = this.reviewModule.commentsByThread(this.threadId);
     }
   }
 
@@ -149,15 +144,9 @@ export default class CommentThread extends Vue {
     return this.thread != null && this.thread.resolved;
   }
 
-  get comments(): Comment[] {
-    if (!this.thread) {
-      return [];
-    }
-
-    return this.reviewModule.commentsByThread(this.thread.id);
-  }
-
   public async addComment(resolve?: boolean) {
+    // Make a new thread id here ... just need the file name
+
     const event: AddCommentEvent = {
       content: this.draftComment,
       side: this.side,
