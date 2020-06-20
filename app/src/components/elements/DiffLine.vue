@@ -7,13 +7,9 @@
       @mouseenter="hovered.left = true"
       @mouseleave="hovered.left = false"
     >
-      <div class="ib line-number-gutter">
-        <code class="line-number">{{ lineNumberString(rendered.left) }}</code>
-      </div>
-      <div class="ib">
-        <code class="line-marker">{{ rendered.left.marker }}</code>
-        <pre class="line-content">{{ rendered.left.content }}</pre>
-      </div>
+      <code class="line-number">{{ lineNumberString(rendered.left) }}</code>
+      <code class="line-marker">{{ rendered.left.marker }}</code>
+      <code class="line-content">{{ rendered.left.content }}</code>
 
       <button
         v-show="!rendered.left.empty && hovered.left && !showComments('left')"
@@ -40,13 +36,9 @@
       @mouseenter="hovered.right = true"
       @mouseleave="hovered.right = false"
     >
-      <div class="ib line-number-gutter">
-        <code class="line-number">{{ lineNumberString(rendered.right) }}</code>
-      </div>
-      <div class="ib">
-        <code class="line-marker">{{ rendered.right.marker }}</code>
-        <pre class="line-content">{{ rendered.right.content }}</pre>
-      </div>
+      <code class="line-number">{{ lineNumberString(rendered.right) }}</code>
+      <code class="line-marker">{{ rendered.right.marker }}</code>
+      <code class="line-content">{{ rendered.right.content }}</code>
 
       <button
         v-show="
@@ -193,16 +185,12 @@ export default class DiffLine extends Vue {
 }
 
 .line-content {
-  @apply inline-block whitespace-pre-wrap;
-}
-
-.line-number-gutter {
-  min-width: 3rem;
-  text-align: right;
+  @apply whitespace-pre-wrap;
 }
 
 .line-number {
   @apply px-2 no-select overflow-hidden;
+  min-width: 3rem;
 }
 
 .line-marker {

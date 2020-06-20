@@ -5,7 +5,7 @@
     >
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <!-- TODO: Show both file names when it's renamed -->
-      <span class="flex-grow pl-2d">{{ meta.from }}</span>
+      <span class="flex-grow pl-2d">{{ title }}</span>
       <span class="flex-shrink mx-1 px-2 rounded bg-green-400 text-green-800"
         >+{{ meta.additions }}</span
       >
@@ -129,6 +129,26 @@ export default class ChangeEntry extends Vue {
       return "caret-down";
     } else {
       return "caret-right";
+    }
+  }
+
+  get added() {
+    return this.meta.from === "/dev/null";
+  }
+
+  get deleted() {
+    return this.meta.to === "/dev/null";
+  }
+
+  get title() {
+    if (this.meta.from === this.meta.to) {
+      return this.meta.from;
+    } else if (this.added) {
+      return `${this.meta.to}`;
+    } else if (this.deleted) {
+      return `${this.meta.from}`;
+    } else {
+      return `${this.meta.from} -> ${this.meta.to}`;
     }
   }
 }

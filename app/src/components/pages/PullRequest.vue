@@ -3,7 +3,13 @@
     <div class="mb-4 relative">
       <h3 class="font-bold text-xl">
         {{ pr.head.repo.full_name }}
-        (<a class="text-blue-500 hover:underline" href="#">#{{ pr.number }}</a
+        (<a
+          class="text-blue-500 hover:underline"
+          :href="
+            `https://github.com/${pr.head.repo.full_name}/pull/${pr.number}`
+          "
+          target="_blank"
+          >#{{ pr.number }}</a
         >)
       </h3>
       <p>
