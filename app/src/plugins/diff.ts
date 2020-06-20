@@ -54,15 +54,72 @@ export function renderPairs(pairs: ChangePair[]): RenderedChangePair[] {
   });
 }
 
+function zipArrays<T>(a: T[], b: T[]): T[] {
+  const maxLen = Math.max(a.length, b.length);
+  const res = new Array<T>();
+
+  for (let i = 0; i < maxLen; i++) {
+    if (i < a.length) {
+      res.push(a[i]);
+    }
+
+    if (i < b.length) {
+      res.push(b[i]);
+    }
+  }
+
+  return res;
+}
+
+function sortChunkChanges(chunk: parseDiff.Chunk) {
+  // First group the changes into "runs" of the same type
+  const runs: parseDiff.Change[][] = [];
+  let currRun: parseDiff.Change[] = [];
+  for (const change of chunk.changes) {
+    if (currRun.length === 0) {
+      currRun.push(change);
+    } else {
+      if (change.type === currRun[0].type) {
+        currRun.push(change);
+      } else {
+        runs.push(currRun);
+        currRun = [change];
+      }
+    }
+  }
+  runs.push(currRun);
+
+  // Now flatten things out but if there's a "del" run next to an "add"
+  // run we zip them together.
+  const res = new Array<parseDiff.Change>();
+  let i = 0;
+  while (i < runs.length) {
+    if (i < runs.length - 1) {
+      const a = runs[i];
+      const b = runs[i + 1];
+
+      if (a[0].type === "del" && b[0].type === "add") {
+        res.push(...zipArrays(a, b));
+        i += 2;
+      } else {
+        res.push(...a);
+        i += 1;
+      }
+    } else {
+      res.push(...runs[i]);
+      i += 1;
+    }
+  }
+
+  return res;
+}
+
 /**
  * Zip the list of changes from a chunk into an array of pairs ready to be diffed side-by-side.
  */
 export function zipChangePairs(chunk: parseDiff.Chunk): ChangePair[] {
   const res: ChangePair[] = [];
-
-  // First sort by line number
-  // const changes = sortChanges(chunk.changes);
-  const changes = chunk.changes;
+  const changes = sortChunkChanges(chunk);
 
   let i = 0;
   while (i < changes.length) {
