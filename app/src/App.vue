@@ -50,6 +50,16 @@ export default class App extends Vue {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.btn:focus {
+  outline: none;
+}
+
+textarea:focus,
+input:focus {
+  border: 1px solid rgba(66, 153, 225, 0.6);
+  outline: none;
+}
+
 .btn {
   @apply px-2 py-1;
   @apply rounded shadow border;

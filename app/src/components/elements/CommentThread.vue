@@ -28,10 +28,7 @@
       <div @focusin="focused = true">
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="authModule.user.photoURL" />
-          <div
-            :class="{ border: !renderDraft, 'border-gray-400': !renderDraft }"
-            class="flex-grow relative py-1 px-2 rounded bg-white"
-          >
+          <div class="flex-grow relative rounded bg-white">
             <font-awesome-icon
               v-show="typing"
               @click="renderDraft = !renderDraft"
@@ -39,7 +36,7 @@
               class="absolute m-1 right-0 text-gray-600 hover:text-gray-800 cursor-pointer"
             />
             <textarea
-              class="w-full overflow-hidden"
+              class="w-full overflow-hidden rounded border border-gray-400 py-1 px-2"
               v-show="!renderDraft"
               v-model="draftComment"
               :rows="typing ? '4' : '1'"
@@ -48,7 +45,7 @@
               @blur="textFocus = false"
             />
             <MarkdownContent
-              class="w-full"
+              class="w-full py-1 px-2"
               v-if="renderDraft"
               :content="draftComment"
             />
