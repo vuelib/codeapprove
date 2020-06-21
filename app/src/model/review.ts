@@ -6,6 +6,7 @@ export interface Review {
     repo: string;
     number: number;
   };
+  reviewers: Record<string, boolean>;
   threads: Thread[];
   comments: Comment[];
 }

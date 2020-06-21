@@ -17,7 +17,9 @@ import {
   faMagic,
   faKeyboard,
   faPlus,
-  faMinus
+  faMinus,
+  faThumbsUp,
+  faUserEdit
 } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -43,6 +45,8 @@ export function initIconLibrary() {
     faKeyboard,
     faPlus,
     faMinus,
+    faThumbsUp,
+    faUserEdit,
 
     // Brand icons
     faGithub

@@ -16,10 +16,14 @@ import * as events from "../../plugins/events";
 })
 export default class ReviewModule extends VuexModule {
   public review: Review = {
+    // TODO: Real
     metadata: {
       owner: "hatboysam",
       repo: "diffmachine",
       number: 5
+    },
+    reviewers: {
+      hatboysam: false
     },
     threads: [],
     comments: []

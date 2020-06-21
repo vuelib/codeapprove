@@ -16,12 +16,12 @@
       <div v-for="(comment, index) in comments" :key="index" class="flex p-2">
         <img class="flex-none avatar mt-1 mr-4" :src="comment.photoURL" />
         <div class="flex-grow">
-          <p>
-            <span class="font-bold">{{ comment.username }}</span>
-            <span v-if="comment.draft" class="italic text-gray-600 text-sm"
+          <div class="inline-flex items-center">
+            <span class="font-bold mr-2">{{ comment.username }}</span>
+            <span v-if="comment.draft" class="text-gray-600 text-sm"
               >(draft)</span
             >
-          </p>
+          </div>
           <MarkdownContent :content="comment.text" />
         </div>
       </div>
