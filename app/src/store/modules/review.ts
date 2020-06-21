@@ -15,11 +15,19 @@ import * as events from "../../plugins/events";
   name: "review"
 })
 export default class ReviewModule extends VuexModule {
-  // TODO: Gonna need more than one!
   public review: Review = {
+    metadata: {
+      owner: "hatboysam",
+      repo: "diffmachine",
+      number: 5
+    },
     threads: [],
     comments: []
   };
+
+  get drafts() {
+    return this.review.comments.filter(x => x.draft);
+  }
 
   get commentsByThread() {
     return (threadId: string) => {
@@ -65,6 +73,13 @@ export default class ReviewModule extends VuexModule {
     }
   }
 
+  @Mutation
+  public removeDraftStatus() {
+    for (const comment of this.review.comments) {
+      comment.draft = false;
+    }
+  }
+
   @Action
   public newThread(opts: { args: ThreadArgs }): Thread {
     console.log(`newThread(${JSON.stringify(opts)})`);
@@ -80,17 +95,27 @@ export default class ReviewModule extends VuexModule {
   }
 
   @Action
-  public newComment(opts: { threadId: string; args: CommentArgs }): Comment {
+  public async newComment(opts: {
+    threadId: string;
+    args: CommentArgs;
+  }): Promise<Comment> {
     console.log(`newComment(${JSON.stringify(opts)})`);
     const comment: Comment = {
       id: uuid.v4(),
       threadId: opts.threadId,
       timestamp: new Date().toISOString(),
+      draft: true,
       ...opts.args
     };
 
     // TODO: Network and shit
     this.context.commit("pushComment", comment);
     return comment;
+  }
+
+  @Action
+  public async sendDraftComments(opts: { approve: boolean }) {
+    // TODO: Network and shit
+    this.context.commit("removeDraftStatus");
   }
 }

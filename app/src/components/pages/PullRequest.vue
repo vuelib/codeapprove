@@ -24,18 +24,23 @@
       </span>
     </div>
 
-    <!-- TODO: Make this work -->
     <div
+      v-if="drafts.length"
       class="flex flex-row items-center rounded border border-yellow-500 bg-yellow-200 my-4 py-3"
     >
       <span class="ml-4 font-bold text-yellow-800"
-        ><font-awesome-icon icon="paper-plane" class="mr-1" /> You have 7 unsent
-        drafts</span
+        ><font-awesome-icon icon="paper-plane" class="mr-1" /> You have
+        {{ drafts.length }} draft comments</span
       >
       <span class="flex-grow"><!-- spacer --></span>
+      <!-- TODO: Discard is unimplemented -->
       <button class="btn btn-red ml-2">Discard</button>
-      <button class="btn btn-blue ml-2">Send</button>
-      <button class="btn btn-green ml-2 mr-2">Send + Approve</button>
+      <button class="btn btn-blue ml-2" @click.prevent="sendDrafts(false)">
+        Send
+      </button>
+      <button class="btn btn-green ml-2 mr-2" @click.prevent="sendDrafts(true)">
+        Send + Approve
+      </button>
     </div>
 
     <!-- Description, reviewers, etc -->
@@ -143,8 +148,17 @@ export default class PullRequest extends Vue {
       });
   }
 
+  public async sendDrafts(approve: boolean) {
+    // TODO: Use the approval state somehow
+    await this.reviewModule.sendDraftComments({ approve });
+  }
+
   get loaded() {
     return this.pr != null;
+  }
+
+  get drafts() {
+    return this.reviewModule.drafts;
   }
 
   get numThreads() {

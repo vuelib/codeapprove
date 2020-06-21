@@ -1,8 +1,11 @@
 export type Side = "left" | "right";
 
 export interface Review {
-  // TODO: Pr metadata
-
+  metadata: {
+    owner: string;
+    repo: string;
+    number: number;
+  };
   threads: Thread[];
   comments: Comment[];
 }
@@ -28,6 +31,7 @@ export interface CommentArgs {
 export interface Comment extends CommentArgs {
   id: string;
   threadId: string;
+  draft: boolean;
   timestamp: string;
 }
 
