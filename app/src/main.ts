@@ -13,6 +13,10 @@ import router from "@/plugins/router";
 // Store
 import store from "@/store";
 
+// https://github.com/ndelvalle/v-click-outside
+const vClickOutside = require("v-click-outside");
+Vue.use(vClickOutside);
+
 Vue.config.productionTip = false;
 
 // Enable performance tracing in dev

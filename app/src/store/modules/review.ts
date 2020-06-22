@@ -1,3 +1,4 @@
+import Vue from "vue";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import * as uuid from "uuid";
 import {
@@ -22,9 +23,7 @@ export default class ReviewModule extends VuexModule {
       repo: "diffmachine",
       number: 5
     },
-    reviewers: {
-      hatboysam: false
-    },
+    reviewers: {},
     threads: [],
     comments: []
   };
@@ -82,6 +81,12 @@ export default class ReviewModule extends VuexModule {
     for (const comment of this.review.comments) {
       comment.draft = false;
     }
+  }
+
+  @Mutation
+  public pushReviewer(opts: { login: string }) {
+    // Makes the new map key reactive
+    Vue.set(this.review.reviewers, opts.login, false);
   }
 
   @Action

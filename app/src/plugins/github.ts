@@ -1,7 +1,21 @@
 import { Octokit } from "@octokit/rest";
+import { SearchUsersResponseData } from "@octokit/types";
 import parse from "parse-diff";
 
 const octokit = new Octokit();
+
+export async function searchUsers(
+  owner: string,
+  repo: string,
+  prefix: string
+): Promise<SearchUsersResponseData> {
+  // TODO: Prefer users from the same repo!
+  const res = await octokit.search.users({
+    q: prefix
+  });
+
+  return res.data;
+}
 
 export async function getPullRequest(
   owner: string,

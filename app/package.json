@@ -20,6 +20,7 @@
     "parse-diff": "^0.7.0",
     "tailwindcss": "^1.4.6",
     "uuid": "^8.1.0",
+    "v-click-outside": "^3.0.1",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.3.0",

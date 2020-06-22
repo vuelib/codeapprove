@@ -23,7 +23,7 @@
           class="w-full border-b border-t border-blue-200"
           :key="`chunk-${i}`"
         >
-          <pre class="w-full py-1 px-4 bg-blue-100 text-blue-500">{{
+          <pre class="w-full py-1 px-2 bg-blue-100 text-blue-500">{{
             chunk.content
           }}</pre>
         </div>

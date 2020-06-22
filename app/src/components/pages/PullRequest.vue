@@ -5,7 +5,7 @@
         <h3 class="font-bold text-xl">
           {{ pr.head.repo.full_name }}
           (<a
-            class="text-blue-500 hover:underline"
+            class="text-blue-600 hover:underline"
             :href="
               `https://github.com/${pr.head.repo.full_name}/pull/${pr.number}`
             "
@@ -73,7 +73,7 @@
 
       <!-- Review info -->
       <div
-        class="col-span-4 shadow inline-block rounded border border-gray-400 overflow-hidden"
+        class="col-span-4 shadow inline-block rounded border border-gray-400"
       >
         <div
           class="flex items-center px-4 py-1 bg-gray-200 font-bold border-b border-gray-400"
@@ -84,18 +84,38 @@
         <div class="p-4">
           <table class="table-auto">
             <tr>
-              <td class="font-bold pr-2">
-                <font-awesome-icon icon="user-check" /> reviewers
+              <td class="font-bold align-top">
+                <div class="inline-flex items-center mr-2">
+                  <font-awesome-icon icon="user-check" class="mr-1" /> reviewers
+                </div>
               </td>
               <td>
-                <span v-for="reviewer in reviewers" :key="reviewer">{{
-                  reviewer
-                }}</span>
+                <p>
+                  <span
+                    v-for="reviewer in reviewers"
+                    :key="reviewer"
+                    class="inline-block pr-1"
+                    >{{ reviewer }}</span
+                  >
+                  <a
+                    class="text-blue-600 hover:underline cursor-pointer px-1"
+                    @click.stop="usersearching = true"
+                    >(add)</a
+                  >
+                </p>
+                <UserSearchModal
+                  class="absolute"
+                  v-if="usersearching"
+                  v-click-outside="() => (usersearching = false)"
+                  @selected="onReviewerSelected"
+                />
               </td>
             </tr>
             <tr>
-              <td class="font-bold pr-2">
-                <font-awesome-icon icon="comment" /> comments
+              <td class="font-bold align-top">
+                <div class="inline-flex items-center mr-2">
+                  <font-awesome-icon icon="comment" class="mr-1" /> comments
+                </div>
               </td>
               <td>
                 {{ numThreads }} threads ({{ numUnresolvedThreads }} unresolved)
@@ -140,6 +160,7 @@ import parseDiff from "parse-diff";
 
 import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
+import UserSearchModal from "@/components/elements/UserSearchModal.vue";
 
 import * as github from "../../plugins/github";
 import ReviewModule from "../../store/modules/review";
@@ -153,11 +174,15 @@ import {
 @Component({
   components: {
     ChangeEntry,
-    MarkdownContent
+    MarkdownContent,
+    UserSearchModal
   }
 })
 export default class PullRequest extends Vue {
+  // TODO: Put these in a "UI" object
+  public usersearching = false;
   public loading = true;
+
   public pr: PullsGetResponseData | null = null;
   public diffs: parseDiff.File[] = [];
 
@@ -182,6 +207,12 @@ export default class PullRequest extends Vue {
   public async sendDrafts(approve: boolean) {
     // TODO: Use the approval state somehow
     await this.reviewModule.sendDraftComments({ approve });
+  }
+
+  public onReviewerSelected(event: { login: string }) {
+    console.log("onReviewerSelected", event);
+    this.usersearching = false;
+    this.reviewModule.pushReviewer(event);
   }
 
   get reviewers(): string[] {
@@ -221,6 +252,4 @@ export default class PullRequest extends Vue {
 }
 </script>
 
-<style lang="scss">
-// None ...
-</style>
+<style lang="scss"></style>
