@@ -1,4 +1,5 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
+import { authWithToken } from "../../plugins/github";
 import { auth } from "../../plugins/firebase";
 
 import * as firebase from "firebase/app";
@@ -9,6 +10,9 @@ import * as firebase from "firebase/app";
 })
 export default class AuthModule extends VuexModule {
   public signInKnown: boolean = false;
+
+  // TODO: This is not the way to do it
+  public accessToken: string | null = null;
   public user: firebase.User | null = null;
 
   @Mutation
@@ -16,6 +20,12 @@ export default class AuthModule extends VuexModule {
     console.log(`auth.setUser(${u ? u.uid : u})`);
     this.signInKnown = true;
     this.user = u;
+  }
+
+  @Mutation
+  setAccessToken(token: string | null) {
+    this.accessToken = token;
+    authWithToken(token);
   }
 
   get username(): string {

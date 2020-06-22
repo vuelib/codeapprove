@@ -45,10 +45,16 @@ export default class SignIn extends Vue {
     // TODO: Scopes
     // provider.addScope('repo');
 
-    // TODO: Should this be an action?
     try {
       const result = await auth().signInWithPopup(provider);
       console.log(`Sign in success`);
+
+      // TODO: Why isn't the access token property documented?
+      this.authModule.setAccessToken(
+        (result.credential as any).accessToken || null
+      );
+
+      // TODO: Real routing after sign-in
       this.$router.push("/pr");
     } catch (error) {
       console.warn(`Sign in failure: ${error}`);

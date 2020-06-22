@@ -29,12 +29,6 @@
         Quick Approve
         <font-awesome-icon icon="check" />
       </button>
-
-      <span
-        class="font-bold bg-yellow-500 text-yellow-800 rounded-lg px-2 py-1"
-      >
-        <font-awesome-icon icon="pause-circle" /> Pending
-      </span>
     </div>
 
     <div
@@ -73,13 +67,25 @@
 
       <!-- Review info -->
       <div
-        class="col-span-4 shadow inline-block rounded border border-gray-400"
+        :class="{
+          'container-yellow': !isApproved,
+          'container-green': isApproved
+        }"
+        class="col-span-4 shadow inline-block overflow-hidden rounded border"
       >
         <div
-          class="flex items-center px-4 py-1 bg-gray-200 font-bold border-b border-gray-400"
+          :class="{
+            'content-yellow': !isApproved,
+            'content-green': isApproved
+          }"
+          class="flex items-center px-4 py-1 font-bold border-b"
         >
-          <font-awesome-icon icon="thumbs-up" class="mr-2" />
-          <span>Review</span>
+          <!-- TODO: Variable icon and styling -->
+          <font-awesome-icon
+            :icon="isApproved ? 'check' : 'pause-circle'"
+            class="mr-2"
+          />
+          <span>Status: {{ statusText }}</span>
         </div>
         <div class="p-4">
           <table class="table-auto">
@@ -90,19 +96,28 @@
                 </div>
               </td>
               <td>
-                <p>
-                  <span
-                    v-for="reviewer in reviewers"
-                    :key="reviewer"
-                    class="inline-block pr-1"
-                    >{{ reviewer }}</span
-                  >
+                <div>
+                  <p v-for="reviewer in reviewers" :key="reviewer">
+                    {{ reviewer }}
+                    <font-awesome-icon
+                      v-if="didApprove(reviewer)"
+                      icon="check"
+                      class="text-green-500 ml-2"
+                      size="xs"
+                    />
+                    <font-awesome-icon
+                      v-else
+                      icon="circle"
+                      class="text-yellow-500 ml-2"
+                      size="xs"
+                    />
+                  </p>
                   <a
-                    class="text-blue-600 hover:underline cursor-pointer px-1"
+                    class="text-blue-600 hover:underline cursor-pointer pr-1"
                     @click.stop="usersearching = true"
                     >(add)</a
                   >
-                </p>
+                </div>
                 <UserSearchModal
                   class="absolute"
                   v-if="usersearching"
@@ -205,18 +220,39 @@ export default class PullRequest extends Vue {
   }
 
   public async sendDrafts(approve: boolean) {
-    // TODO: Use the approval state somehow
+    // TODO: Need the real state!
+    this.reviewModule.pushReviewer({ login: "todoname", approved: approve });
     await this.reviewModule.sendDraftComments({ approve });
   }
 
   public onReviewerSelected(event: { login: string }) {
     console.log("onReviewerSelected", event);
     this.usersearching = false;
-    this.reviewModule.pushReviewer(event);
+    this.reviewModule.pushReviewer({ login: event.login, approved: false });
+  }
+
+  get isApproved() {
+    return Object.values(this.reviewModule.review.reviewers).some(x => x);
+  }
+
+  get statusText() {
+    if (this.reviewers.length === 0) {
+      return "Needs Review";
+    }
+
+    if (this.isApproved) {
+      return "Approved";
+    } else {
+      return "Pending";
+    }
   }
 
   get reviewers(): string[] {
     return Object.keys(this.reviewModule.review.reviewers);
+  }
+
+  public didApprove(login: string): boolean {
+    return this.reviewModule.review.reviewers[login] || false;
   }
 
   get loaded() {
@@ -252,4 +288,20 @@ export default class PullRequest extends Vue {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="postcss">
+.container-yellow {
+  @apply border-yellow-700;
+}
+
+.content-yellow {
+  @apply bg-yellow-500 text-yellow-900;
+}
+
+.container-green {
+  @apply border-green-700;
+}
+
+.content-green {
+  @apply border-green-700 bg-green-500 text-green-900;
+}
+</style>

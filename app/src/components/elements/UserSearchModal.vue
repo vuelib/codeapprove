@@ -1,6 +1,7 @@
 <template>
   <div
     @keyup="keyHandler"
+    id="searchbox"
     class="w-auto shadow-lg bg-white border border-gray-400 rounded"
   >
     <div class="font-bold px-2">
@@ -11,6 +12,7 @@
         ref="searchField"
         type="text"
         v-model="query"
+        class="w-full"
         placeholder="Type a username..."
       />
     </div>
@@ -18,7 +20,7 @@
       <span class="p-2" v-if="items.length === 0 && query">
         No results...
       </span>
-      <ul v-else>
+      <ul class="w-full" v-else>
         <li
           v-for="(item, index) in items"
           :key="item.login"
@@ -121,6 +123,10 @@ export default class UserSearchModal extends Vue {
 </script>
 
 <style scoped lang="postcss">
+#searchbox {
+  min-width: 240px;
+}
+
 .avatar {
   height: 20px;
   width: 20px;

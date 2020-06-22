@@ -84,9 +84,9 @@ export default class ReviewModule extends VuexModule {
   }
 
   @Mutation
-  public pushReviewer(opts: { login: string }) {
+  public pushReviewer(opts: { login: string; approved: boolean }) {
     // Makes the new map key reactive
-    Vue.set(this.review.reviewers, opts.login, false);
+    Vue.set(this.review.reviewers, opts.login, opts.approved);
   }
 
   @Action

@@ -2,7 +2,16 @@ import { Octokit } from "@octokit/rest";
 import { SearchUsersResponseData } from "@octokit/types";
 import parse from "parse-diff";
 
-const octokit = new Octokit();
+let octokit = new Octokit();
+
+export function authWithToken(token: string | null) {
+  // TODO: What about token refresh?
+  if (token != null) {
+    octokit = new Octokit({ auth: token });
+  } else {
+    octokit = new Octokit();
+  }
+}
 
 export async function searchUsers(
   owner: string,
