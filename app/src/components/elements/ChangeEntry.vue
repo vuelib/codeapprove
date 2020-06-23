@@ -5,13 +5,23 @@
     >
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <!-- TODO: Show both file names when it's renamed -->
-      <span class="flex-grow pl-2d">{{ title }}</span>
-      <span class="flex-shrink mx-1 px-2 rounded bg-green-400 text-green-800"
-        >+{{ meta.additions }}</span
+      <span class="flex-grow pl-2">{{ title }}</span>
+      <span class="text-right text-sm text-gray-700 mr-2">{{
+        meta.additions + meta.deletions
+      }}</span>
+      <div
+        class="w-12 rounded overflow-hidden"
+        style="line-height: 12px; height: 12px;"
       >
-      <span class="flex-shrink mx-1 px-2 rounded bg-red-400 text-red-800"
-        >-{{ meta.deletions }}</span
-      >
+        <div
+          class="inline-block bg-green-500"
+          :style="`height: 12px; width: ${additionPct}%`"
+        ></div>
+        <div
+          class="inline-block bg-red-500"
+          :style="`height: 12px; width: ${100 - additionPct}%`"
+        ></div>
+      </div>
     </div>
     <div
       v-if="eager || expanded"
@@ -145,6 +155,19 @@ export default class ChangeEntry extends Vue {
     this.expanded = !this.expanded;
     if (this.expanded) {
       this.eager = true;
+    }
+  }
+
+  get additionPct() {
+    const exact =
+      this.meta.additions / (this.meta.additions + this.meta.deletions);
+    if (exact === 0) {
+      return 0;
+    } else if (exact === 1) {
+      return 100;
+    } else {
+      const asPct = Math.round(exact * 100);
+      return Math.max(10, Math.min(asPct, 90));
     }
   }
 

@@ -21,9 +21,10 @@
 
       <span class="flex-grow"><!-- spacer --></span>
 
+      <!-- TODO: Don't show this if you already approved -->
       <button
         v-if="!drafts.length"
-        class="btn btn-green mx-4"
+        class="btn btn-green"
         @click="sendDrafts(true)"
       >
         Quick Approve
@@ -67,17 +68,11 @@
 
       <!-- Review info -->
       <div
-        :class="{
-          'container-yellow': !isApproved,
-          'container-green': isApproved
-        }"
+        :class="isApproved ? 'container-green' : 'container-yellow'"
         class="col-span-4 shadow inline-block overflow-hidden rounded border"
       >
         <div
-          :class="{
-            'content-yellow': !isApproved,
-            'content-green': isApproved
-          }"
+          :class="isApproved ? 'content-green' : 'content-yellow'"
           class="flex items-center px-4 py-1 font-bold border-b"
         >
           <!-- TODO: Variable icon and styling -->
@@ -100,15 +95,13 @@
                   <p v-for="reviewer in reviewers" :key="reviewer">
                     {{ reviewer }}
                     <font-awesome-icon
-                      v-if="didApprove(reviewer)"
-                      icon="check"
-                      class="text-green-500 ml-2"
-                      size="xs"
-                    />
-                    <font-awesome-icon
-                      v-else
-                      icon="circle"
-                      class="text-yellow-500 ml-2"
+                      :icon="didApprove(reviewer) ? 'check' : 'circle'"
+                      :class="
+                        didApprove(reviewer)
+                          ? 'text-green-500'
+                          : 'text-yellow-500'
+                      "
+                      class="ml-1"
                       size="xs"
                     />
                   </p>
@@ -232,7 +225,15 @@ export default class PullRequest extends Vue {
   }
 
   get isApproved() {
+    return this.hasSomeApproval && !this.hasUnresolved;
+  }
+
+  get hasSomeApproval() {
     return Object.values(this.reviewModule.review.reviewers).some(x => x);
+  }
+
+  get hasUnresolved() {
+    return this.numUnresolvedThreads > 0;
   }
 
   get statusText() {
@@ -240,10 +241,14 @@ export default class PullRequest extends Vue {
       return "Needs Review";
     }
 
-    if (this.isApproved) {
-      return "Approved";
+    if (this.hasSomeApproval) {
+      if (this.hasUnresolved) {
+        return "Pending Resolution";
+      } else {
+        return "Approved";
+      }
     } else {
-      return "Pending";
+      return "Pending Approval";
     }
   }
 
