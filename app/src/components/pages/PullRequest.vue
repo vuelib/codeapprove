@@ -43,6 +43,7 @@
       <span class="flex-grow"><!-- spacer --></span>
       <!-- TODO: Discard is unimplemented -->
       <button class="btn btn-red ml-2">Discard</button>
+      <!-- TODO: This should not unset approval if already approved -->
       <button class="btn btn-blue ml-2" @click.prevent="sendDrafts(false)">
         Send
       </button>
@@ -178,6 +179,7 @@ import {
   renderPairs,
   zipChangePairs
 } from "../../plugins/diff";
+import { Thread, Comment, ReviewMetadata } from "../../model/review";
 
 @Component({
   components: {
@@ -191,25 +193,38 @@ export default class PullRequest extends Vue {
   public usersearching = false;
   public loading = true;
 
+  // TODO: These should be one state object
   public pr: PullsGetResponseData | null = null;
   public diffs: parseDiff.File[] = [];
 
   private reviewModule = getModule(ReviewModule, this.$store);
+
+  // TODO: This could be a mixin and expose a withLoading() hook
   private uiModule = getModule(UIModule, this.$store);
 
   async mounted() {
     this.uiModule.beginLoading();
 
-    // TODO: can use await
-    github
-      .getPullRequest("hatboysam", "diffmachine", 5)
-      .then(({ pr, diffs }) => {
-        this.pr = Object.freeze(pr);
-        this.diffs = diffs;
-      })
-      .then(() => {
-        this.uiModule.endLoading();
-      });
+    // TODO: Need to watch for route changes
+    // https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes
+    const params = this.$route.params;
+
+    const meta: ReviewMetadata = {
+      owner: params.owner,
+      repo: params.repo,
+      number: Number.parseInt(params.number)
+    };
+
+    this.reviewModule.initializeReview(meta);
+    const { pr, diffs } = await github.getPullRequest(
+      meta.owner,
+      meta.repo,
+      meta.number
+    );
+    this.pr = Object.freeze(pr);
+    this.diffs = diffs;
+
+    this.uiModule.endLoading();
   }
 
   public async sendDrafts(approve: boolean) {
@@ -243,12 +258,12 @@ export default class PullRequest extends Vue {
 
     if (this.hasSomeApproval) {
       if (this.hasUnresolved) {
-        return "Pending Resolution";
+        return "Needs Resolution";
       } else {
         return "Approved";
       }
     } else {
-      return "Pending Approval";
+      return "Needs Approval";
     }
   }
 
@@ -273,7 +288,11 @@ export default class PullRequest extends Vue {
   }
 
   get numUnresolvedThreads() {
-    return this.reviewModule.review.threads.filter(x => !x.resolved).length;
+    // TODO: Draft comments affect this right now, they should not
+    const unresolved: Thread[] = this.reviewModule.review.threads.filter(
+      x => !x.resolved
+    );
+    return unresolved.length;
   }
 
   private getMetadata(diff: parseDiff.File) {

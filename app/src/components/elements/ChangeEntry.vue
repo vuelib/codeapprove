@@ -5,7 +5,12 @@
     >
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <!-- TODO: Show both file names when it's renamed -->
-      <span class="flex-grow pl-2">{{ title }}</span>
+      <span class="ml-2">{{ title }}</span>
+      <span class="text-sm text-gray-700 ml-4" v-if="allThreads.length > 0">
+        {{ allThreads.length }}
+        <font-awesome-icon icon="comment" size="sm" />
+      </span>
+      <span class="flex-grow"><!-- spacer --></span>
       <span class="text-right text-sm text-gray-700 mr-2">{{
         meta.additions + meta.deletions
       }}</span>
@@ -156,6 +161,13 @@ export default class ChangeEntry extends Vue {
     if (this.expanded) {
       this.eager = true;
     }
+  }
+
+  get allThreads() {
+    const l: Thread[] = this.reviewModule.threadsByFile(this.meta.from, "left");
+    const r: Thread[] = this.reviewModule.threadsByFile(this.meta.to, "right");
+
+    return [...l, ...r];
   }
 
   get additionPct() {

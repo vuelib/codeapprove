@@ -6,7 +6,10 @@
 
     <!-- Page body from router -->
     <div class="grid grid-cols-12">
-      <router-view class="mt-8 col-start-2 col-span-10" />
+      <router-view
+        :key="$route.fullPath"
+        class="mt-8 col-start-2 col-span-10"
+      />
     </div>
   </div>
 </template>

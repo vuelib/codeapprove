@@ -9,7 +9,7 @@ Vue.use(VueRouter);
 // TODO: Block some paths based on sign in
 export default new VueRouter({
   routes: [
-    { path: "/pr", component: PullRequest },
+    { path: "/pr/:owner/:repo/:number", component: PullRequest },
     { path: "/signin", component: SignIn }
   ]
 });

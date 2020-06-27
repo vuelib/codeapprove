@@ -44,6 +44,7 @@
               v-model="draftComment"
               :rows="typing ? '4' : '1'"
               placeholder="Reply...?"
+              ref="replyField"
               @focus="textFocus = true"
               @blur="textFocus = false"
             />
@@ -132,6 +133,11 @@ export default class CommentThread extends Vue {
   mounted() {
     events.onNewComment(this.onNewComment);
     this.loadComments();
+
+    // TODO: We should only focus like this when it's a new comment thread
+    // if (this.comments.length === 0) {
+    //   (this.$refs.replyField as any).focus();
+    // }
   }
 
   destroyed() {

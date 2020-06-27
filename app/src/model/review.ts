@@ -1,11 +1,13 @@
 export type Side = "left" | "right";
 
+export interface ReviewMetadata {
+  owner: string;
+  repo: string;
+  number: number;
+}
+
 export interface Review {
-  metadata: {
-    owner: string;
-    repo: string;
-    number: number;
-  };
+  metadata: ReviewMetadata;
   reviewers: Record<string, boolean>;
   threads: Thread[];
   comments: Comment[];

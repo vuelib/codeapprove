@@ -7,7 +7,9 @@ import {
   CommentArgs,
   Thread,
   ThreadArgs,
-  threadMatch
+  Side,
+  threadMatch,
+  ReviewMetadata
 } from "@/model/review";
 import * as events from "../../plugins/events";
 
@@ -19,9 +21,9 @@ export default class ReviewModule extends VuexModule {
   public review: Review = {
     // TODO: Real
     metadata: {
-      owner: "hatboysam",
-      repo: "diffmachine",
-      number: 5
+      owner: "unknown",
+      repo: "unknown",
+      number: 0
     },
     reviewers: {},
     threads: [],
@@ -50,6 +52,25 @@ export default class ReviewModule extends VuexModule {
         return null;
       }
       return this.review.threads.find(t => threadMatch(t, args)) || null;
+    };
+  }
+
+  get threadsByFile() {
+    return (file: string, side: Side) => {
+      return this.review.threads.filter(
+        x => x.file === file && x.side === side
+      );
+    };
+  }
+
+  @Mutation
+  public initializeReview(metadata: ReviewMetadata) {
+    // TODO: Should this be an action which pulls down information?
+    this.review = {
+      metadata,
+      reviewers: {},
+      threads: [],
+      comments: []
     };
   }
 
