@@ -21,14 +21,22 @@
 
       <span class="flex-grow"><!-- spacer --></span>
 
-      <!-- TODO: Don't show this if you already approved -->
       <button
-        v-if="!drafts.length"
+        v-if="!drafts.length && !userHasApproved"
         class="btn btn-green"
-        @click="sendDrafts(true)"
+        @click="setMyApproval(true)"
       >
         Quick Approve
         <font-awesome-icon icon="check" />
+      </button>
+
+      <button
+        v-if="userHasApproved"
+        class="btn btn-red"
+        @click="setMyApproval(false)"
+      >
+        Undo Approval
+        <font-awesome-icon icon="times" />
       </button>
     </div>
 
@@ -231,12 +239,15 @@ export default class PullRequest extends Vue {
     this.uiModule.endLoading();
   }
 
-  public async sendDrafts(approve: boolean) {
-    // TODO: Need the real state!
+  public setMyApproval(approved: boolean) {
     this.reviewModule.pushReviewer({
       login: this.authModule.assertUser.username,
-      approved: approve
+      approved
     });
+  }
+
+  public async sendDrafts(approve: boolean) {
+    this.setMyApproval(approve);
     await this.reviewModule.sendDraftComments({ approve });
   }
 
@@ -244,6 +255,14 @@ export default class PullRequest extends Vue {
     console.log("onReviewerSelected", event);
     this.usersearching = false;
     this.reviewModule.pushReviewer({ login: event.login, approved: false });
+  }
+
+  get userHasApproved() {
+    return (
+      this.reviewModule.review.reviewers[
+        this.authModule.assertUser.username
+      ] === true
+    );
   }
 
   get isApproved() {

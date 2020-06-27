@@ -9,9 +9,23 @@
       ><span class="text-md">Sign In</span>
     </router-link>
 
-    <button v-if="signedIn" @click="signOut()">
-      <span class="text-md">Sign Out</span>
-    </button>
+    <div v-if="signedIn" @click="showDropdown = true">
+      <div class="flex items-center">
+        <img class="avatar" :src="photoURL" />
+        <font-awesome-icon icon="caret-down" class="ml-2" />
+      </div>
+
+      <ul
+        v-if="showDropdown"
+        v-click-outside="() => (showDropdown = false)"
+        class="dropdown absolute whitespace-no-wrap mt-2 border border-gray-400 bg-white rounded text-md text-black"
+      >
+        <li class="block px-4 py-2">{{ username }}</li>
+        <li class="block px-4 py-2 dropdown-item" @click="signOut()">
+          <font-awesome-icon icon="door-open" class="pr-1" /> Sign Out
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -23,21 +37,58 @@ import AuthModule from "../../store/modules/auth";
 
 @Component
 export default class HeaderBar extends Vue {
+  showDropdown = false;
+
   private authModule = getModule(AuthModule, this.$store);
 
   get signedIn() {
     return this.authModule.signedIn;
   }
 
+  get username() {
+    if (!this.authModule.user) {
+      return "unknown";
+    }
+
+    return this.authModule.assertUser.username;
+  }
+
+  get photoURL() {
+    if (!this.authModule.user) {
+      return "";
+    }
+
+    return this.authModule.assertUser.photoURL;
+  }
+
   public async signOut() {
+    this.showDropdown = false;
     await this.authModule.startSignOut();
     this.$router.push("/signin");
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="postcss">
 .hidden {
   display: none;
+}
+
+.avatar {
+  height: 36px;
+  width: 36px;
+  @apply rounded-full;
+}
+
+.dropdown {
+  transform: translate(-50%);
+}
+
+.dropdown-item {
+  @apply cursor-pointer text-gray-800 border-t border-gray-400;
+}
+
+.dropdown-item:hover {
+  @apply text-white bg-blue-500 border-t border-white;
 }
 </style>

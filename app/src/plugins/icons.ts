@@ -20,7 +20,9 @@ import {
   faMinus,
   faThumbsUp,
   faUserEdit,
-  faCircle
+  faCircle,
+  faTimes,
+  faDoorOpen
 } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -49,6 +51,8 @@ export function initIconLibrary() {
     faThumbsUp,
     faUserEdit,
     faCircle,
+    faTimes,
+    faDoorOpen,
 
     // Brand icons
     faGithub

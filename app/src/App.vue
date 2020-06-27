@@ -90,7 +90,7 @@ input:focus {
 }
 
 .btn-blue:hover {
-  @apply bg-blue-500;
+  @apply border-blue-600 bg-blue-500;
 }
 
 .btn-red {
@@ -98,7 +98,7 @@ input:focus {
 }
 
 .btn-red:hover {
-  @apply bg-red-400;
+  @apply border-red-500 bg-red-400;
 }
 
 .btn-green {
@@ -106,6 +106,6 @@ input:focus {
 }
 
 .btn-green:hover {
-  @apply bg-green-500;
+  @apply border-green-600 bg-green-500;
 }
 </style>
