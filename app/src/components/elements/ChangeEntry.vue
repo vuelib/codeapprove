@@ -136,8 +136,8 @@ export default class ChangeEntry extends Vue {
     }
 
     const commentArgs: CommentArgs = {
-      username: this.authModule.username,
-      photoURL: this.authModule.photoURL,
+      username: this.authModule.assertUser.username,
+      photoURL: this.authModule.assertUser.photoURL,
       text: event.content
     };
 

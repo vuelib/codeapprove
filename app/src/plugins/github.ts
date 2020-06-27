@@ -5,6 +5,8 @@ import parse from "parse-diff";
 let octokit = new Octokit();
 
 export function authWithToken(token: string | null) {
+  console.log(`github.authWithToken(${token === null ? null : "<redacted>"})`);
+
   // TODO: What about token refresh?
   if (token != null) {
     octokit = new Octokit({ auth: token });

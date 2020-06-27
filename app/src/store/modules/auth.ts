@@ -1,6 +1,7 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import { authWithToken } from "../../plugins/github";
 import { auth } from "../../plugins/firebase";
+import { User } from "../../model/auth";
 
 import * as firebase from "firebase/app";
 
@@ -12,35 +13,23 @@ export default class AuthModule extends VuexModule {
   public signInKnown: boolean = false;
 
   // TODO: This is not the way to do it
-  public accessToken: string | null = null;
-  public user: firebase.User | null = null;
+  public user: User | null = null;
 
   @Mutation
-  setUser(u: firebase.User | null) {
-    console.log(`auth.setUser(${u ? u.uid : u})`);
+  setUser(u: User | null) {
+    console.log(`auth.setUser(${u ? u.uid : null})`);
     this.signInKnown = true;
     this.user = u;
-  }
 
-  @Mutation
-  setAccessToken(token: string | null) {
-    this.accessToken = token;
-    authWithToken(token);
-  }
-
-  get username(): string {
-    // TODO: real one from the api
-    if (this.user) {
-      return this.user.providerData[0]!.displayName!;
+    if (u) {
+      authWithToken(u.githubToken);
+    } else {
+      authWithToken(null);
     }
-
-    return "unknown";
   }
 
-  get photoURL(): string {
-    // TODO: Ever null?
-    // TODO: Make a CDN-cached API to get this from GitHub
-    return this.user!.photoURL!;
+  get assertUser(): User {
+    return this.user!;
   }
 
   get signedIn(): boolean {

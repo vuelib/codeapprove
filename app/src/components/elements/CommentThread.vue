@@ -30,7 +30,10 @@
       <!-- TODO: Handle focus out -->
       <div @focusin="focused = true">
         <div class="flex p-2">
-          <img class="flex-none avatar mr-4" :src="authModule.user.photoURL" />
+          <img
+            class="flex-none avatar mr-4"
+            :src="authModule.assertUser.photoURL"
+          />
           <div class="flex-grow relative rounded bg-white">
             <font-awesome-icon
               v-show="typing"

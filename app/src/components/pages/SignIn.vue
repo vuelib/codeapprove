@@ -32,6 +32,8 @@ import * as firebase from "firebase/app";
 import { auth } from "../../plugins/firebase";
 
 import { getModule } from "vuex-module-decorators";
+
+import { User, createUser } from "../../model/auth";
 import AuthModule from "../../store/modules/auth";
 
 @Component({
@@ -47,18 +49,23 @@ export default class SignIn extends Vue {
 
     try {
       const result = await auth().signInWithPopup(provider);
-      console.log(`Sign in success`);
+      if (result.user) {
+        console.log(`Sign in success`);
 
-      // TODO: Why isn't the access token property documented?
-      this.authModule.setAccessToken(
-        (result.credential as any).accessToken || null
-      );
+        const token = (result.credential as firebase.auth.OAuthCredential)
+          .accessToken!;
+        const user: User = createUser(result.user, token);
+        this.authModule.setUser(user);
 
-      // TODO: Real routing after sign-in
-      this.$router.push("/pr");
+        // TODO: Real routing after sign-in
+        this.$router.push("/pr");
+      } else {
+        console.log(`Sign in failure`);
+        this.authModule.setUser(null);
+      }
     } catch (error) {
       console.warn(`Sign in failure: ${error}`);
-      // TODO: handle
+      this.authModule.setUser(null);
     }
   }
 }

@@ -180,6 +180,7 @@ import {
   zipChangePairs
 } from "../../plugins/diff";
 import { Thread, Comment, ReviewMetadata } from "../../model/review";
+import AuthModule from "../../store/modules/auth";
 
 @Component({
   components: {
@@ -197,6 +198,7 @@ export default class PullRequest extends Vue {
   public pr: PullsGetResponseData | null = null;
   public diffs: parseDiff.File[] = [];
 
+  private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
 
   // TODO: This could be a mixin and expose a withLoading() hook
@@ -229,7 +231,10 @@ export default class PullRequest extends Vue {
 
   public async sendDrafts(approve: boolean) {
     // TODO: Need the real state!
-    this.reviewModule.pushReviewer({ login: "todoname", approved: approve });
+    this.reviewModule.pushReviewer({
+      login: this.authModule.assertUser.username,
+      approved: approve
+    });
     await this.reviewModule.sendDraftComments({ approve });
   }
 

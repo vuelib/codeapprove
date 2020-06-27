@@ -36,7 +36,9 @@ export default class App extends Vue {
 
   created() {
     this.authUnsub = auth().onAuthStateChanged(user => {
-      this.authModule.setUser(user);
+      if (!user) {
+        this.authModule.setUser(null);
+      }
     });
   }
 
