@@ -11,18 +11,38 @@ import * as firebase from "firebase/app";
 })
 export default class AuthModule extends VuexModule {
   public signInKnown: boolean = false;
-
-  // TODO: This is not the way to do it
   public user: User | null = null;
+
+  @Mutation
+  restoreFromLocalStorage() {
+    const userString = localStorage.getItem("user");
+    if (userString == null) {
+      this.user = null;
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userString) as User;
+      this.user = user;
+      console.log("User restored");
+    } catch (e) {
+      console.log("Failed to parse user JSON");
+      this.user = null;
+    }
+
+    this.signInKnown = true;
+  }
 
   @Mutation
   setUser(u: User | null) {
     console.log(`auth.setUser(${u ? u.uid : null})`);
+
     this.signInKnown = true;
     this.user = u;
 
-    if (u) {
-      authWithToken(u.githubToken);
+    localStorage.setItem("user", JSON.stringify(this.user));
+    if (this.user) {
+      authWithToken(this.user.githubToken);
     } else {
       authWithToken(null);
     }

@@ -58,7 +58,7 @@ export default class SignIn extends Vue {
         this.authModule.setUser(user);
 
         // TODO: Real routing after sign-in
-        this.$router.push("/pr");
+        this.$router.push("/pr/hatboysam/diffmachine/5");
       } else {
         console.log(`Sign in failure`);
         this.authModule.setUser(null);

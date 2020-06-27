@@ -1,5 +1,8 @@
 import { Octokit } from "@octokit/rest";
-import { SearchUsersResponseData } from "@octokit/types";
+import {
+  SearchUsersResponseData,
+  UsersGetAuthenticatedResponseData
+} from "@octokit/types";
 import parse from "parse-diff";
 
 let octokit = new Octokit();
@@ -13,6 +16,11 @@ export function authWithToken(token: string | null) {
   } else {
     octokit = new Octokit();
   }
+}
+
+export async function me(): Promise<UsersGetAuthenticatedResponseData> {
+  const res = await octokit.users.getAuthenticated();
+  return res.data;
 }
 
 export async function searchUsers(

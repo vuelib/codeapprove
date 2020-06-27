@@ -3,16 +3,17 @@ import App from "./App.vue";
 
 import "./assets/styles/index.css";
 
-// Font awesome icons
-import { initIconLibrary } from "@/plugins/icons";
-initIconLibrary();
+// Store
+import store from "@/store";
 
 // Router
 import router from "@/plugins/router";
 
-// Store
-import store from "@/store";
+// Font awesome icons
+import { initIconLibrary } from "@/plugins/icons";
+initIconLibrary();
 
+// Click outside plugin
 // https://github.com/ndelvalle/v-click-outside
 const vClickOutside = require("v-click-outside");
 Vue.use(vClickOutside);
