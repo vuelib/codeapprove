@@ -129,7 +129,7 @@ export default class DiffLine extends Vue {
 
   public getThreadId(side: Side): string | null {
     // TODO: Seriously need to optimize this!  Should be calculated inside out
-    const thread = side === "left" ? this.threads.left : this.threads.right;
+    const thread = this.threads[side];
     return thread === null ? null : thread.id;
   }
 

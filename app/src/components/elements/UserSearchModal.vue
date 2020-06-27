@@ -43,8 +43,10 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import * as github from "../../plugins/github";
-import { KeyObject } from "crypto";
+import { getModule } from "vuex-module-decorators";
+
+import { Github } from "../../plugins/github";
+import AuthModule from "../../store/modules/auth";
 
 @Component
 export default class UserSearchModal extends Vue {
@@ -52,9 +54,13 @@ export default class UserSearchModal extends Vue {
   public activeIndex = 0;
   public items: any[] = [];
 
+  private github!: Github;
+  private authModule = getModule(AuthModule, this.$store);
   private searchFn: Function = () => {};
 
   mounted() {
+    this.github = new Github(this.authModule.assertUser.githubToken);
+
     (this.$refs.searchField as any).focus();
 
     this.searchFn = this.debounce(async () => {
@@ -62,7 +68,7 @@ export default class UserSearchModal extends Vue {
         return;
       }
 
-      const res = await github.searchUsers("", "", this.query);
+      const res = await this.github.searchUsers("", "", this.query);
 
       this.items = res.items.slice(0, 10);
       this.activeIndex = 0;

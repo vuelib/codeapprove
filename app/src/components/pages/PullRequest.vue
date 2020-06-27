@@ -171,7 +171,7 @@ import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 import UserSearchModal from "@/components/elements/UserSearchModal.vue";
 
-import * as github from "../../plugins/github";
+import { Github } from "../../plugins/github";
 import ReviewModule from "../../store/modules/review";
 import UIModule from "../../store/modules/ui";
 import {
@@ -200,11 +200,13 @@ export default class PullRequest extends Vue {
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
-
   // TODO: This could be a mixin and expose a withLoading() hook
   private uiModule = getModule(UIModule, this.$store);
 
+  private github!: Github;
+
   async mounted() {
+    this.github = new Github(this.authModule.assertUser.githubToken);
     this.uiModule.beginLoading();
 
     // TODO: Need to watch for route changes
@@ -218,7 +220,7 @@ export default class PullRequest extends Vue {
     };
 
     this.reviewModule.initializeReview(meta);
-    const { pr, diffs } = await github.getPullRequest(
+    const { pr, diffs } = await this.github.getPullRequest(
       meta.owner,
       meta.repo,
       meta.number

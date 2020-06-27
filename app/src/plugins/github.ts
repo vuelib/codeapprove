@@ -7,71 +7,72 @@ import parse from "parse-diff";
 
 let octokit = new Octokit();
 
-export function authWithToken(token: string | null) {
-  console.log(`github.authWithToken(${token === null ? null : "<redacted>"})`);
-
-  // TODO: What about token refresh?
-  if (token != null) {
-    octokit = new Octokit({ auth: token });
-  } else {
-    octokit = new Octokit();
-  }
-}
-
-export async function me(): Promise<UsersGetAuthenticatedResponseData> {
-  const res = await octokit.users.getAuthenticated();
-  return res.data;
-}
-
-export async function searchUsers(
-  owner: string,
-  repo: string,
-  prefix: string
-): Promise<SearchUsersResponseData> {
-  // TODO: Prefer users from the same repo!
-  const res = await octokit.search.users({
-    q: prefix
-  });
-
-  return res.data;
-}
-
-export async function getPullRequest(
-  owner: string,
-  repo: string,
-  pull_number: number
-) {
-  const pr = await octokit.pulls.get({
-    owner,
-    repo,
-    pull_number
-  });
-
-  const diffs = await getDiff(owner, repo, pr.data.base.ref, pr.data.head.ref);
-
-  return {
-    pr: pr.data,
-    diffs
-  };
-}
-
-export async function getDiff(
-  owner: string,
-  repo: string,
-  base: string,
-  head: string
-): Promise<parse.File[]> {
-  const res = await octokit.repos.compareCommits({
-    owner,
-    repo,
-    base,
-    head,
-    headers: {
-      accept: "application/vnd.github.v3.diff"
+export class Github {
+  constructor(token: string | null) {
+    // TODO: What about token refresh?
+    if (token != null) {
+      octokit = new Octokit({ auth: token });
+    } else {
+      octokit = new Octokit();
     }
-  });
+  }
 
-  // The strange header changes the response type
-  const data = (res.data as unknown) as string;
-  return parse(data);
+  async me(): Promise<UsersGetAuthenticatedResponseData> {
+    const res = await octokit.users.getAuthenticated();
+    return res.data;
+  }
+
+  async searchUsers(
+    owner: string,
+    repo: string,
+    prefix: string
+  ): Promise<SearchUsersResponseData> {
+    // TODO: Prefer users from the same repo!
+    const res = await octokit.search.users({
+      q: prefix
+    });
+
+    return res.data;
+  }
+
+  async getPullRequest(owner: string, repo: string, pull_number: number) {
+    const pr = await octokit.pulls.get({
+      owner,
+      repo,
+      pull_number
+    });
+
+    const diffs = await this.getDiff(
+      owner,
+      repo,
+      pr.data.base.ref,
+      pr.data.head.ref
+    );
+
+    return {
+      pr: pr.data,
+      diffs
+    };
+  }
+
+  async getDiff(
+    owner: string,
+    repo: string,
+    base: string,
+    head: string
+  ): Promise<parse.File[]> {
+    const res = await octokit.repos.compareCommits({
+      owner,
+      repo,
+      base,
+      head,
+      headers: {
+        accept: "application/vnd.github.v3.diff"
+      }
+    });
+
+    // The strange header changes the response type
+    const data = (res.data as unknown) as string;
+    return parse(data);
+  }
 }

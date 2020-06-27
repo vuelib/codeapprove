@@ -1,5 +1,4 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { authWithToken } from "../../plugins/github";
 import { auth } from "../../plugins/firebase";
 import { User } from "../../model/auth";
 
@@ -36,16 +35,10 @@ export default class AuthModule extends VuexModule {
   @Mutation
   setUser(u: User | null) {
     console.log(`auth.setUser(${u ? u.uid : null})`);
-
     this.signInKnown = true;
     this.user = u;
 
     localStorage.setItem("user", JSON.stringify(this.user));
-    if (this.user) {
-      authWithToken(this.user.githubToken);
-    } else {
-      authWithToken(null);
-    }
   }
 
   get assertUser(): User {

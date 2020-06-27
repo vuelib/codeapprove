@@ -35,26 +35,30 @@ import { getModule } from "vuex-module-decorators";
 
 import { User, createUser } from "../../model/auth";
 import AuthModule from "../../store/modules/auth";
+import UiModule from "../../store/modules/ui";
+import UIModule from "../../store/modules/ui";
 
 @Component({
   components: {}
 })
 export default class SignIn extends Vue {
-  authModule = getModule(AuthModule, this.$store);
+  private authModule = getModule(AuthModule, this.$store);
+  private uiModule = getModule(UIModule, this.$store);
 
   public async startSignIn() {
     const provider = new firebase.auth.GithubAuthProvider();
     // TODO: Scopes
     // provider.addScope('repo');
 
+    this.uiModule.beginLoading();
     try {
       const result = await auth().signInWithPopup(provider);
       if (result.user) {
         console.log(`Sign in success`);
 
-        const token = (result.credential as firebase.auth.OAuthCredential)
-          .accessToken!;
-        const user: User = createUser(result.user, token);
+        const cred = result.credential as firebase.auth.OAuthCredential;
+
+        const user: User = await createUser(result.user, cred.accessToken!);
         this.authModule.setUser(user);
 
         // TODO: Real routing after sign-in
@@ -67,6 +71,7 @@ export default class SignIn extends Vue {
       console.warn(`Sign in failure: ${error}`);
       this.authModule.setUser(null);
     }
+    this.uiModule.endLoading();
   }
 }
 </script>

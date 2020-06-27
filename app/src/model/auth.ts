@@ -1,4 +1,5 @@
 import * as firebase from "firebase/app";
+import { Github } from "../plugins/github";
 
 export interface User {
   uid: string;
@@ -9,15 +10,18 @@ export interface User {
   githubToken: string;
 }
 
-export function createUser(u: firebase.User, githubToken: string): User {
+export async function createUser(
+  u: firebase.User,
+  githubToken: string
+): Promise<User> {
+  const github = new Github(githubToken);
+  const ghUser = await github.me();
+
   return {
     uid: u.uid,
-
-    username: "unknown",
+    username: ghUser.login,
     email: u.email!,
-    // TODO: Get this from GitHub
     photoURL: u.photoURL!,
-
     githubToken
   };
 }
