@@ -29,7 +29,13 @@
       </div>
     </div>
     <div
-      v-if="eager || expanded"
+      v-if="loading"
+      class="text-lg text-center bg-gray-100 text-gray-600 p-4"
+    >
+      Loading...
+    </div>
+    <div
+      v-if="loaded || expanded"
       v-show="expanded"
       class="overflow-hidden bg-yellow-100"
     >
@@ -95,8 +101,8 @@ export default class ChangeEntry extends Vue {
   @Prop() meta!: FileMetadata;
   @Prop() chunks!: ChunkData[];
 
-  // TODO: This should depend on the number of additions and the file name
-  public eager = false;
+  public loading = false;
+  public loaded = false;
   public expanded = false;
 
   private authModule = getModule(AuthModule, this.$store);
@@ -157,10 +163,50 @@ export default class ChangeEntry extends Vue {
   }
 
   public toggle() {
-    this.expanded = !this.expanded;
-    if (this.expanded) {
-      this.eager = true;
+    if (!this.expanded) {
+      this.expand();
+    } else {
+      this.expanded = false;
     }
+  }
+
+  public expand() {
+    if (this.loaded) {
+      this.expanded = true;
+      return;
+    }
+
+    // TODO: Add some benchmarking here!
+    let totalLength = 0;
+    this.chunks.forEach(c => (totalLength += c.pairs.length));
+    const isLarge = totalLength >= 50;
+
+    if (!isLarge) {
+      this.expanded = true;
+      this.loaded = true;
+      return;
+    }
+
+    this.loading = true;
+    this.nextRender(() => {
+      this.expanded = true;
+      this.loaded = true;
+      this.loading = false;
+    });
+  }
+
+  public collapse() {
+    this.expanded = false;
+  }
+
+  /**
+   * This is like a harder version of nextTick, see:
+   * https://github.com/vuejs/vue/issues/9200
+   */
+  public nextRender(callback: FrameRequestCallback) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(callback);
+    });
   }
 
   get allThreads() {
