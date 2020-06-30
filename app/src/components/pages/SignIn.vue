@@ -8,7 +8,7 @@
       </div>
       <div class="p-4">
         <p>
-          DiffMachine needs access to your GitHub account in order to perform
+          CodeApprove needs access to your GitHub account in order to perform
           code review.
         </p>
 

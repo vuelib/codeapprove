@@ -11,6 +11,9 @@
         class="mt-8 col-start-2 col-span-10"
       />
     </div>
+
+    <!-- Errors -->
+    <ErrorStack />
   </div>
 </template>
 
@@ -20,6 +23,7 @@ import { getModule } from "vuex-module-decorators";
 
 import HeaderBar from "@/components/elements/HeaderBar.vue";
 import ProgressBar from "@/components/elements/ProgressBar.vue";
+import ErrorStack from "@/components/elements/ErrorStack.vue";
 
 import { auth } from "./plugins/firebase";
 import AuthModule from "./store/modules/auth";
@@ -27,7 +31,8 @@ import AuthModule from "./store/modules/auth";
 @Component({
   components: {
     HeaderBar,
-    ProgressBar
+    ProgressBar,
+    ErrorStack
   }
 })
 export default class App extends Vue {
