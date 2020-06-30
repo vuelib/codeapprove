@@ -13,13 +13,14 @@
         </p>
 
         <!-- TODO: This is a nuts style -->
-        <button
-          @click.prevent="startSignIn()"
-          class="inline-flex items-center bg-gray-900 hover:bg-black border-gray-700 border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
+        <a :href="githubUrl" target="_self"
+          ><button
+            class="inline-flex items-center bg-gray-900 hover:bg-black border-gray-700 border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
+          >
+            <font-awesome-icon :icon="['fab', 'github']" size="lg" />
+            <span class="ml-2 font-bold">Sign In with GitHub</span>
+          </button></a
         >
-          <font-awesome-icon :icon="['fab', 'github']" size="lg" />
-          <span class="ml-2 font-bold">Sign In with GitHub</span>
-        </button>
       </div>
     </div>
   </div>
@@ -29,6 +30,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 
 import * as firebase from "firebase/app";
+import { config } from "../../plugins/config";
 import { auth } from "../../plugins/firebase";
 
 import { getModule } from "vuex-module-decorators";
@@ -45,33 +47,38 @@ export default class SignIn extends Vue {
   private authModule = getModule(AuthModule, this.$store);
   private uiModule = getModule(UIModule, this.$store);
 
-  public async startSignIn() {
-    const provider = new firebase.auth.GithubAuthProvider();
-    // TODO: Scopes
-    // provider.addScope('repo');
+  async mounted() {
+    if (this.$route.query.custom_token) {
+      this.signInCustom(
+        this.$route.query.custom_token as string,
+        this.$route.query.access_token as string
+      );
+    }
+  }
 
+  private async signInCustom(customToken: string, accessToken: string) {
     this.uiModule.beginLoading();
     try {
-      const result = await auth().signInWithPopup(provider);
+      const result = await auth().signInWithCustomToken(customToken);
       if (result.user) {
-        console.log(`Sign in success`);
-
-        const cred = result.credential as firebase.auth.OAuthCredential;
-
-        const user: User = await createUser(result.user, cred.accessToken!);
+        // TODO: Store the expiry
+        const user: User = createUser(result.user, accessToken);
         this.authModule.setUser(user);
 
         // TODO: Real routing after sign-in
         this.$router.push("/pr/hatboysam/diffmachine/5");
       } else {
-        console.log(`Sign in failure`);
         this.authModule.setUser(null);
       }
-    } catch (error) {
-      console.warn(`Sign in failure: ${error}`);
+    } catch (e) {
+      console.warn(`Sign in failure: ${e}`);
       this.authModule.setUser(null);
     }
     this.uiModule.endLoading();
+  }
+
+  get githubUrl() {
+    return `https://github.com/login/oauth/authorize?client_id=${config.github.client_id}&redirect_uri=${config.github.redirect}`;
   }
 }
 </script>

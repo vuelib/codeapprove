@@ -18,7 +18,7 @@
       <ul
         v-if="showDropdown"
         v-click-outside="() => (showDropdown = false)"
-        class="dropdown absolute whitespace-no-wrap mt-2 border border-gray-400 bg-white rounded text-md text-black"
+        class="dropdown absolute mt-2 rounded shadow border border-gray-400 bg-white rounded whitespace-no-wrap text-md text-black"
       >
         <li class="block px-4 py-2">{{ username }}</li>
         <li class="block px-4 py-2 dropdown-item" @click="signOut()">

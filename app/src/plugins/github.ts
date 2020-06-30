@@ -5,20 +5,23 @@ import {
 } from "@octokit/types";
 import parse from "parse-diff";
 
-let octokit = new Octokit();
+const PREVIEWS = ["machine-man-preview"];
 
 export class Github {
+  private unauthed: Octokit = new Octokit({ previews: PREVIEWS });
+  private authed: Octokit;
+
   constructor(token: string | null) {
     // TODO: What about token refresh?
     if (token != null) {
-      octokit = new Octokit({ auth: token });
+      this.authed = new Octokit({ auth: token, previews: PREVIEWS });
     } else {
-      octokit = new Octokit();
+      this.authed = new Octokit({ previews: PREVIEWS });
     }
   }
 
   async me(): Promise<UsersGetAuthenticatedResponseData> {
-    const res = await octokit.users.getAuthenticated();
+    const res = await this.authed.users.getAuthenticated();
     return res.data;
   }
 
@@ -28,7 +31,7 @@ export class Github {
     prefix: string
   ): Promise<SearchUsersResponseData> {
     // TODO: Prefer users from the same repo!
-    const res = await octokit.search.users({
+    const res = await this.unauthed.search.users({
       q: prefix
     });
 
@@ -36,7 +39,7 @@ export class Github {
   }
 
   async getPullRequest(owner: string, repo: string, pull_number: number) {
-    const pr = await octokit.pulls.get({
+    const pr = await this.authed.pulls.get({
       owner,
       repo,
       pull_number
@@ -61,13 +64,13 @@ export class Github {
     base: string,
     head: string
   ): Promise<parse.File[]> {
-    const res = await octokit.repos.compareCommits({
+    const res = await this.unauthed.repos.compareCommits({
       owner,
       repo,
       base,
       head,
-      headers: {
-        accept: "application/vnd.github.v3.diff"
+      mediaType: {
+        format: "diff"
       }
     });
 

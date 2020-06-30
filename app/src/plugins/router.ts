@@ -14,6 +14,7 @@ const authModule = getModule(AuthModule, store);
 authModule.restoreFromLocalStorage();
 
 const router = new VueRouter({
+  mode: "history",
   routes: [
     {
       path: "/pr/:owner/:repo/:number",

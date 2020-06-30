@@ -8,6 +8,16 @@
   },
   "hosting": {
     "public": "app/dist",
+    "rewrites": [
+      {
+        "source": "/oauth",
+        "function": "oauth"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
