@@ -37,7 +37,7 @@
     <div
       v-if="loaded || expanded"
       v-show="expanded"
-      class="overflow-hidden bg-yellow-100"
+      class="bg-dark-4 overflow-hidden"
     >
       <template v-for="({ chunk, pairs }, i) in this.chunks">
         <div

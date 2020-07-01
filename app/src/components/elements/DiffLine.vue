@@ -31,7 +31,7 @@
 
     <!-- Right -->
     <div
-      class="ib relative w-1/2 align-top border-l border-gray-300"
+      class="ib relative w-1/2 align-top border-l border-dark-0"
       :class="bgClass(rendered.right)"
       @mouseenter="hovered.right = true"
       @mouseleave="hovered.right = false"
@@ -138,9 +138,9 @@ export default class DiffLine extends Vue {
       case "del":
         return "bg-red-200";
       case "add":
-        return "bg-green-200";
+        return "bg-diff-green";
       default:
-        return "";
+        return "bg-dark-4";
     }
   }
 
