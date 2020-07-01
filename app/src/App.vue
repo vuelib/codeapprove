@@ -58,6 +58,8 @@ export default class App extends Vue {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  @apply text-wht-brt bg-dark-1;
 }
 
 .btn:focus {
@@ -73,7 +75,7 @@ input:focus {
 .btn {
   @apply px-2 py-1;
   @apply rounded shadow border;
-  @apply bg-white;
+  @apply bg-dark-4;
 }
 
 .btn-small {
@@ -87,7 +89,7 @@ input:focus {
 
 .btn:hover {
   @apply shadow-none;
-  @apply border-white text-white;
+  @apply text-wht-med;
 }
 
 .btn-blue {

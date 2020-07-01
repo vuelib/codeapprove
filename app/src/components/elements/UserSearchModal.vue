@@ -2,17 +2,17 @@
   <div
     @keyup="keyHandler"
     id="searchbox"
-    class="w-auto shadow-lg bg-white border border-gray-400 rounded"
+    class="w-auto shadow-lg bg-dark-2 border border-dark-0 rounded"
   >
-    <div class="font-bold px-2">
+    <div class="bg-dark-2 font-bold px-2">
       Search
     </div>
-    <div class="p-2 border-t border-b border-gray-400">
+    <div class="p-2 border-t border-b border-dark-0">
       <input
         ref="searchField"
         type="text"
         v-model="query"
-        class="w-full"
+        class="w-full bg-dark-4"
         placeholder="Type a username..."
       />
     </div>
@@ -32,7 +32,7 @@
           <div class="py-1 px-1">
             <img
               :src="item.avatar_url"
-              class="border border-gray-500 rounded-full inline avatar mr-2"
+              class="rounded-full inline avatar mr-2"
             /><span>{{ item.login }}</span>
           </div>
         </li>
@@ -139,6 +139,6 @@ export default class UserSearchModal extends Vue {
 }
 
 .active {
-  @apply font-bold border-t border-b border-gray-400 bg-gray-200;
+  @apply font-bold border-t border-b border-dark-0 bg-dark-3;
 }
 </style>

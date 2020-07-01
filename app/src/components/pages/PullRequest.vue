@@ -5,7 +5,7 @@
         <h3 class="font-bold text-xl">
           {{ pr.head.repo.full_name }}
           (<a
-            class="text-blue-600 hover:underline"
+            class="text-purple-300 hover:underline"
             :href="
               `https://github.com/${pr.head.repo.full_name}/pull/${pr.number}`
             "
@@ -42,9 +42,9 @@
 
     <div
       v-if="drafts.length"
-      class="flex flex-row items-center rounded border border-yellow-500 bg-yellow-200 my-4 py-3"
+      class="flex flex-row items-center rounded border border-dark-0 bg-dark-3 my-4 py-3"
     >
-      <span class="ml-4 font-bold text-yellow-800"
+      <span class="ml-4 font-bold text-yellow-400"
         ><font-awesome-icon icon="paper-plane" class="mr-1" /> You have
         {{ drafts.length }} draft comments</span
       >
@@ -64,25 +64,25 @@
     <div class="grid grid-cols-12 gap-4 items-start">
       <!-- Description -->
       <div
-        class="col-span-8 shadow rounded border border-gray-400 overflow-hidden"
+        class="col-span-8 shadow rounded border border-dark-0 overflow-hidden"
       >
         <div
-          class="flex items-center px-4 py-1 bg-gray-200 font-bold border-b border-gray-400"
+          class="flex items-center px-4 py-1 bg-dark-3 font-bold border-b border-dark-0"
         >
           <font-awesome-icon icon="user-edit" class="mr-2" />
           <span>Description</span>
         </div>
-        <MarkdownContent class="p-4" :content="pr.body" />
+        <MarkdownContent class="bg-dark-2 p-4" :content="pr.body" />
       </div>
 
       <!-- Review info -->
       <div
         :class="isApproved ? 'container-green' : 'container-yellow'"
-        class="col-span-4 shadow inline-block overflow-hidden rounded border"
+        class="col-span-4 shadow inline-block border-dark-0 overflow-hidden rounded border"
       >
         <div
           :class="isApproved ? 'content-green' : 'content-yellow'"
-          class="flex items-center px-4 py-1 font-bold border-b"
+          class="flex items-center px-4 py-1 bg-dark-3 font-bold border-dark-0 border-b"
         >
           <!-- TODO: Variable icon and styling -->
           <font-awesome-icon
@@ -91,7 +91,7 @@
           />
           <span>Status: {{ statusText }}</span>
         </div>
-        <div class="p-4">
+        <div class="bg-dark-2 p-4">
           <table class="table-auto">
             <tr>
               <td class="font-bold align-top">
@@ -340,18 +340,20 @@ export default class PullRequest extends Vue {
 
 <style lang="postcss">
 .container-yellow {
-  @apply border-yellow-700;
+  /* @apply border-yellow-300; */
 }
 
 .content-yellow {
-  @apply bg-yellow-500 text-yellow-900;
+  /* @apply border-yellow-300 bg-yellow-200 text-yellow-400; */
+  @apply text-yellow-400;
 }
 
 .container-green {
-  @apply border-green-700;
+  /* @apply border-green-400; */
 }
 
 .content-green {
-  @apply border-green-700 bg-green-500 text-green-900;
+  /* @apply border-green-300 bg-green-200 text-green-400; */
+  @apply text-green-400;
 }
 </style>
