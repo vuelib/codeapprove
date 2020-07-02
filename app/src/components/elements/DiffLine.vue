@@ -3,10 +3,10 @@
     <!-- Left -->
     <div
       class="ib relative w-1/2 align-top"
-      :class="bgClass(rendered.left)"
       @mouseenter="hovered.left = true"
       @mouseleave="hovered.left = false"
     >
+      <div class="shim" :class="bgClass(rendered.left)"></div>
       <code class="line-number">{{ lineNumberString(rendered.left) }}</code>
       <code class="line-marker">{{ rendered.left.marker }}</code>
       <code class="line-content">{{ rendered.left.content }}</code>
@@ -32,10 +32,10 @@
     <!-- Right -->
     <div
       class="ib relative w-1/2 align-top border-l border-dark-0"
-      :class="bgClass(rendered.right)"
       @mouseenter="hovered.right = true"
       @mouseleave="hovered.right = false"
     >
+      <div class="shim" :class="bgClass(rendered.right)"></div>
       <code class="line-number">{{ lineNumberString(rendered.right) }}</code>
       <code class="line-marker">{{ rendered.right.marker }}</code>
       <code class="line-content">{{ rendered.right.content }}</code>
@@ -136,11 +136,11 @@ export default class DiffLine extends Vue {
   public bgClass(change: RenderedChange): string {
     switch (change.type) {
       case "del":
-        return "bg-red-200";
+        return "bg-red-500";
       case "add":
-        return "bg-diff-green";
+        return "bg-green-500";
       default:
-        return "bg-dark-4";
+        return "hidden";
     }
   }
 
@@ -155,6 +155,17 @@ export default class DiffLine extends Vue {
 </script>
 
 <style scoped lang="postcss">
+.shim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+
+  opacity: 0.25;
+}
+
 .ib {
   @apply inline-block;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="border border-gray-400 bg-white">
+  <div class="border border-dark-0 bg-dark-6">
     <div
       v-if="resolved && !forceExpand"
       class="flex items-center px-2 py-1 text-gray-600"
@@ -31,7 +31,7 @@
       <div @focusin="focused = true">
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="photoURL" />
-          <div class="flex-grow relative rounded bg-white">
+          <div class="flex-grow relative rounded bg-dark-7">
             <font-awesome-icon
               v-show="typing"
               @click="renderDraft = !renderDraft"
@@ -39,7 +39,7 @@
               class="absolute m-1 right-0 text-gray-600 hover:text-gray-800 cursor-pointer"
             />
             <textarea
-              class="w-full overflow-hidden rounded border border-gray-400 py-1 px-2"
+              class="w-full overflow-hidden rounded bg-dark-7 py-1 px-2"
               v-show="!renderDraft"
               v-model="draftComment"
               :rows="typing ? '4' : '1'"

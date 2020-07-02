@@ -32,5 +32,7 @@ export default class ErrorStack extends Vue {
   position: fixed;
   bottom: 24px;
   right: 24px;
+
+  z-index: 100;
 }
 </style>

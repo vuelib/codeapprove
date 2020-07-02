@@ -54,12 +54,14 @@ export default class App extends Vue {
 </script>
 
 <style lang="postcss">
+body {
+  @apply text-wht-brt bg-dark-1;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @apply text-wht-brt bg-dark-1;
 }
 
 .btn:focus {

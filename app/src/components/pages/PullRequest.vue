@@ -42,7 +42,7 @@
 
     <div
       v-if="drafts.length"
-      class="flex flex-row items-center rounded border border-dark-0 bg-dark-3 my-4 py-3"
+      class="flex flex-row items-center rounded border border-dark-0 bg-dark-4 my-4 py-3"
     >
       <span class="ml-4 font-bold text-yellow-400"
         ><font-awesome-icon icon="paper-plane" class="mr-1" /> You have

@@ -28,10 +28,7 @@
         ></div>
       </div>
     </div>
-    <div
-      v-if="loading"
-      class="text-lg text-center bg-dark-2 text-brt-dim p-4"
-    >
+    <div v-if="loading" class="text-lg text-center bg-dark-2 text-brt-dim p-4">
       Loading...
     </div>
     <div
@@ -41,10 +38,10 @@
     >
       <template v-for="({ chunk, pairs }, i) in this.chunks">
         <div
-          class="w-full border-b border-t border-blue-200"
+          class="w-full border-b border-t border-blue-500"
           :key="`chunk-${i}`"
         >
-          <pre class="w-full py-1 px-2 bg-blue-100 text-blue-500">{{
+          <pre class="w-full py-1 px-2 bg-dark-3 text-blue-500">{{
             chunk.content
           }}</pre>
         </div>

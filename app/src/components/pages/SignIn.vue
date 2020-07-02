@@ -1,9 +1,11 @@
 <template>
   <div class="flex flex-col items-center">
     <div
-      class="max-w-sm text-center inline-flex flex-col items-center m-8 rounded overflow-hidden border shadow-lg border-gray-300"
+      class="max-w-sm text-center inline-flex flex-col items-center m-8 rounded overflow-hidden border shadow-lg bg-dark-2 border-dark-0"
     >
-      <div class="w-full font-bold text-lg text-white bg-blue-800 p-2 m-0">
+      <div
+        class="w-full font-bold text-lg text-white bg-dark-3 border-b border-dark-0 p-2 m-0"
+      >
         Sign In
       </div>
       <div class="p-4">
@@ -15,7 +17,7 @@
         <!-- TODO: This is a nuts style -->
         <a :href="githubUrl" target="_self"
           ><button
-            class="inline-flex items-center bg-gray-900 hover:bg-black border-gray-700 border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
+            class="inline-flex items-center bg-dark-0 hover:bg-black border-wht-dim border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
           >
             <font-awesome-icon :icon="['fab', 'github']" size="lg" />
             <span class="ml-2 font-bold">Sign In with GitHub</span>
