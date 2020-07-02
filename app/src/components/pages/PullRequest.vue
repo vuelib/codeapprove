@@ -149,12 +149,8 @@
         <span class="font-bold text-lg">Changes</span>
         <span class="flex-grow"><!-- spacer --></span>
 
-        <!-- TODO: Make these work -->
-        <button class="btn btn-small btn-blue ml-2">
-          Expand <font-awesome-icon icon="plus" class="ml-1" />
-        </button>
-        <button class="btn btn-small btn-blue ml-2">
-          Collapse <font-awesome-icon icon="minus" class="ml-1" />
+        <button @click="collapseAll" class="btn btn-small btn-blue ml-2">
+          Collapse All <font-awesome-icon icon="minus" class="ml-1" />
         </button>
       </div>
 
@@ -262,6 +258,15 @@ export default class PullRequest extends Vue {
     console.log("onReviewerSelected", event);
     this.usersearching = false;
     this.reviewModule.pushReviewer({ login: event.login, approved: false });
+  }
+
+  public collapseAll() {
+    const changes = this.$refs.changes as ChangeEntryAPI[];
+    for (const c of changes) {
+      c.deactivate();
+      c.collapse();
+    }
+    this.activeFileIndex = -1;
   }
 
   private onNextFile() {

@@ -42,12 +42,12 @@ const LANG_MAP: Record<string, string> = {
   yaml: "yaml"
 };
 
-const Prism = require('prismjs');
+const Prism = require("prismjs");
 
 // TODO: Will this tree-shake properly?
 // Require the prism plugin for each language we support
 // See: https://github.com/PrismJS/prism/issues/593
-if (!Prism.languages['markup-templating']) {
+if (!Prism.languages["markup-templating"]) {
   require("prismjs/components/prism-markup-templating.js");
 }
 

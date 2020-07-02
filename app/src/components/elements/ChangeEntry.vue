@@ -92,6 +92,8 @@ import {
 export type ChangeEntryAPI = Vue & {
   activate(): void;
   deactivate(): void;
+  expand(): void;
+  collapse(): void;
   toggle(): void;
 };
 
@@ -186,8 +188,12 @@ export default class ChangeEntry extends Vue {
     if (!this.expanded) {
       this.expand();
     } else {
-      this.expanded = false;
+      this.collapse();
     }
+  }
+
+  public collapse() {
+    this.expanded = false;
   }
 
   public expand() {
@@ -213,10 +219,6 @@ export default class ChangeEntry extends Vue {
       this.loaded = true;
       this.loading = false;
     });
-  }
-
-  public collapse() {
-    this.expanded = false;
   }
 
   /**

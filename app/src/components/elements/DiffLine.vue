@@ -151,9 +151,9 @@ export default class DiffLine extends Vue {
   public bgClass(change: RenderedChange): string {
     switch (change.type) {
       case "del":
-        return "bg-red-500";
+        return "bg-red-700";
       case "add":
-        return "bg-green-500";
+        return "bg-green-700";
       default:
         return "hidden";
     }
@@ -174,6 +174,10 @@ code {
   background: transparent !important;
 }
 
+.line-content code[class*="language-"] {
+  @apply text-wht-brt;
+}
+
 .shim {
   position: absolute;
   top: 0;
@@ -182,7 +186,7 @@ code {
   height: 100%;
   z-index: 2;
 
-  opacity: 0.25;
+  opacity: 0.15;
 }
 
 .ib {
