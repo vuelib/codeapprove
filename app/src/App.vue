@@ -80,22 +80,21 @@ input:focus {
 
 .btn {
   @apply px-2 py-1;
-  @apply rounded shadow border;
-  @apply bg-dark-4;
+  @apply rounded border;
+  @apply bg-dark-1;
 }
 
 .btn-small {
   /** TODO: This should be applied to all icon buttons! */
   @apply flex flex-row items-center;
   @apply text-sm;
-  @apply px-1;
+  @apply px-2;
   padding-top: 1px;
   padding-bottom: 1px;
 }
 
 .btn:hover {
-  @apply shadow-none;
-  @apply text-wht-med;
+  @apply bg-dark-5;
 }
 
 .btn-blue {
@@ -103,7 +102,7 @@ input:focus {
 }
 
 .btn-blue:hover {
-  @apply border-blue-600 bg-blue-500;
+  @apply text-blue-400 text-blue-500;
 }
 
 .btn-red {
@@ -111,7 +110,7 @@ input:focus {
 }
 
 .btn-red:hover {
-  @apply border-red-500 bg-red-400;
+  @apply text-red-400 text-red-400;
 }
 
 .btn-green {
@@ -119,6 +118,6 @@ input:focus {
 }
 
 .btn-green:hover {
-  @apply border-green-600 bg-green-500;
+  @apply border-green-400 text-green-400;
 }
 </style>

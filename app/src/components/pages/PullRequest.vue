@@ -42,7 +42,7 @@
 
     <div
       v-if="drafts.length"
-      class="flex flex-row items-center rounded border border-dark-0 bg-dark-4 my-4 py-3"
+      class="flex flex-row items-center rounded border border-dark-0 bg-dark-3 dark-shadow my-4 py-3"
     >
       <span class="ml-4 font-bold text-yellow-400"
         ><font-awesome-icon icon="paper-plane" class="mr-1" /> You have
@@ -77,11 +77,10 @@
 
       <!-- Review info -->
       <div
-        :class="isApproved ? 'container-green' : 'container-yellow'"
         class="col-span-4 dark-shadow inline-block border-dark-0 overflow-hidden rounded border"
       >
         <div
-          :class="isApproved ? 'content-green' : 'content-yellow'"
+          :class="isApproved ? 'text-green-400' : 'text-yellow-400'"
           class="flex items-center px-4 py-1 bg-dark-3 font-bold border-dark-0 border-b"
         >
           <!-- TODO: Variable icon and styling -->
@@ -338,22 +337,4 @@ export default class PullRequest extends Vue {
 }
 </script>
 
-<style lang="postcss">
-.container-yellow {
-  /* @apply border-yellow-300; */
-}
-
-.content-yellow {
-  /* @apply border-yellow-300 bg-yellow-200 text-yellow-400; */
-  @apply text-yellow-400;
-}
-
-.container-green {
-  /* @apply border-green-400; */
-}
-
-.content-green {
-  /* @apply border-green-300 bg-green-200 text-green-400; */
-  @apply text-green-400;
-}
-</style>
+<style lang="postcss"></style>
