@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loaded" class="relative py-4 px-4">
+  <div v-if="loaded" v-hotkey="keymap" class="relative py-4 px-4">
     <HotkeyModal :map="keymap" />
     <div class="mb-4 flex flex-row items-center">
       <div>
@@ -160,6 +160,7 @@
 
       <ChangeEntry
         v-for="(diff, index) in diffs"
+        ref="changes"
         :key="`${index}-change`"
         :meta="getMetadata(diff)"
         :chunks="renderChunkData(diff)"
@@ -191,6 +192,7 @@ import {
 import { Thread, Comment, ReviewMetadata } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import { KeyMap } from "../elements/HotkeyModal.vue";
+import { ChangeEntryAPI } from "../elements/ChangeEntry.vue";
 
 @Component({
   components: {
@@ -208,6 +210,8 @@ export default class PullRequest extends Vue {
   // TODO: These should be one state object
   public pr: PullsGetResponseData | null = null;
   public diffs: parseDiff.File[] = [];
+
+  public activeFileIndex = -1;
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
@@ -261,22 +265,59 @@ export default class PullRequest extends Vue {
   }
 
   private onNextFile() {
-    console.log("TODO: Next");
+    const prev = this.getCurrentChangeEntry();
+    if (prev) {
+      prev.deactivate();
+    }
+
+    if (this.activeFileIndex < this.diffs.length - 1) {
+      this.activeFileIndex++;
+    }
+
+    const next = this.getCurrentChangeEntry()!;
+    next.activate();
   }
 
   private onPrevFile() {
-    console.log("TODO: Prev");
+    const prev = this.getCurrentChangeEntry();
+    if (prev) {
+      prev.deactivate();
+    }
+
+    if (this.activeFileIndex > 0) {
+      this.activeFileIndex--;
+    }
+
+    const next = this.getCurrentChangeEntry()!;
+    next.activate();
+  }
+
+  private onToggleFile() {
+    const ce = this.getCurrentChangeEntry()!;
+    ce.toggle();
+  }
+
+  private getCurrentChangeEntry(): ChangeEntryAPI | undefined {
+    if (this.activeFileIndex < 0) {
+      return;
+    }
+
+    return (this.$refs.changes as ChangeEntryAPI[])[this.activeFileIndex];
   }
 
   get keymap(): KeyMap {
     return {
       j: {
         keydown: this.onNextFile,
-        desc: "Move to next file."
+        desc: "Select next file."
       },
       k: {
         keydown: this.onPrevFile,
-        desc: "Move to previous file."
+        desc: "Select previous file."
+      },
+      x: {
+        keydown: this.onToggleFile,
+        desc: "Expand/collapse selected file."
       }
     };
   }

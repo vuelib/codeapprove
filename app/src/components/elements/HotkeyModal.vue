@@ -68,7 +68,7 @@ export default class HotkeyModal extends Vue {
 
 <style lang="postcss">
 .hotkey-overlay {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);

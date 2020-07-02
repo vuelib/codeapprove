@@ -1,5 +1,8 @@
 <template>
-  <div class="rounded overflow-hidden my-2 dark-shadow border border-dark-0">
+  <div
+    :class="{ active: active }"
+    class="rounded overflow-hidden my-2 dark-shadow border border-dark-0"
+  >
     <div
       @click="toggle"
       class="flex p-2 font-bold items-center bg-dark-3 border-b border-dark-0"
@@ -85,7 +88,13 @@ import {
   FileMetadata
 } from "../../plugins/diff";
 
-interface ChunkData {
+export type ChangeEntryAPI = Vue & {
+  activate(): void;
+  deactivate(): void;
+  toggle(): void;
+};
+
+export interface ChunkData {
   chunk: parseDiff.Chunk;
   pairs: RenderedChangePair[];
 }
@@ -99,6 +108,7 @@ export default class ChangeEntry extends Vue {
   @Prop() meta!: FileMetadata;
   @Prop() chunks!: ChunkData[];
 
+  public active = false;
   public loading = false;
   public loaded = false;
   public expanded = false;
@@ -158,6 +168,17 @@ export default class ChangeEntry extends Vue {
         resolved: event.resolve
       });
     }
+  }
+
+  public activate() {
+    this.active = true;
+    this.$el.scrollIntoView({
+      block: "center"
+    });
+  }
+
+  public deactivate() {
+    this.active = false;
   }
 
   public toggle() {
@@ -257,6 +278,8 @@ export default class ChangeEntry extends Vue {
 }
 </script>
 
-<style scoped lang="scss">
-// None
+<style scoped lang="postcss">
+.active {
+  @apply border border-blue-500;
+}
 </style>
