@@ -23,6 +23,10 @@ Vue.use(vClickOutside);
 const VueHotKey = require("v-hotkey");
 Vue.use(VueHotKey.default);
 
+// Prism syntax highlighting
+import "prismjs";
+import "prism-themes/themes/prism-atom-dark.css";
+
 Vue.config.productionTip = false;
 
 // Enable performance tracing in dev

@@ -54,6 +54,7 @@
           v-for="(pair, j) in pairs"
           :key="`chunk-${i}-change-${j}`"
           :rendered="pair"
+          :langs="langPair"
           :threads="getThreads(pair)"
           @add-comment="onAddComment(chunk, $event)"
         />
@@ -72,6 +73,7 @@ import DiffLine from "@/components/elements/DiffLine.vue";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { AddCommentEvent } from "../../model/events";
+import { LANG_MAP } from "../../plugins/prism";
 
 import {
   ThreadArgs,
@@ -83,7 +85,6 @@ import {
 import {
   ChangePair,
   zipChangePairs,
-  renderPairs,
   RenderedChangePair,
   FileMetadata
 } from "../../plugins/diff";
@@ -226,6 +227,25 @@ export default class ChangeEntry extends Vue {
     requestAnimationFrame(() => {
       requestAnimationFrame(callback);
     });
+  }
+
+  public get langPair() {
+    return {
+      left: this.getLang("left"),
+      right: this.getLang("right")
+    };
+  }
+
+  private getLang(side: Side): string {
+    const filename = side === "left" ? this.meta.from : this.meta.to;
+    const segments = filename.split(".");
+    const ext = segments[segments.length - 1];
+
+    if (LANG_MAP[ext]) {
+      return LANG_MAP[ext];
+    }
+
+    return "markup";
   }
 
   get allThreads() {

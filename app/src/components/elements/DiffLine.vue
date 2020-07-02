@@ -9,7 +9,9 @@
       <div class="shim" :class="bgClass(rendered.left)"></div>
       <code class="line-number">{{ lineNumberString(rendered.left) }}</code>
       <code class="line-marker">{{ rendered.left.marker }}</code>
-      <code class="line-content">{{ rendered.left.content }}</code>
+      <prism inline :language="langs.left" class="line-content">{{
+        rendered.left.content
+      }}</prism>
 
       <button
         v-show="!rendered.left.empty && hovered.left && !showComments('left')"
@@ -38,7 +40,9 @@
       <div class="shim" :class="bgClass(rendered.right)"></div>
       <code class="line-number">{{ lineNumberString(rendered.right) }}</code>
       <code class="line-marker">{{ rendered.right.marker }}</code>
-      <code class="line-content">{{ rendered.right.content }}</code>
+      <prism inline :language="langs.right" class="line-content">{{
+        rendered.right.content
+      }}</prism>
 
       <button
         v-show="
@@ -69,21 +73,32 @@ import parseDiff from "parse-diff";
 
 import CommentThread from "@/components/elements/CommentThread.vue";
 import ReviewModule from "../../store/modules/review";
-import { Comment, ThreadArgs, Thread, ThreadPair } from "../../model/review";
+import {
+  Comment,
+  ThreadArgs,
+  Thread,
+  ThreadPair,
+  LangPair
+} from "../../model/review";
 import {
   RenderedChangePair,
   renderChange,
   RenderedChange
 } from "../../plugins/diff";
 
+// TODO: Should I move this out?
+const Prism = require("vue-prism-component");
+
 type Side = "left" | "right";
 
 @Component({
   components: {
-    CommentThread
+    CommentThread,
+    Prism
   }
 })
 export default class DiffLine extends Vue {
+  @Prop() public langs!: LangPair;
   @Prop() public threads!: ThreadPair;
   @Prop() public rendered!: RenderedChangePair;
 
@@ -155,6 +170,10 @@ export default class DiffLine extends Vue {
 </script>
 
 <style scoped lang="postcss">
+code {
+  background: transparent !important;
+}
+
 .shim {
   position: absolute;
   top: 0;

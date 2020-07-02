@@ -38,6 +38,11 @@ export interface Comment extends CommentArgs {
   timestamp: string;
 }
 
+export interface LangPair {
+  left: string;
+  right: string;
+}
+
 export interface ThreadPair {
   left: Thread | null;
   right: Thread | null;
