@@ -1,5 +1,6 @@
 <template>
-  <div v-if="loaded" class="py-4 px-4">
+  <div v-if="loaded" class="relative py-4 px-4">
+    <HotkeyModal :map="keymap" />
     <div class="mb-4 flex flex-row items-center">
       <div>
         <h3 class="font-bold text-xl">
@@ -177,6 +178,7 @@ import parseDiff from "parse-diff";
 import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 import UserSearchModal from "@/components/elements/UserSearchModal.vue";
+import HotkeyModal from "@/components/elements/HotkeyModal.vue";
 
 import { Github } from "../../plugins/github";
 import ReviewModule from "../../store/modules/review";
@@ -188,12 +190,14 @@ import {
 } from "../../plugins/diff";
 import { Thread, Comment, ReviewMetadata } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
+import { KeyMap } from "../elements/HotkeyModal.vue";
 
 @Component({
   components: {
     ChangeEntry,
     MarkdownContent,
-    UserSearchModal
+    UserSearchModal,
+    HotkeyModal
   }
 })
 export default class PullRequest extends Vue {
@@ -254,6 +258,27 @@ export default class PullRequest extends Vue {
     console.log("onReviewerSelected", event);
     this.usersearching = false;
     this.reviewModule.pushReviewer({ login: event.login, approved: false });
+  }
+
+  private onNextFile() {
+    console.log("TODO: Next");
+  }
+
+  private onPrevFile() {
+    console.log("TODO: Prev");
+  }
+
+  get keymap(): KeyMap {
+    return {
+      j: {
+        keydown: this.onNextFile,
+        desc: "Move to next file."
+      },
+      k: {
+        keydown: this.onPrevFile,
+        desc: "Move to previous file."
+      }
+    };
   }
 
   get userHasApproved() {
