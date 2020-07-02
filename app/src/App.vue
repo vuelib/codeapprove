@@ -54,6 +54,10 @@ export default class App extends Vue {
 </script>
 
 <style lang="postcss">
+body {
+  @apply text-wht-brt bg-dark-1;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -70,24 +74,27 @@ input:focus {
   outline: none;
 }
 
+.dark-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
 .btn {
   @apply px-2 py-1;
-  @apply rounded shadow border;
-  @apply bg-white;
+  @apply rounded border;
+  @apply bg-dark-1;
 }
 
 .btn-small {
   /** TODO: This should be applied to all icon buttons! */
   @apply flex flex-row items-center;
   @apply text-sm;
-  @apply px-1;
+  @apply px-2;
   padding-top: 1px;
   padding-bottom: 1px;
 }
 
 .btn:hover {
-  @apply shadow-none;
-  @apply border-white text-white;
+  @apply bg-dark-5;
 }
 
 .btn-blue {
@@ -95,7 +102,7 @@ input:focus {
 }
 
 .btn-blue:hover {
-  @apply border-blue-600 bg-blue-500;
+  @apply text-blue-400 text-blue-500;
 }
 
 .btn-red {
@@ -103,7 +110,7 @@ input:focus {
 }
 
 .btn-red:hover {
-  @apply border-red-500 bg-red-400;
+  @apply text-red-400 text-red-400;
 }
 
 .btn-green {
@@ -111,6 +118,6 @@ input:focus {
 }
 
 .btn-green:hover {
-  @apply border-green-600 bg-green-500;
+  @apply border-green-400 text-green-400;
 }
 </style>

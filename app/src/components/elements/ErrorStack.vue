@@ -3,9 +3,9 @@
     <div
       v-for="error in errors"
       :key="error"
-      class="rounded bg-red-200 border border-red-500 text-red-700 text-lg px-3 py-2"
+      class="rounded bg-dark-5 border border-dark-0 dark-shadow text-red-400 text-lg px-5 py-4"
     >
-      <font-awesome-icon icon="exclamation-circle" class="mr-2" /><b>Error:</b>
+      <b><font-awesome-icon icon="exclamation-circle" class="mr-2" />Error:</b>
       {{ error }}
     </div>
   </div>
@@ -32,5 +32,7 @@ export default class ErrorStack extends Vue {
   position: fixed;
   bottom: 24px;
   right: 24px;
+
+  z-index: 100;
 }
 </style>

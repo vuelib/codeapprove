@@ -31,16 +31,16 @@ export default class ProgressBar extends Vue {
 }
 
 .line {
+  @apply bg-purple-400;
   position: absolute;
   opacity: 0.4;
-  background: #4a8df8;
   width: 150%;
   height: 5px;
 }
 
 .subline {
+  @apply bg-purple-400;
   position: absolute;
-  background: #4a8df8;
   height: 5px;
 }
 .inc {

@@ -1,7 +1,7 @@
 <template>
   <div
     id="bar"
-    class="flex items-center shadow-md text-white font-bold py-4 px-8 bg-blue-800"
+    class="flex items-center dark-shadow text-purple-300 font-bold py-4 px-8 bg-dark-2"
   >
     <font-awesome-icon icon="code-branch" size="lg" class="mr-4" />
     <span class="text-xl flex-grow">CodeApprove</span>
@@ -18,9 +18,9 @@
       <ul
         v-if="showDropdown"
         v-click-outside="() => (showDropdown = false)"
-        class="dropdown absolute mt-2 rounded shadow border border-gray-400 bg-white rounded whitespace-no-wrap text-md text-black"
+        class="dropdown absolute mt-2 rounded dark-shadow border border-dark-0 bg-dark-3 rounded whitespace-no-wrap text-md text-white-brt"
       >
-        <li class="block px-4 py-2">{{ username }}</li>
+        <li class="block px-4 py-2 text-wht-brt">{{ username }}</li>
         <li class="block px-4 py-2 dropdown-item" @click="signOut()">
           <font-awesome-icon icon="door-open" class="pr-1" /> Sign Out
         </li>
@@ -85,10 +85,10 @@ export default class HeaderBar extends Vue {
 }
 
 .dropdown-item {
-  @apply cursor-pointer text-gray-800 border-t border-gray-400;
+  @apply cursor-pointer text-wht-brt border-t border-dark-0;
 }
 
 .dropdown-item:hover {
-  @apply text-white bg-blue-500 border-t border-white;
+  @apply font-bold bg-dark-5 border-t border-dark-0;
 }
 </style>
