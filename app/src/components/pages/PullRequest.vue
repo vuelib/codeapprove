@@ -64,7 +64,7 @@
     <div class="grid grid-cols-12 gap-4 items-start">
       <!-- Description -->
       <div
-        class="col-span-8 shadow rounded border border-dark-0 overflow-hidden"
+        class="col-span-8 dark-shadow rounded border border-dark-0 overflow-hidden"
       >
         <div
           class="flex items-center px-4 py-1 bg-dark-3 font-bold border-b border-dark-0"
@@ -78,7 +78,7 @@
       <!-- Review info -->
       <div
         :class="isApproved ? 'container-green' : 'container-yellow'"
-        class="col-span-4 shadow inline-block border-dark-0 overflow-hidden rounded border"
+        class="col-span-4 dark-shadow inline-block border-dark-0 overflow-hidden rounded border"
       >
         <div
           :class="isApproved ? 'content-green' : 'content-yellow'"

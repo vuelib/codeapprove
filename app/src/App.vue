@@ -74,6 +74,10 @@ input:focus {
   outline: none;
 }
 
+.dark-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
 .btn {
   @apply px-2 py-1;
   @apply rounded shadow border;

@@ -2,9 +2,9 @@
   <div
     @keyup="keyHandler"
     id="searchbox"
-    class="w-auto shadow-lg bg-dark-2 border border-dark-0 rounded"
+    class="w-auto dark-shadow bg-dark-2 border border-dark-0 rounded"
   >
-    <div class="bg-dark-2 font-bold px-2">
+    <div class="bg-dark-3 font-bold py-1 px-2">
       Search
     </div>
     <div class="p-2 border-t border-b border-dark-0">

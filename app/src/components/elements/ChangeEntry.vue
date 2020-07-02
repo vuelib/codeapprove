@@ -1,11 +1,11 @@
 <template>
-  <div class="rounded overflow-hidden my-2 border border-dark-0">
+  <div class="rounded overflow-hidden my-2 dark-shadow border border-dark-0">
     <div
       class="flex p-2 font-bold items-center bg-dark-3 border-b border-dark-0"
     >
       <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
       <!-- TODO: Show both file names when it's renamed -->
-      <span class="ml-2">{{ title }}</span>
+      <span class="ml-2 text-wht-med">{{ title }}</span>
       <span class="text-sm text-purple-300 ml-4" v-if="allThreads.length > 0">
         {{ allThreads.length }}
         <font-awesome-icon icon="comment" size="sm" />

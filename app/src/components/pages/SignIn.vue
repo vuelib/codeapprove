@@ -17,7 +17,7 @@
         <!-- TODO: This is a nuts style -->
         <a :href="githubUrl" target="_self"
           ><button
-            class="inline-flex items-center bg-dark-0 hover:bg-black border-wht-dim border hover:border-transparent shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
+            class="inline-flex items-center bg-dark-0 hover:bg-black border-wht-dim border hover:border-transparent dark-shadow hover:shadow-none rounded-lg mt-8 mb-4 px-4 py-2 text-white"
           >
             <font-awesome-icon :icon="['fab', 'github']" size="lg" />
             <span class="ml-2 font-bold">Sign In with GitHub</span>
