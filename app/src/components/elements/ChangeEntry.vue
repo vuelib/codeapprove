@@ -73,7 +73,7 @@ import DiffLine from "@/components/elements/DiffLine.vue";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { AddCommentEvent } from "../../model/events";
-import { LANG_MAP } from "../../plugins/prism";
+import { getFileLang } from "../../plugins/prism";
 
 import {
   ThreadArgs,
@@ -231,21 +231,9 @@ export default class ChangeEntry extends Vue {
 
   public get langPair() {
     return {
-      left: this.getLang("left"),
-      right: this.getLang("right")
+      left: getFileLang(this.meta.from),
+      right: getFileLang(this.meta.to)
     };
-  }
-
-  private getLang(side: Side): string {
-    const filename = side === "left" ? this.meta.from : this.meta.to;
-    const segments = filename.split(".");
-    const ext = segments[segments.length - 1];
-
-    if (LANG_MAP[ext]) {
-      return LANG_MAP[ext];
-    }
-
-    return "markup";
   }
 
   get allThreads() {
