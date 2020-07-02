@@ -1,14 +1,11 @@
 <template>
-  <div class="border border-gray-400 bg-white">
-    <div
-      v-if="resolved && !forceExpand"
-      class="flex items-center px-2 py-1 text-gray-600"
-    >
-      <span class="italic flex-grow">Comment resolved</span>
+  <div class="dark-shadow border border-dark-0 bg-dark-6">
+    <div v-if="resolved && !forceExpand" class="flex items-center px-2 py-1">
+      <span class="italic flex-grow text-wht-dim">Comment resolved</span>
       <font-awesome-icon
         @click="forceExpand = true"
         icon="eye"
-        class="hover:text-gray-800 cursor-pointer"
+        class="hover:text-white-brt text-wht-med cursor-pointer"
       />
     </div>
     <div v-else>
@@ -18,7 +15,7 @@
         <div class="flex-grow">
           <div class="inline-flex items-center">
             <span class="font-bold mr-2">{{ comment.username }}</span>
-            <span v-if="comment.draft" class="text-gray-600 text-sm"
+            <span v-if="comment.draft" class="text-wht-md text-sm"
               >(draft)</span
             >
           </div>
@@ -31,15 +28,15 @@
       <div @focusin="focused = true">
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="photoURL" />
-          <div class="flex-grow relative rounded bg-white">
+          <div class="flex-grow relative rounded bg-dark-7">
             <font-awesome-icon
               v-show="typing"
               @click="renderDraft = !renderDraft"
               :icon="renderDraft ? 'keyboard' : 'magic'"
-              class="absolute m-1 right-0 text-gray-600 hover:text-gray-800 cursor-pointer"
+              class="absolute m-1 right-0 text-wht-med hover:text-wht-brt cursor-pointer"
             />
             <textarea
-              class="w-full overflow-hidden rounded border border-gray-400 py-1 px-2"
+              class="w-full overflow-hidden rounded bg-dark-7 py-1 px-2"
               v-show="!renderDraft"
               v-model="draftComment"
               :rows="typing ? '4' : '1'"

@@ -1,17 +1,18 @@
 <template>
-  <div class="rounded overflow-hidden my-2 border border-gray-400">
+  <div class="rounded overflow-hidden my-2 dark-shadow border border-dark-0">
     <div
-      class="flex p-2 font-bold items-center bg-gray-200 border-b border-gray-400"
+      @click="toggle"
+      class="flex p-2 font-bold items-center bg-dark-3 border-b border-dark-0"
     >
-      <font-awesome-icon fixed-width @click="toggle" :icon="icon" />
+      <font-awesome-icon fixed-width :icon="icon" />
       <!-- TODO: Show both file names when it's renamed -->
-      <span class="ml-2">{{ title }}</span>
-      <span class="text-sm text-gray-700 ml-4" v-if="allThreads.length > 0">
+      <span class="ml-2 text-wht-med">{{ title }}</span>
+      <span class="text-sm text-purple-300 ml-4" v-if="allThreads.length > 0">
         {{ allThreads.length }}
         <font-awesome-icon icon="comment" size="sm" />
       </span>
       <span class="flex-grow"><!-- spacer --></span>
-      <span class="text-right text-sm text-gray-700 mr-2">{{
+      <span class="text-right text-sm text-white-md mr-2">{{
         meta.additions + meta.deletions
       }}</span>
       <div
@@ -19,32 +20,29 @@
         style="line-height: 12px; height: 12px;"
       >
         <div
-          class="inline-block bg-green-500"
+          class="inline-block bg-green-400"
           :style="`height: 12px; width: ${additionPct}%`"
         ></div>
         <div
-          class="inline-block bg-red-500"
+          class="inline-block bg-red-400"
           :style="`height: 12px; width: ${100 - additionPct}%`"
         ></div>
       </div>
     </div>
-    <div
-      v-if="loading"
-      class="text-lg text-center bg-gray-100 text-gray-600 p-4"
-    >
+    <div v-if="loading" class="text-lg text-center bg-dark-2 text-brt-dim p-4">
       Loading...
     </div>
     <div
       v-if="loaded || expanded"
       v-show="expanded"
-      class="overflow-hidden bg-yellow-100"
+      class="bg-dark-4 overflow-hidden"
     >
       <template v-for="({ chunk, pairs }, i) in this.chunks">
         <div
-          class="w-full border-b border-t border-blue-200"
+          class="w-full border-b border-t border-blue-500"
           :key="`chunk-${i}`"
         >
-          <pre class="w-full py-1 px-2 bg-blue-100 text-blue-500">{{
+          <pre class="w-full py-1 px-2 bg-dark-3 text-blue-500">{{
             chunk.content
           }}</pre>
         </div>
