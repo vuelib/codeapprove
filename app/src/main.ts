@@ -18,6 +18,11 @@ initIconLibrary();
 const vClickOutside = require("v-click-outside");
 Vue.use(vClickOutside);
 
+// Hotkey plugin
+// https://github.com/Dafrok/v-hotkey
+const VueHotKey = require("v-hotkey");
+Vue.use(VueHotKey.default);
+
 Vue.config.productionTip = false;
 
 // Enable performance tracing in dev

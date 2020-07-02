@@ -1,6 +1,6 @@
 <template>
   <div
-    @keyup="keyHandler"
+    v-hotkey="keymap"
     id="searchbox"
     class="w-auto dark-shadow bg-dark-2 border border-dark-0 rounded"
   >
@@ -84,26 +84,28 @@ export default class UserSearchModal extends Vue {
     this.searchFn();
   }
 
-  public keyHandler(event: KeyboardEvent) {
-    const ARROW_DOWN = 40;
-    const ARROW_UP = 38;
-    const ENTER = 13;
+  get keymap() {
+    return {
+      down: this.onArrowDown,
+      up: this.onArrowUp,
+      enter: this.onEnter
+    };
+  }
 
-    switch (event.keyCode) {
-      case ARROW_UP:
-        if (this.activeIndex > 0) {
-          this.activeIndex--;
-        }
-        break;
-      case ARROW_DOWN:
-        if (this.activeIndex < this.items.length - 1) {
-          this.activeIndex++;
-        }
-        break;
-      case ENTER:
-        this.selectItem(this.activeIndex);
-        break;
+  private onArrowUp() {
+    if (this.activeIndex > 0) {
+      this.activeIndex--;
     }
+  }
+
+  private onArrowDown() {
+    if (this.activeIndex < this.items.length - 1) {
+      this.activeIndex++;
+    }
+  }
+
+  private onEnter() {
+    this.selectItem(this.activeIndex);
   }
 
   public selectItem(index: number) {
