@@ -31,7 +31,7 @@
 
     <!-- Right -->
     <div
-      class="ib relative w-1/2 align-top border-l border-dark-0"
+      class="ib relative w-1/2 align-top"
       @mouseenter="hovered.right = true"
       @mouseleave="hovered.right = false"
     >
