@@ -295,6 +295,7 @@ export default class PullRequest extends Vue {
   private onToggleFile() {
     const ce = this.getCurrentChangeEntry()!;
     ce.toggle();
+    ce.activate();
   }
 
   private getCurrentChangeEntry(): ChangeEntryAPI | undefined {
