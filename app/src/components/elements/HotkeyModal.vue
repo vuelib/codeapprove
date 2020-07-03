@@ -2,7 +2,7 @@
   <div
     v-hotkey="keymap"
     v-show="show"
-    class="hotkey-overlay shadow-dark rounded border border-dark-0 bg-dark-5"
+    class="hotkey-overlay rounded border border-dark-0 bg-dark-5"
   >
     <div class="py-2 px-4 text-lg font-bold border-b border-dark-0 bg-dark-6">
       <font-awesome-icon icon="keyboard" class="ml-1 mr-2" /> Keyboard Shortcuts
@@ -43,7 +43,7 @@ export default class HotkeyModal extends Vue {
 
   get keymap() {
     return {
-      "ctrl+/": {
+      "alt+/": {
         keydown: this.onShow,
         keyup: this.onHide
       }

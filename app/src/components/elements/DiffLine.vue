@@ -27,7 +27,10 @@
         :side="'left'"
         :line="rendered.left.number"
         :threadId="getThreadId('left')"
-        @cancel="drafting.left = false"
+        @cancel="
+          drafting.left = false;
+          hovered.left = false;
+        "
       />
     </div>
 
@@ -60,7 +63,10 @@
         :side="'right'"
         :line="rendered.right.number"
         :threadId="getThreadId('right')"
-        @cancel="drafting.right = false"
+        @cancel="
+          drafting.right = false;
+          hovered.right = false;
+        "
       />
     </div>
   </div>
@@ -212,11 +218,11 @@ code {
 }
 
 .comment-button {
-  @apply absolute top-0 right-0;
-  @apply px-2 ml-2 rounded shadow bg-blue-500 text-white;
+  @apply z-10 absolute top-0 right-0;
+  @apply px-2 ml-2 rounded shadow bg-purple-500 text-white;
 }
 
 .comment-button:hover {
-  @apply shadow-md bg-blue-600;
+  @apply bg-purple-600;
 }
 </style>

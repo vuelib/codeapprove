@@ -12,7 +12,7 @@
     <div v-if="signedIn" @click="showDropdown = true">
       <div class="flex items-center">
         <img class="avatar" :src="photoURL" />
-        <font-awesome-icon icon="caret-down" class="ml-2" />
+        <font-awesome-icon icon="caret-down" class="ml-2 text-wht-brt" />
       </div>
 
       <ul
@@ -89,6 +89,6 @@ export default class HeaderBar extends Vue {
 }
 
 .dropdown-item:hover {
-  @apply font-bold bg-dark-5 border-t border-dark-0;
+  @apply font-bold text-purple-300 bg-dark-5 border-t border-dark-0;
 }
 </style>

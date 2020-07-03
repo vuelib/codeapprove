@@ -1,5 +1,5 @@
 <template>
-  <div class="dark-shadow border border-dark-0 bg-dark-6">
+  <div class="relative z-10 dark-shadow border border-dark-0 bg-dark-6">
     <div v-if="resolved && !forceExpand" class="flex items-center px-2 py-1">
       <span class="italic flex-grow text-wht-dim">Comment resolved</span>
       <font-awesome-icon

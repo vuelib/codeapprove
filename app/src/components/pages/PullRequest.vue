@@ -73,7 +73,9 @@
           <font-awesome-icon icon="user-edit" class="mr-2" />
           <span>Description</span>
         </div>
-        <MarkdownContent class="bg-dark-2 p-4" :content="pr.body" />
+        <div class="description-content bg-dark-2">
+          <MarkdownContent class="px-4 pt-2 pb-4" :content="pr.body" />
+        </div>
       </div>
 
       <!-- Review info -->
@@ -313,15 +315,15 @@ export default class PullRequest extends Vue {
 
   get keymap(): KeyMap {
     return {
-      j: {
+      "alt+j": {
         keydown: this.onNextFile,
         desc: "Select next file."
       },
-      k: {
+      "alt+k": {
         keydown: this.onPrevFile,
         desc: "Select previous file."
       },
-      x: {
+      "alt+x": {
         keydown: this.onToggleFile,
         desc: "Expand/collapse selected file."
       }
@@ -409,4 +411,9 @@ export default class PullRequest extends Vue {
 }
 </script>
 
-<style lang="postcss"></style>
+<style lang="postcss">
+.description-content {
+  max-height: 400px;
+  overflow-y: scroll;
+}
+</style>
