@@ -3,7 +3,7 @@
     <div
       v-for="error in errors"
       :key="error"
-      class="rounded bg-dark-5 border border-dark-0 dark-shadow text-red-400 text-lg px-5 py-4"
+      class="rounded bg-dark-5 border border-dark-0 dark-shadow text-red-400 text-lg px-5 py-4 mt-4"
     >
       <b><font-awesome-icon icon="exclamation-circle" class="mr-2" />Error:</b>
       {{ error }}

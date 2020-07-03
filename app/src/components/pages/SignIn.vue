@@ -74,6 +74,7 @@ export default class SignIn extends Vue {
       }
     } catch (e) {
       console.warn(`Sign in failure: ${e}`);
+      this.uiModule.addDisappearingError("Sign in failed.");
       this.authModule.setUser(null);
     }
     this.uiModule.endLoading();
