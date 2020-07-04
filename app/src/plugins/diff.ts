@@ -1,4 +1,5 @@
 import * as parseDiff from "parse-diff";
+import { freezeArray } from "./freeze";
 
 type Side = "left" | "right";
 
@@ -45,13 +46,14 @@ export function getFileMetadata(file: parseDiff.File): FileMetadata {
 }
 
 export function renderPairs(pairs: ChangePair[]): RenderedChangePair[] {
-  return pairs.map(p => {
-    // TODO: Is this appropriate?
-    return Object.freeze({
+  const rps = pairs.map(p => {
+    return {
       left: renderChange(p.left, "left"),
       right: renderChange(p.right, "right")
-    });
+    };
   });
+
+  return freezeArray(rps);
 }
 
 function zipArrays<T>(a: T[], b: T[]): T[] {

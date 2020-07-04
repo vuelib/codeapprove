@@ -68,7 +68,6 @@ export default class MarkdownContent extends Vue {
   @apply mb-3 p-2 bg-dark-4;
 }
 
-
 /** Based on https://www.w3schools.com/tags/tag_hn.asp */
 
 .md >>> h1 {

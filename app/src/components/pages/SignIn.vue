@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center">
     <div
-      class="max-w-sm text-center inline-flex flex-col items-center m-8 rounded overflow-hidden border shadow-lg bg-dark-2 border-dark-0"
+      class="max-w-sm text-center inline-flex flex-col items-center m-8 rounded overflow-auto border dark-shadow bg-dark-2 border-dark-0"
     >
       <div
         class="w-full font-bold text-lg text-white bg-dark-3 border-b border-dark-0 p-2 m-0"

@@ -4,19 +4,18 @@
     <div class="mb-4 flex flex-row items-center">
       <div>
         <h3 class="font-bold text-xl">
-          {{ pr.head.repo.full_name }}
-          (<a
+          {{ meta.owner }}/{{ meta.repo }} (<a
             class="text-purple-300 hover:underline"
             :href="
-              `https://github.com/${pr.head.repo.full_name}/pull/${pr.number}`
+              `https://github.com/${meta.owner}/${meta.repo}/pull/${meta.number}`
             "
             target="_blank"
-            >#{{ pr.number }}</a
+            >#{{ meta.number }}</a
           >)
         </h3>
         <p>
-          merge <code>{{ pr.head.ref }}</code> into
-          <code>{{ pr.base.ref }}</code>
+          merge <code>{{ prData.pr.head.ref }}</code> into
+          <code>{{ prData.pr.base.ref }}</code>
         </p>
       </div>
 
@@ -74,7 +73,7 @@
           <span>Description</span>
         </div>
         <div class="description-content bg-dark-2">
-          <MarkdownContent class="px-4 pt-2 pb-4" :content="pr.body" />
+          <MarkdownContent class="px-4 pt-2 pb-4" :content="prData.pr.body" />
         </div>
       </div>
 
@@ -151,13 +150,34 @@
         <span class="font-bold text-lg">Changes</span>
         <span class="flex-grow"><!-- spacer --></span>
 
+        <!-- Change selector -->
+        <div
+          class="flex items-center rounded bg-dark-3 border-dark-0 text-sm dark-shadow py-1 px-2"
+        >
+          <span class="mr-1 font-bold">Base:</span>
+          <select
+            class="bg-dark-4"
+            @change="onBaseSelected($event.target.value)"
+          >
+            <option :value="prData.pr.base.ref">{{
+              prData.pr.base.ref
+            }}</option>
+            <option
+              v-for="commit in prData.commits"
+              :key="commit.sha"
+              :value="commit.sha"
+              >{{ displayCommit(commit) }}</option
+            >
+          </select>
+        </div>
+
         <button @click="collapseAll" class="btn btn-small btn-blue ml-2">
           Collapse All <font-awesome-icon icon="minus" class="ml-1" />
         </button>
       </div>
 
       <ChangeEntry
-        v-for="(diff, index) in diffs"
+        v-for="(diff, index) in prData.diffs"
         ref="changes"
         :key="`${index}-change`"
         :meta="getMetadata(diff)"
@@ -179,7 +199,8 @@ import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 import UserSearchModal from "@/components/elements/UserSearchModal.vue";
 import HotkeyModal from "@/components/elements/HotkeyModal.vue";
 
-import { Github } from "../../plugins/github";
+import { Github, PullRequestData } from "../../plugins/github";
+import { freezeArray } from "../../plugins/freeze";
 import ReviewModule from "../../store/modules/review";
 import UIModule from "../../store/modules/ui";
 import {
@@ -190,7 +211,7 @@ import {
 import { Thread, Comment, ReviewMetadata } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import { KeyMap } from "../elements/HotkeyModal.vue";
-import { ChangeEntryAPI } from "../elements/ChangeEntry.vue";
+import { ChangeEntryAPI, ChunkData } from "../elements/ChangeEntry.vue";
 
 @Component({
   components: {
@@ -206,8 +227,8 @@ export default class PullRequest extends Vue {
   public loading = true;
 
   // TODO: These should be one state object
-  public pr: PullsGetResponseData | null = null;
-  public diffs: parseDiff.File[] = [];
+  public prData: PullRequestData | null = null;
+  public meta!: ReviewMetadata;
 
   public activeFileIndex = -1;
 
@@ -226,20 +247,19 @@ export default class PullRequest extends Vue {
     // https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes
     const params = this.$route.params;
 
-    const meta: ReviewMetadata = {
+    this.meta = {
       owner: params.owner,
       repo: params.repo,
       number: Number.parseInt(params.number)
     };
 
-    this.reviewModule.initializeReview(meta);
-    const { pr, diffs } = await this.github.getPullRequest(
-      meta.owner,
-      meta.repo,
-      meta.number
+    // TODO: Call this again on base change?
+    this.reviewModule.initializeReview(this.meta);
+    this.prData = await this.github.getPullRequest(
+      this.meta.owner,
+      this.meta.repo,
+      this.meta.number
     );
-    this.pr = Object.freeze(pr);
-    this.diffs = diffs;
 
     this.uiModule.endLoading();
   }
@@ -257,7 +277,6 @@ export default class PullRequest extends Vue {
   }
 
   public onReviewerSelected(event: { login: string }) {
-    console.log("onReviewerSelected", event);
     this.usersearching = false;
     this.reviewModule.pushReviewer({ login: event.login, approved: false });
   }
@@ -271,13 +290,37 @@ export default class PullRequest extends Vue {
     this.activeFileIndex = -1;
   }
 
+  public async onBaseSelected(base: string) {
+    this.uiModule.beginLoading();
+    const diffs = await this.github.getDiff(
+      this.meta.owner,
+      this.meta.repo,
+      base,
+      this.prData!.pr.head.ref
+    );
+    this.prData!.diffs = freezeArray(diffs);
+    this.uiModule.endLoading();
+  }
+
+  public displayCommit(commit: {
+    sha: string;
+    commit: { message: string };
+  }): string {
+    let shortMsg = commit.commit.message;
+    if (shortMsg.length >= 25) {
+      shortMsg = shortMsg.substring(0, 22) + "...";
+    }
+
+    return `${commit.sha.substring(0, 6)} ${shortMsg}`;
+  }
+
   private onNextFile() {
     const prev = this.getCurrentChangeEntry();
     if (prev) {
       prev.deactivate();
     }
 
-    if (this.activeFileIndex < this.diffs.length - 1) {
+    if (this.activeFileIndex < this.prData!.diffs.length - 1) {
       this.activeFileIndex++;
     }
 
@@ -375,7 +418,7 @@ export default class PullRequest extends Vue {
   }
 
   get loaded() {
-    return this.pr != null;
+    return this.prData != null;
   }
 
   get drafts() {
@@ -398,20 +441,25 @@ export default class PullRequest extends Vue {
     return Object.freeze(getFileMetadata(diff));
   }
 
-  private renderChunkData(diff: parseDiff.File) {
-    // TODO: Freeze the whole thing
-    return diff.chunks.map(chunk => {
-      return Object.freeze({
+  private renderChunkData(diff: parseDiff.File): ChunkData[] {
+    const data = diff.chunks.map(chunk => {
+      return {
         chunk,
         // TODO: Render and zip all at once
         pairs: renderPairs(zipChangePairs(chunk))
-      });
+      };
     });
+
+    return freezeArray(data);
   }
 }
 </script>
 
 <style lang="postcss">
+select {
+  appearance: none;
+}
+
 .description-content {
   max-height: 400px;
   overflow-y: scroll;

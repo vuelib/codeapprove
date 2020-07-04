@@ -1,14 +1,16 @@
 <template>
   <div id="app">
     <!-- Page Header -->
-    <HeaderBar />
-    <ProgressBar />
+    <div class="w-full fixed z-20">
+      <HeaderBar />
+      <ProgressBar />
+    </div>
 
     <!-- Page body from router -->
     <div class="grid grid-cols-12">
       <router-view
         :key="$route.fullPath"
-        class="mt-8 col-start-2 col-span-10"
+        class="mt-24 col-start-2 col-span-10"
       />
     </div>
 

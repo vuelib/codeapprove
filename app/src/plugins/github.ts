@@ -1,11 +1,20 @@
 import { Octokit } from "@octokit/rest";
 import {
   SearchUsersResponseData,
-  UsersGetAuthenticatedResponseData
+  UsersGetAuthenticatedResponseData,
+  PullsGetResponseData,
+  PullsListCommitsResponseData
 } from "@octokit/types";
-import parse from "parse-diff";
+import parseDiff from "parse-diff";
+import { freezeArray } from "./freeze";
 
 const PREVIEWS = ["machine-man-preview"];
+
+export interface PullRequestData {
+  pr: PullsGetResponseData;
+  commits: PullsListCommitsResponseData;
+  diffs: parseDiff.File[];
+}
 
 export class Github {
   private unauthed: Octokit = new Octokit({ previews: PREVIEWS });
@@ -38,7 +47,11 @@ export class Github {
     return res.data;
   }
 
-  async getPullRequest(owner: string, repo: string, pull_number: number) {
+  async getPullRequest(
+    owner: string,
+    repo: string,
+    pull_number: number
+  ): Promise<PullRequestData> {
     const pr = await this.authed.pulls.get({
       owner,
       repo,
@@ -52,9 +65,17 @@ export class Github {
       pr.data.head.ref
     );
 
+    const commits = await this.unauthed.pulls.listCommits({
+      owner,
+      repo,
+      pull_number
+    });
+
+    // Diff should be separate
     return {
-      pr: pr.data,
-      diffs
+      pr: Object.freeze(pr.data),
+      commits: freezeArray(commits.data),
+      diffs: freezeArray(diffs)
     };
   }
 
@@ -63,7 +84,7 @@ export class Github {
     repo: string,
     base: string,
     head: string
-  ): Promise<parse.File[]> {
+  ): Promise<parseDiff.File[]> {
     const res = await this.unauthed.repos.compareCommits({
       owner,
       repo,
@@ -76,6 +97,6 @@ export class Github {
 
     // The strange header changes the response type
     const data = (res.data as unknown) as string;
-    return parse(data);
+    return parseDiff(data);
   }
 }

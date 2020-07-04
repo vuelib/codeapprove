@@ -33,13 +33,12 @@ export default class ProgressBar extends Vue {
 .line {
   @apply bg-purple-400;
   position: absolute;
-  opacity: 0.4;
   width: 150%;
   height: 5px;
 }
 
 .subline {
-  @apply bg-purple-400;
+  @apply bg-purple-600;
   position: absolute;
   height: 5px;
 }
