@@ -40,10 +40,10 @@
       v-show="expanded"
       class="bg-dark-4 overflow-hidden"
     >
-      <template v-for="({ chunk, pairs }, i) in this.chunks">
+      <template v-for="{ chunk, pairs } in chunks">
         <div
           class="w-full border-b border-t border-blue-500"
-          :key="`chunk-${i}`"
+          :key="chunk.content"
         >
           <pre class="w-full py-1 px-2 bg-dark-3 text-blue-500">{{
             chunk.content
@@ -52,7 +52,7 @@
 
         <DiffLine
           v-for="(pair, j) in pairs"
-          :key="`chunk-${i}-change-${j}`"
+          :key="`${chunk.content}-pair-${j}`"
           :rendered="pair"
           :langs="langPair"
           :threads="getThreads(pair)"

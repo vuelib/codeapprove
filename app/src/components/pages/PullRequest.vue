@@ -154,8 +154,9 @@
         <div
           class="flex items-center rounded bg-dark-3 border-dark-0 text-sm dark-shadow py-1 px-2"
         >
-          <span class="mr-1 font-bold">Base:</span>
+          <label for="select-base" class="mr-1 font-bold">Base:</label>
           <select
+            id="select-base"
             class="bg-dark-4"
             @change="onBaseSelected($event.target.value)"
           >
@@ -177,9 +178,9 @@
       </div>
 
       <ChangeEntry
-        v-for="(diff, index) in prData.diffs"
+        v-for="diff in prData.diffs"
         ref="changes"
-        :key="`${index}-change`"
+        :key="`change-${diff.from}-${diff.to}`"
         :meta="getMetadata(diff)"
         :chunks="renderChunkData(diff)"
       />
@@ -292,6 +293,8 @@ export default class PullRequest extends Vue {
 
   public async onBaseSelected(base: string) {
     this.uiModule.beginLoading();
+    this.collapseAll();
+
     const diffs = await this.github.getDiff(
       this.meta.owner,
       this.meta.repo,
@@ -462,6 +465,6 @@ select {
 
 .description-content {
   max-height: 400px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 </style>
