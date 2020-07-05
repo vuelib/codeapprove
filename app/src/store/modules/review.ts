@@ -4,14 +4,16 @@ import * as uuid from "uuid";
 import {
   Review,
   Comment,
-  CommentArgs,
+  CommentUser,
   Thread,
   ThreadArgs,
   Side,
   threadMatch,
-  ReviewMetadata
+  ReviewMetadata,
+  ThreadContentArgs
 } from "@/model/review";
 import * as events from "../../plugins/events";
+import { NEW_COMMENT_EVENT, AddCommentEvent } from "../../plugins/events";
 
 // TODO: Namespacing?
 @Module({
@@ -86,7 +88,7 @@ export default class ReviewModule extends VuexModule {
     this.review.comments.push(comment);
 
     // TODO: Is there a way I could automate this?
-    events.emitNewComment({ threadId: comment.threadId });
+    events.emit(NEW_COMMENT_EVENT, { threadId: comment.threadId });
   }
 
   @Mutation
@@ -111,12 +113,13 @@ export default class ReviewModule extends VuexModule {
   }
 
   @Action
-  public newThread(opts: { args: ThreadArgs }): Thread {
+  public newThread(opts: { args: ThreadArgs; ca: ThreadContentArgs }): Thread {
     console.log(`newThread(${JSON.stringify(opts)})`);
     const thread: Thread = {
       id: uuid.v4(),
       resolved: false,
-      ...opts.args
+      ...opts.args,
+      ...opts.ca
     };
 
     // TODO: Network and shit
@@ -127,15 +130,19 @@ export default class ReviewModule extends VuexModule {
   @Action
   public async newComment(opts: {
     threadId: string;
-    args: CommentArgs;
+    user: CommentUser;
+    text: string;
   }): Promise<Comment> {
     console.log(`newComment(${JSON.stringify(opts)})`);
     const comment: Comment = {
       id: uuid.v4(),
       threadId: opts.threadId,
+      username: opts.user.username,
+      photoURL: opts.user.photoURL,
+      text: opts.text,
+
       timestamp: new Date().toISOString(),
-      draft: true,
-      ...opts.args
+      draft: true
     };
 
     // TODO: Network and shit
@@ -147,5 +154,48 @@ export default class ReviewModule extends VuexModule {
   public async sendDraftComments(opts: { approve: boolean }) {
     // TODO: Network and shit
     this.context.commit("removeDraftStatus");
+  }
+
+  @Action
+  public async handleAddCommentEvent(opts: {
+    e: AddCommentEvent;
+    user: CommentUser;
+  }) {
+    const e = opts.e;
+    const threadArgs: ThreadArgs = {
+      file: e.file,
+      side: e.side,
+      line: e.line
+    };
+
+    // TODO: This needs to be real
+    const threadContentArgs: ThreadContentArgs = {
+      sha: e.sha,
+      lineContent: e.lineContent
+    };
+
+    // TODO: Doing this inside the comment thread may help reactivity?
+    let thread: Thread | null = this.threadByArgs(threadArgs);
+    if (!thread) {
+      thread = await this.newThread({
+        args: threadArgs,
+        ca: threadContentArgs
+      });
+    }
+
+    // Add comment
+    await this.newComment({
+      threadId: thread.id,
+      user: opts.user,
+      text: e.content
+    });
+
+    // If resolution state specified, set that
+    if (e.resolve != undefined) {
+      this.context.commit("setThreadResolved", {
+        threadId: thread.id,
+        resolved: e.resolve
+      });
+    }
   }
 }

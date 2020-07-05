@@ -56,7 +56,6 @@
           :rendered="pair"
           :langs="langPair"
           :threads="getThreads(pair)"
-          @add-comment="onAddComment(chunk, $event)"
         />
       </template>
     </div>
@@ -64,23 +63,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Mixins } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import parseDiff from "parse-diff";
 
+import { EventEnhancer } from "../mixins/EventEnhancer";
 import DiffLine from "@/components/elements/DiffLine.vue";
 
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
-import { AddCommentEvent } from "../../model/events";
+import { AddCommentEvent } from "../../plugins/events";
 import { getFileLang } from "../../plugins/prism";
 
 import {
   ThreadArgs,
   Thread,
-  CommentArgs,
   Side,
-  ThreadPair
+  ThreadPair,
+  ThreadContentArgs
 } from "../../model/review";
 import {
   ChangePair,
@@ -107,7 +107,7 @@ export interface ChunkData {
     DiffLine
   }
 })
-export default class ChangeEntry extends Vue {
+export default class ChangeEntry extends Mixins(EventEnhancer) {
   @Prop() meta!: FileMetadata;
   @Prop() chunks!: ChunkData[];
 
@@ -138,39 +138,11 @@ export default class ChangeEntry extends Vue {
     };
   }
 
-  public async onAddComment(chunk: parseDiff.Chunk, event: AddCommentEvent) {
-    const file = event.side === "left" ? this.meta.from : this.meta.to;
-    const threadArgs: ThreadArgs = {
-      file,
-      side: event.side,
-      line: event.line
-    };
-
-    // TODO: Doing this inside the comment thread may help reactivity?
-    let thread: Thread | null = this.reviewModule.threadByArgs(threadArgs);
-    if (!thread) {
-      thread = await this.reviewModule.newThread({ args: threadArgs });
-    }
-
-    const commentArgs: CommentArgs = {
-      username: this.authModule.assertUser.username,
-      photoURL: this.authModule.assertUser.photoURL,
-      text: event.content
-    };
-
-    // Add comment
-    await this.reviewModule.newComment({
-      threadId: thread.id,
-      args: commentArgs
-    });
-
-    // If resolution state specified, set that
-    if (event.resolve != undefined) {
-      this.reviewModule.setThreadResolved({
-        threadId: thread.id,
-        resolved: event.resolve
-      });
-    }
+  public handleEvent(e: Partial<AddCommentEvent>) {
+    console.log("ChangeEntry#handleEvent");
+    const file = e.side === "left" ? this.meta.from : this.meta.to;
+    e.file = file;
+    this.bubbleUp(e);
   }
 
   public activate() {

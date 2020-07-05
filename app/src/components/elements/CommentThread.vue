@@ -86,19 +86,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Mixins } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import * as firebase from "firebase/app";
 
+import { EventEnhancer } from "../../components/mixins/EventEnhancer";
 import MarkdownContent from "@/components/elements/MarkdownContent.vue";
-import { AddCommentEvent, ADD_COMMENT_EVENT } from "../../model/events";
 import {
-  Thread,
-  ThreadArgs,
-  Comment,
-  CommentArgs,
-  Side
-} from "../../model/review";
+  AddCommentEvent,
+  ADD_COMMENT_EVENT,
+  NEW_COMMENT_EVENT
+} from "../../plugins/events";
+import { Thread, ThreadArgs, Comment, Side } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
@@ -109,10 +108,10 @@ import * as events from "../../plugins/events";
     MarkdownContent
   }
 })
-export default class CommentThread extends Vue {
+export default class CommentThread extends Mixins(EventEnhancer) {
   @Prop() side!: Side;
   @Prop() line!: number;
-  @Prop() threadId!: string;
+  @Prop() threadId!: string | null;
 
   comments: Comment[] = [];
 
@@ -128,7 +127,7 @@ export default class CommentThread extends Vue {
   draftComment: string = "";
 
   mounted() {
-    events.onNewComment(this.onNewComment);
+    events.on(NEW_COMMENT_EVENT, this.onNewComment);
     this.loadComments();
 
     // TODO: We should only focus like this when it's a new comment thread
@@ -138,7 +137,7 @@ export default class CommentThread extends Vue {
   }
 
   destroyed() {
-    events.offNewComment(this.onNewComment);
+    events.off(NEW_COMMENT_EVENT, this.onNewComment);
   }
 
   private loadComments() {
@@ -167,17 +166,14 @@ export default class CommentThread extends Vue {
   }
 
   public async addComment(resolve?: boolean) {
-    // TODO: the only reason this event has to be bubbled up is because we don't have the file name
-    //       here when it's a new thread.
-    const event: AddCommentEvent = {
+    const partialEvt: Partial<AddCommentEvent> = {
       content: this.draftComment,
       side: this.side,
       line: this.line,
-      resolve
+      resolve: resolve
     };
 
-    // Note: this emits from the PARENT which means DiffLine emits the event
-    this.$parent.$emit(ADD_COMMENT_EVENT, event);
+    this.bubbleUp(partialEvt);
 
     // TODO: Need some kind of "pending" state until the thing hits the server
 

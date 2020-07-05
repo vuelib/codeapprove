@@ -4,19 +4,33 @@ const BUS = new Vue();
 
 type Callback<T> = (arg: T) => void;
 
-const NEW_COMMENT_EVENT = "new-comment";
+import { Side } from "../model/review";
+
+export const ADD_COMMENT_EVENT = "add-comment";
+export interface AddCommentEvent {
+  side: Side;
+  line: number;
+  content: string;
+  resolve?: boolean;
+
+  file: string;
+  lineContent: string;
+  sha: string;
+}
+
+export const NEW_COMMENT_EVENT = "new-comment";
 export interface NewCommentEvent {
   threadId: string;
 }
 
-export function emitNewComment(evt: NewCommentEvent) {
-  BUS.$emit(NEW_COMMENT_EVENT, evt);
+export function emit<T>(event: string, data: T) {
+  BUS.$emit(event, data);
 }
 
-export function onNewComment(fn: Callback<NewCommentEvent>) {
-  BUS.$on(NEW_COMMENT_EVENT, fn);
+export function on<T>(event: string, fn: Callback<T>) {
+  BUS.$on(event, fn);
 }
 
-export function offNewComment(fn: Callback<NewCommentEvent>) {
-  BUS.$off(NEW_COMMENT_EVENT, fn);
+export function off<T>(event: string, fn: Callback<T>) {
+  BUS.$off(event, fn);
 }

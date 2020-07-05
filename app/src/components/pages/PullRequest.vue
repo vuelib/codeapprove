@@ -189,12 +189,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Mixins } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import { PullsGetResponseData } from "@octokit/types";
 
 import parseDiff from "parse-diff";
 
+import { EventEnhancer } from "../mixins/EventEnhancer";
 import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
 import UserSearchModal from "@/components/elements/UserSearchModal.vue";
@@ -209,10 +210,16 @@ import {
   renderPairs,
   zipChangePairs
 } from "../../plugins/diff";
-import { Thread, Comment, ReviewMetadata } from "../../model/review";
+import {
+  Thread,
+  Comment,
+  ReviewMetadata,
+  CommentUser
+} from "../../model/review";
 import AuthModule from "../../store/modules/auth";
 import { KeyMap } from "../elements/HotkeyModal.vue";
 import { ChangeEntryAPI, ChunkData } from "../elements/ChangeEntry.vue";
+import { AddCommentEvent } from "../../plugins/events";
 
 @Component({
   components: {
@@ -222,7 +229,7 @@ import { ChangeEntryAPI, ChunkData } from "../elements/ChangeEntry.vue";
     HotkeyModal
   }
 })
-export default class PullRequest extends Vue {
+export default class PullRequest extends Mixins(EventEnhancer) {
   // TODO: Put these in a "UI" object
   public usersearching = false;
   public loading = true;
@@ -270,6 +277,21 @@ export default class PullRequest extends Vue {
       login: this.authModule.assertUser.username,
       approved
     });
+  }
+
+  public handleEvent(e: Partial<AddCommentEvent>) {
+    console.log("PullRequest#handleEvent");
+    // TODO: If we're not using the standard base we can't do this!
+    e.sha =
+      e.side === "left" ? this.prData!.pr.base.sha : this.prData!.pr.head.sha;
+
+    const finalEvent = e as AddCommentEvent;
+    const user: CommentUser = {
+      username: this.authModule.assertUser.username,
+      photoURL: this.authModule.assertUser.photoURL
+    };
+
+    this.reviewModule.handleAddCommentEvent({ e: finalEvent, user });
   }
 
   public async sendDrafts(approve: boolean) {

@@ -73,11 +73,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch, Mixins } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import parseDiff from "parse-diff";
 
 import CommentThread from "@/components/elements/CommentThread.vue";
+import { EventEnhancer } from "../mixins/EventEnhancer";
 import ReviewModule from "../../store/modules/review";
 import {
   Comment,
@@ -91,6 +92,7 @@ import {
   renderChange,
   RenderedChange
 } from "../../plugins/diff";
+import { AddCommentEvent } from "../../plugins/events";
 
 // TODO: Should I move this out?
 const Prism = require("vue-prism-component");
@@ -103,7 +105,7 @@ type Side = "left" | "right";
     Prism
   }
 })
-export default class DiffLine extends Vue {
+export default class DiffLine extends Mixins(EventEnhancer) {
   @Prop() public langs!: LangPair;
   @Prop() public threads!: ThreadPair;
   @Prop() public rendered!: RenderedChangePair;
@@ -127,6 +129,12 @@ export default class DiffLine extends Vue {
 
   mounted() {
     this.loadComments();
+  }
+
+  public handleEvent(e: Partial<AddCommentEvent>) {
+    console.log("DiffLine#handleEvent");
+    e.lineContent = this.rendered[e.side!].content;
+    this.bubbleUp(e);
   }
 
   public loadComments() {

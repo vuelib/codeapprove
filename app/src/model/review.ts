@@ -14,28 +14,32 @@ export interface Review {
 }
 
 export interface ThreadArgs {
-  // TODO: It's much more complex than this
   file: string;
   side: Side;
   line: number;
 }
 
-export interface Thread extends ThreadArgs {
+export interface ThreadContentArgs {
+  sha: string;
+  lineContent: string;
+}
+
+export interface Thread extends ThreadArgs, ThreadContentArgs {
   id: string;
   resolved: boolean;
 }
 
-export interface CommentArgs {
+export interface CommentUser {
   username: string;
   photoURL: string;
-  text: string;
 }
 
-export interface Comment extends CommentArgs {
+export interface Comment extends CommentUser {
   id: string;
   threadId: string;
   draft: boolean;
   timestamp: string;
+  text: string;
 }
 
 export interface LangPair {
