@@ -3,6 +3,9 @@
     :class="{ active: active }"
     class="rounded overflow-hidden my-2 dark-shadow border border-dark-0"
   >
+    <!-- Bind hotkeys when active -->
+    <div v-if="active && expanded" v-hotkey="hotKeyMap" />
+
     <div
       @click="toggle"
       class="flex p-2 font-bold items-center bg-dark-3 border-b border-dark-0"
@@ -52,6 +55,7 @@
 
         <DiffLine
           v-for="(pair, j) in pairs"
+          ref="difflines"
           :key="`${chunk.content}-pair-${j}`"
           :rendered="pair"
           :langs="langPair"
@@ -67,9 +71,10 @@ import { Component, Prop, Vue, Mixins } from "vue-property-decorator";
 import { getModule } from "vuex-module-decorators";
 import parseDiff from "parse-diff";
 
+import { ChangeEntryAPI, DiffLineAPI } from "../api";
 import { EventEnhancer } from "../mixins/EventEnhancer";
-import DiffLine from "@/components/elements/DiffLine.vue";
 
+import DiffLine from "@/components/elements/DiffLine.vue";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { AddCommentEvent } from "../../plugins/events";
@@ -88,14 +93,7 @@ import {
   RenderedChangePair,
   FileMetadata
 } from "../../plugins/diff";
-
-export type ChangeEntryAPI = Vue & {
-  activate(): void;
-  deactivate(): void;
-  expand(): void;
-  collapse(): void;
-  toggle(): void;
-};
+import { KeyMap, CHANGE_ENTRY_KEY_MAP } from "../../plugins/hotkeys";
 
 export interface ChunkData {
   chunk: parseDiff.Chunk;
@@ -107,7 +105,8 @@ export interface ChunkData {
     DiffLine
   }
 })
-export default class ChangeEntry extends Mixins(EventEnhancer) {
+export default class ChangeEntry extends Mixins(EventEnhancer)
+  implements ChangeEntryAPI {
   @Prop() meta!: FileMetadata;
   @Prop() chunks!: ChunkData[];
 
@@ -115,6 +114,8 @@ export default class ChangeEntry extends Mixins(EventEnhancer) {
   public loading = false;
   public loaded = false;
   public expanded = false;
+
+  public activeLineIndex = -1;
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
@@ -145,6 +146,17 @@ export default class ChangeEntry extends Mixins(EventEnhancer) {
     this.bubbleUp(e);
   }
 
+  get hotKeyMap(): KeyMap {
+    return CHANGE_ENTRY_KEY_MAP(this);
+  }
+
+  // TODO: When we can expand between chunks this will be a problem
+  get totalLength(): number {
+    let totalLength = 0;
+    this.chunks.forEach(c => (totalLength += c.pairs.length));
+    return totalLength;
+  }
+
   public activate() {
     this.active = true;
     this.$el.scrollIntoView({
@@ -154,6 +166,13 @@ export default class ChangeEntry extends Mixins(EventEnhancer) {
 
   public deactivate() {
     this.active = false;
+
+    const line = this.getCurrentLine();
+    if (line) {
+      line.deactivate;
+    }
+
+    this.activeLineIndex = -1;
   }
 
   public toggle() {
@@ -175,9 +194,7 @@ export default class ChangeEntry extends Mixins(EventEnhancer) {
     }
 
     // TODO: Add some benchmarking here!
-    let totalLength = 0;
-    this.chunks.forEach(c => (totalLength += c.pairs.length));
-    const isLarge = totalLength >= 50;
+    const isLarge = this.totalLength >= 50;
 
     if (!isLarge) {
       this.expanded = true;
@@ -191,6 +208,50 @@ export default class ChangeEntry extends Mixins(EventEnhancer) {
       this.loaded = true;
       this.loading = false;
     });
+  }
+
+  public nextLine() {
+    const prev = this.getCurrentLine();
+    if (prev) {
+      prev.deactivate();
+    }
+
+    if (this.activeLineIndex < this.totalLength - 1) {
+      this.activeLineIndex++;
+    }
+
+    const next = this.getCurrentLine()!;
+    next.activate();
+
+    console.log("nextLine", this.activeLineIndex);
+  }
+
+  public prevLine() {
+    const prev = this.getCurrentLine();
+    if (prev) {
+      prev.deactivate();
+    }
+
+    if (this.activeLineIndex > 0) {
+      this.activeLineIndex--;
+    }
+
+    const next = this.getCurrentLine()!;
+    next.activate();
+  }
+
+  public addLineComment() {
+    const line = this.getCurrentLine();
+    if (line) {
+      line.addComment();
+    }
+  }
+
+  public getCurrentLine(): DiffLineAPI | undefined {
+    const lines = this.$refs.difflines as DiffLineAPI[];
+    if (lines) {
+      return lines[this.activeLineIndex];
+    }
   }
 
   /**

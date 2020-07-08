@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full">
+  <div class="relative w-full">
+    <div v-if="active" class="shim bg-yellow-100"></div>
+
     <!-- Left -->
     <div
       class="ib relative w-1/2 align-top"
@@ -93,6 +95,7 @@ import {
   RenderedChange
 } from "../../plugins/diff";
 import { AddCommentEvent } from "../../plugins/events";
+import { DiffLineAPI } from "../api";
 
 // TODO: Should I move this out?
 const Prism = require("vue-prism-component");
@@ -105,7 +108,8 @@ type Side = "left" | "right";
     Prism
   }
 })
-export default class DiffLine extends Mixins(EventEnhancer) {
+export default class DiffLine extends Mixins(EventEnhancer)
+  implements DiffLineAPI {
   @Prop() public langs!: LangPair;
   @Prop() public threads!: ThreadPair;
   @Prop() public rendered!: RenderedChangePair;
@@ -127,6 +131,8 @@ export default class DiffLine extends Mixins(EventEnhancer) {
     right: false
   };
 
+  public active = false;
+
   mounted() {
     this.loadComments();
   }
@@ -135,6 +141,26 @@ export default class DiffLine extends Mixins(EventEnhancer) {
     console.log("DiffLine#handleEvent");
     e.lineContent = this.rendered[e.side!].content;
     this.bubbleUp(e);
+  }
+
+  public activate() {
+    this.active = true;
+    this.$el.scrollIntoView({
+      block: "center"
+    });
+  }
+
+  public deactivate() {
+    this.active = false;
+  }
+
+  public addComment() {
+    const hasRight = !this.rendered.right.empty;
+    if (hasRight) {
+      this.drafting.right = true;
+    } else {
+      this.drafting.left = true;
+    }
   }
 
   public loadComments() {

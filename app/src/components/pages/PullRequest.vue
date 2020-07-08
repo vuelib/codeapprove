@@ -1,6 +1,8 @@
 <template>
-  <div v-if="loaded" v-hotkey="keymap" class="relative py-4 px-4">
-    <HotkeyModal :map="keymap" />
+  <div v-if="loaded" v-hotkey="hotKeyMap" class="relative py-4 px-4">
+    <!-- Includes descriptions for children -->
+    <HotkeyModal :map="hotKeyDescriptions" />
+
     <div class="mb-4 flex flex-row items-center">
       <div>
         <h3 class="font-bold text-xl">
@@ -217,8 +219,17 @@ import {
   CommentUser
 } from "../../model/review";
 import AuthModule from "../../store/modules/auth";
-import { KeyMap } from "../elements/HotkeyModal.vue";
-import { ChangeEntryAPI, ChunkData } from "../elements/ChangeEntry.vue";
+import {
+  KeyMap,
+  KeyDescMap,
+  combineHotkeys,
+  PULL_REQUEST_KEY_DESC,
+  PULL_REQUEST_KEY_MAP,
+  CHANGE_ENTRY_KEY_DESC
+} from "../../plugins/hotkeys";
+
+import { ChangeEntryAPI, PullRequestAPI } from "../api";
+import { ChunkData } from "../elements/ChangeEntry.vue";
 import { AddCommentEvent } from "../../plugins/events";
 
 @Component({
@@ -229,7 +240,8 @@ import { AddCommentEvent } from "../../plugins/events";
     HotkeyModal
   }
 })
-export default class PullRequest extends Mixins(EventEnhancer) {
+export default class PullRequest extends Mixins(EventEnhancer)
+  implements PullRequestAPI {
   // TODO: Put these in a "UI" object
   public usersearching = false;
   public loading = true;
@@ -339,7 +351,7 @@ export default class PullRequest extends Mixins(EventEnhancer) {
     return `${commit.sha.substring(0, 6)} ${shortMsg}`;
   }
 
-  private onNextFile() {
+  public onNextFile() {
     const prev = this.getCurrentChangeEntry();
     if (prev) {
       prev.deactivate();
@@ -353,7 +365,7 @@ export default class PullRequest extends Mixins(EventEnhancer) {
     next.activate();
   }
 
-  private onPrevFile() {
+  public onPrevFile() {
     const prev = this.getCurrentChangeEntry();
     if (prev) {
       prev.deactivate();
@@ -367,7 +379,7 @@ export default class PullRequest extends Mixins(EventEnhancer) {
     next.activate();
   }
 
-  private onToggleFile() {
+  public onToggleFile() {
     const ce = this.getCurrentChangeEntry()!;
     ce.toggle();
     ce.activate();
@@ -381,21 +393,12 @@ export default class PullRequest extends Mixins(EventEnhancer) {
     return (this.$refs.changes as ChangeEntryAPI[])[this.activeFileIndex];
   }
 
-  get keymap(): KeyMap {
-    return {
-      "alt+j": {
-        keydown: this.onNextFile,
-        desc: "Select next file."
-      },
-      "alt+k": {
-        keydown: this.onPrevFile,
-        desc: "Select previous file."
-      },
-      "alt+x": {
-        keydown: this.onToggleFile,
-        desc: "Expand/collapse selected file."
-      }
-    };
+  get hotKeyDescriptions(): KeyDescMap {
+    return combineHotkeys(PULL_REQUEST_KEY_DESC, CHANGE_ENTRY_KEY_DESC);
+  }
+
+  get hotKeyMap(): KeyMap {
+    return PULL_REQUEST_KEY_MAP(this);
   }
 
   get userHasApproved() {

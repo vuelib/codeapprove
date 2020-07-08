@@ -26,18 +26,11 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-
-export interface KeyMap {
-  [key: string]: {
-    keydown: Function;
-    keyup?: Function;
-    desc: string;
-  };
-}
+import { KeyDescMap } from "../../plugins/hotkeys";
 
 @Component
 export default class HotkeyModal extends Vue {
-  @Prop() map!: KeyMap;
+  @Prop() map!: KeyDescMap;
 
   show = false;
 
