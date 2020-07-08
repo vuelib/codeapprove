@@ -7,20 +7,21 @@
     <div class="py-2 px-4 text-lg font-bold border-b border-dark-0 bg-dark-6">
       <font-awesome-icon icon="keyboard" class="ml-1 mr-2" /> Keyboard Shortcuts
     </div>
-    <div class="py-2 px-4">
-      <ul>
-        <li
-          class="flex items-center py-1"
-          v-for="key in Object.keys(map)"
-          :key="key"
-        >
-          <div class="key">
-            <code>{{ renderKey(key) }}</code>
-          </div>
-          <span class="ml-3">{{ map[key].desc }}</span>
-        </li>
-      </ul>
-    </div>
+    <table class="my-2 mx-4">
+      <tbody>
+        <tr v-for="key in Object.keys(map)" :key="key">
+          <td class="p-1">
+            <div class="key">
+              <!-- TODO: Maybe render separate keys -->
+              <code>{{ renderKey(key) }}</code>
+            </div>
+          </td>
+          <td class="pl-4">
+            <span>{{ map[key].desc }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
