@@ -180,8 +180,9 @@
       </div>
 
       <ChangeEntry
-        v-for="diff in prData.diffs"
+        v-for="(diff, i) in prData.diffs"
         ref="changes"
+        @click.native="setActiveChangeEntry(i)"
         :key="`change-${diff.from}-${diff.to}`"
         :meta="getMetadata(diff)"
         :chunks="renderChunkData(diff)"
@@ -231,6 +232,7 @@ import {
 import { ChangeEntryAPI, PullRequestAPI } from "../api";
 import { ChunkData } from "../elements/ChangeEntry.vue";
 import { AddCommentEvent } from "../../plugins/events";
+import { makeTopVisible, makeBottomVisible } from "../../plugins/dom";
 
 @Component({
   components: {
@@ -351,32 +353,29 @@ export default class PullRequest extends Mixins(EventEnhancer)
     return `${commit.sha.substring(0, 6)} ${shortMsg}`;
   }
 
+  public setActiveChangeEntry(index: number) {
+    const curr = this.getCurrentChangeEntry();
+    if (curr) {
+      curr.deactivate();
+    }
+
+    this.activeFileIndex = index;
+    const next = this.getCurrentChangeEntry();
+    if (next) {
+      next.activate();
+    }
+  }
+
   public onNextFile() {
-    const prev = this.getCurrentChangeEntry();
-    if (prev) {
-      prev.deactivate();
-    }
-
-    if (this.activeFileIndex < this.prData!.diffs.length - 1) {
-      this.activeFileIndex++;
-    }
-
-    const next = this.getCurrentChangeEntry()!;
-    next.activate();
+    this.setActiveChangeEntry(
+      Math.min(this.activeFileIndex + 1, this.prData!.diffs.length - 1)
+    );
+    makeTopVisible(this.getCurrentChangeEntry()!.$el, 200);
   }
 
   public onPrevFile() {
-    const prev = this.getCurrentChangeEntry();
-    if (prev) {
-      prev.deactivate();
-    }
-
-    if (this.activeFileIndex > 0) {
-      this.activeFileIndex--;
-    }
-
-    const next = this.getCurrentChangeEntry()!;
-    next.activate();
+    this.setActiveChangeEntry(Math.max(this.activeFileIndex - 1, 0));
+    makeTopVisible(this.getCurrentChangeEntry()!.$el, 200);
   }
 
   public onToggleFile() {

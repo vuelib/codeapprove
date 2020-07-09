@@ -145,9 +145,6 @@ export default class DiffLine extends Mixins(EventEnhancer)
 
   public activate() {
     this.active = true;
-    this.$el.scrollIntoView({
-      block: "center"
-    });
   }
 
   public deactivate() {

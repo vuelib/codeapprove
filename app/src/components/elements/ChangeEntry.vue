@@ -78,6 +78,7 @@ import DiffLine from "@/components/elements/DiffLine.vue";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { AddCommentEvent } from "../../plugins/events";
+import { nextRender, makeTopVisible } from "../../plugins/dom";
 import { getFileLang } from "../../plugins/prism";
 
 import {
@@ -159,20 +160,11 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
 
   public activate() {
     this.active = true;
-    this.$el.scrollIntoView({
-      block: "center"
-    });
   }
 
   public deactivate() {
     this.active = false;
-
-    const line = this.getCurrentLine();
-    if (line) {
-      line.deactivate;
-    }
-
-    this.activeLineIndex = -1;
+    this.setActiveDiffLine(-1);
   }
 
   public toggle() {
@@ -203,41 +195,37 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     }
 
     this.loading = true;
-    this.nextRender(() => {
+    nextRender(() => {
       this.expanded = true;
       this.loaded = true;
       this.loading = false;
     });
   }
 
+  public setActiveDiffLine(index: number) {
+    const curr = this.getCurrentLine();
+    if (curr) {
+      curr.deactivate();
+    }
+
+    this.activeLineIndex = index;
+    const next = this.getCurrentLine();
+    if (next) {
+      next.activate();
+    }
+  }
+
   public nextLine() {
-    const prev = this.getCurrentLine();
-    if (prev) {
-      prev.deactivate();
-    }
-
-    if (this.activeLineIndex < this.totalLength - 1) {
-      this.activeLineIndex++;
-    }
-
-    const next = this.getCurrentLine()!;
-    next.activate();
-
-    console.log("nextLine", this.activeLineIndex);
+    this.setActiveDiffLine(
+      Math.min(this.activeLineIndex + 1, this.totalLength - 1)
+    );
+    makeTopVisible(this.getCurrentLine()!.$el, 150);
   }
 
   public prevLine() {
-    const prev = this.getCurrentLine();
-    if (prev) {
-      prev.deactivate();
-    }
-
-    if (this.activeLineIndex > 0) {
-      this.activeLineIndex--;
-    }
-
-    const next = this.getCurrentLine()!;
-    next.activate();
+    this.setActiveDiffLine(Math.max(this.activeLineIndex - 1, 0));
+    // TODO: When scrolling up we don't properly account for the header
+    makeTopVisible(this.getCurrentLine()!.$el, 150);
   }
 
   public addLineComment() {
@@ -252,16 +240,6 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     if (lines) {
       return lines[this.activeLineIndex];
     }
-  }
-
-  /**
-   * This is like a harder version of nextTick, see:
-   * https://github.com/vuejs/vue/issues/9200
-   */
-  public nextRender(callback: FrameRequestCallback) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(callback);
-    });
   }
 
   public get langPair() {
