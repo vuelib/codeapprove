@@ -24,6 +24,7 @@
       </button>
 
       <CommentThread
+        ref="leftComment"
         v-if="showComments('left')"
         class="w-full"
         :side="'left'"
@@ -60,6 +61,7 @@
       </button>
 
       <CommentThread
+        ref="rightComment"
         v-if="showComments('right')"
         class="w-full"
         :side="'right'"
@@ -149,6 +151,10 @@ export default class DiffLine extends Mixins(EventEnhancer)
 
   public deactivate() {
     this.active = false;
+
+    if (document.activeElement) {
+      (document.activeElement as HTMLElement).blur();
+    }
   }
 
   public addComment() {

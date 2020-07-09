@@ -44,26 +44,26 @@ export const PULL_REQUEST_KEY_MAP = (instance: PullRequestAPI) => {
 };
 
 export const CHANGE_ENTRY_KEY_DESC: KeyDescMap = {
-  "alt+down": {
+  "alt+n": {
     desc: "Next line in file."
   },
-  "alt+up": {
+  "alt+m": {
     desc: "Previous line in file."
   },
-  "alt+m": {
+  "alt+p": {
     desc: "Add comment to current line."
   }
 };
 
 export const CHANGE_ENTRY_KEY_MAP = (instance: ChangeEntryAPI) => {
   const actionMap: KeyActionMap = {
-    "alt+down": {
+    "alt+n": {
       keydown: instance.nextLine
     },
-    "alt+up": {
+    "alt+m": {
       keydown: instance.prevLine
     },
-    "alt+m": {
+    "alt+p": {
       keydown: instance.addLineComment
     }
   };

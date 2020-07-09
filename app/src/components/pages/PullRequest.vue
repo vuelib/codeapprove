@@ -147,7 +147,7 @@
     </div>
 
     <!-- Changes -->
-    <div class="mt-8">
+    <div class="mt-8" v-click-outside="() => setActiveChangeEntry(-1)">
       <div class="flex flex-row items-center">
         <span class="font-bold text-lg">Changes</span>
         <span class="flex-grow"><!-- spacer --></span>

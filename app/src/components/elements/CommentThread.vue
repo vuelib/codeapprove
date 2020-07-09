@@ -130,10 +130,9 @@ export default class CommentThread extends Mixins(EventEnhancer) {
     events.on(NEW_COMMENT_EVENT, this.onNewComment);
     this.loadComments();
 
-    // TODO: We should only focus like this when it's a new comment thread
-    // if (this.comments.length === 0) {
-    //   (this.$refs.replyField as any).focus();
-    // }
+    if (this.comments.length === 0) {
+      (this.$refs.replyField as HTMLElement).focus();
+    }
   }
 
   destroyed() {
