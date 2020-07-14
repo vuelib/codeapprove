@@ -31,6 +31,9 @@ export function makeTopVisible(el: Element, padding: number = 0) {
 }
 
 export function newFunction() {
+  for (let i = 0; i < 10; i++) {
+    console.log("Numbers", i);
+  }
   console.log("Goodbye world!");
 }
 
