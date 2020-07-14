@@ -30,6 +30,10 @@ export function makeTopVisible(el: Element, padding: number = 0) {
   }
 }
 
+export function newFunction() {
+  console.log("Hello world!");
+}
+
 export function makeBottomVisible(el: Element, padding: number = 0) {
   if (isBottomVisible(el, padding)) {
     return;
