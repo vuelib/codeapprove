@@ -31,7 +31,7 @@ export function makeTopVisible(el: Element, padding: number = 0) {
 }
 
 export function newFunction() {
-  console.log("Hello world!");
+  console.log("Goodbye world!");
 }
 
 export function makeBottomVisible(el: Element, padding: number = 0) {
