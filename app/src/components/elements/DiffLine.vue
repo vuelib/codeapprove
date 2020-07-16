@@ -24,11 +24,11 @@
       </button>
 
       <CommentThread
-        ref="leftComment"
         v-if="showComments('left')"
         class="w-full"
         :side="'left'"
         :line="rendered.left.number"
+        :content="rendered.left.content"
         :threadId="getThreadId('left')"
         @cancel="
           drafting.left = false;
@@ -61,11 +61,11 @@
       </button>
 
       <CommentThread
-        ref="rightComment"
         v-if="showComments('right')"
         class="w-full"
         :side="'right'"
         :line="rendered.right.number"
+        :content="rendered.right.content"
         :threadId="getThreadId('right')"
         @cancel="
           drafting.right = false;

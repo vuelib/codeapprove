@@ -28,6 +28,19 @@ export interface ChangePair {
   right?: parseDiff.Change;
 }
 
+export interface ChunkData {
+  chunk: parseDiff.Chunk;
+  pairs: RenderedChangePair[];
+}
+
+export interface PullRequestChanges {
+  changes: {
+    file: parseDiff.File;
+    metadata: FileMetadata;
+    data: ChunkData[];
+  }[];
+}
+
 const EMPTY_RENDERED: RenderedChange = {
   type: "normal",
   empty: true,

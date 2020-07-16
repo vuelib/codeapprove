@@ -147,45 +147,65 @@
     </div>
 
     <!-- Changes -->
-    <div class="mt-8" v-click-outside="() => setActiveChangeEntry(-1)">
+    <div class="mt-12" v-click-outside="() => setActiveChangeEntry(-1)">
       <div class="flex flex-row items-center">
         <span class="font-bold text-lg">Changes</span>
         <span class="flex-grow"><!-- spacer --></span>
 
-        <!-- Change selector -->
-        <div
-          class="flex items-center rounded bg-dark-3 border-dark-0 text-sm dark-shadow py-1 px-2"
-        >
-          <label for="select-base" class="mr-1 font-bold">Base:</label>
-          <select
-            id="select-base"
-            class="bg-dark-4"
-            @change="onBaseSelected($event.target.value)"
-          >
-            <option :value="prData.pr.base.ref">{{
-              prData.pr.base.ref
-            }}</option>
-            <option
-              v-for="commit in prData.commits"
-              :key="commit.sha"
-              :value="commit.sha"
-              >{{ displayCommit(commit) }}</option
-            >
-          </select>
-        </div>
+        <!-- Select base commit -->
+        <LabeledSelect
+          class="mr-2"
+          label="Base"
+          :keys="[prData.pr.base.ref, ...prData.commits.map(c => c.sha)]"
+          :values="[
+            prData.pr.base.ref,
+            ...prData.commits.map(c => displayCommit(c))
+          ]"
+          @selected="onBaseSelected($event.key)"
+        />
 
-        <button @click="collapseAll" class="btn btn-small btn-blue ml-2">
+        <!-- Select head commit -->
+        <LabeledSelect
+          class="mr-2"
+          label="Head"
+          :keys="prData.commits.map(c => c.sha).reverse()"
+          :values="prData.commits.map(c => displayCommit(c)).reverse()"
+          @selected="onHeadSelected($event.key)"
+        />
+
+        <button @click="collapseAll" class="btn btn-small btn-blue">
           Collapse All <font-awesome-icon icon="minus" class="ml-1" />
         </button>
       </div>
 
       <ChangeEntry
-        v-for="(diff, i) in prData.diffs"
+        v-for="(change, i) in prChanges.changes"
         ref="changes"
         @click.native="setActiveChangeEntry(i)"
-        :key="`change-${diff.from}-${diff.to}`"
-        :meta="getMetadata(diff)"
-        :chunks="renderChunkData(diff)"
+        :key="`change-${change.file.from}-${change.file.to}`"
+        :meta="change.metadata"
+        :chunks="change.data"
+      />
+    </div>
+
+    <!-- Comments -->
+    <div class="mt-12">
+      <div class="flex flex-row items-center">
+        <span class="font-bold text-lg">Comments</span>
+      </div>
+
+      <div v-if="threads.length === 0">
+        No comments...
+      </div>
+
+      <CommentThread
+        v-for="thread in threads"
+        :key="thread.id"
+        class="w-1/2"
+        :side="thread.side"
+        :line="thread.line"
+        :content="thread.lineContent"
+        :threadId="thread.id"
       />
     </div>
   </div>
@@ -199,10 +219,12 @@ import { PullsGetResponseData } from "@octokit/types";
 import parseDiff from "parse-diff";
 
 import { EventEnhancer } from "../mixins/EventEnhancer";
-import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import ChangeEntry from "@/components/elements/ChangeEntry.vue";
+import CommentThread from "@/components/elements/CommentThread.vue";
+import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import UserSearchModal from "@/components/elements/UserSearchModal.vue";
 import HotkeyModal from "@/components/elements/HotkeyModal.vue";
+import LabeledSelect from "@/components/elements/LabeledSelect.vue";
 
 import { Github, PullRequestData } from "../../plugins/github";
 import { freezeArray } from "../../plugins/freeze";
@@ -211,7 +233,11 @@ import UIModule from "../../store/modules/ui";
 import {
   getFileMetadata,
   renderPairs,
-  zipChangePairs
+  zipChangePairs,
+  ChunkData,
+  PullRequestChanges,
+  FileMetadata,
+  RenderedChangePair
 } from "../../plugins/diff";
 import {
   Thread,
@@ -230,36 +256,41 @@ import {
 } from "../../plugins/hotkeys";
 
 import { ChangeEntryAPI, PullRequestAPI } from "../api";
-import { ChunkData } from "../elements/ChangeEntry.vue";
 import { AddCommentEvent } from "../../plugins/events";
 import { makeTopVisible, makeBottomVisible } from "../../plugins/dom";
 
 @Component({
   components: {
     ChangeEntry,
+    CommentThread,
     MarkdownContent,
     UserSearchModal,
-    HotkeyModal
+    HotkeyModal,
+    LabeledSelect
   }
 })
 export default class PullRequest extends Mixins(EventEnhancer)
   implements PullRequestAPI {
+  private authModule = getModule(AuthModule, this.$store);
+  private reviewModule = getModule(ReviewModule, this.$store);
+  private uiModule = getModule(UIModule, this.$store);
+
+  private github!: Github;
+
   // TODO: Put these in a "UI" object
   public usersearching = false;
   public loading = true;
 
   // TODO: These should be one state object
   public prData: PullRequestData | null = null;
+  public prChanges: PullRequestChanges | null = null;
   public meta!: ReviewMetadata;
 
+  // Diff start/end
+  public diffBase: string | null = null;
+  public diffHead: string | null = null;
+
   public activeFileIndex = -1;
-
-  private authModule = getModule(AuthModule, this.$store);
-  private reviewModule = getModule(ReviewModule, this.$store);
-  // TODO: This could be a mixin and expose a withLoading() hook
-  private uiModule = getModule(UIModule, this.$store);
-
-  private github!: Github;
 
   async mounted() {
     this.github = new Github(this.authModule.assertUser.githubToken);
@@ -283,6 +314,8 @@ export default class PullRequest extends Mixins(EventEnhancer)
       this.meta.number
     );
 
+    this.prChanges = this.renderPullRequest(this.prData);
+
     this.uiModule.endLoading();
   }
 
@@ -295,9 +328,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
 
   public handleEvent(e: Partial<AddCommentEvent>) {
     console.log("PullRequest#handleEvent");
-    // TODO: If we're not using the standard base we can't do this!
-    e.sha =
-      e.side === "left" ? this.prData!.pr.base.sha : this.prData!.pr.head.sha;
+    e.sha = e.side === "left" ? this.baseSha() : this.headSha();
 
     const finalEvent = e as AddCommentEvent;
     const user: CommentUser = {
@@ -327,15 +358,34 @@ export default class PullRequest extends Mixins(EventEnhancer)
     this.activeFileIndex = -1;
   }
 
+  // TODO: The head/base state should probably be in the Vuex module
   public async onBaseSelected(base: string) {
+    this.diffBase = base;
+    this.reloadDiff();
+  }
+
+  public async onHeadSelected(head: string) {
+    this.diffHead = head;
+    this.reloadDiff();
+  }
+
+  public headSha() {
+    return this.diffHead || this.prData!.pr.head.ref;
+  }
+
+  public baseSha() {
+    return this.diffBase || this.prData!.pr.base.ref;
+  }
+
+  public async reloadDiff() {
     this.uiModule.beginLoading();
     this.collapseAll();
 
     const diffs = await this.github.getDiff(
       this.meta.owner,
       this.meta.repo,
-      base,
-      this.prData!.pr.head.ref
+      this.headSha(),
+      this.baseSha()
     );
     this.prData!.diffs = freezeArray(diffs);
     this.uiModule.endLoading();
@@ -390,6 +440,10 @@ export default class PullRequest extends Mixins(EventEnhancer)
     }
 
     return (this.$refs.changes as ChangeEntryAPI[])[this.activeFileIndex];
+  }
+
+  get threads(): Thread[] {
+    return this.reviewModule.review.threads;
   }
 
   get hotKeyDescriptions(): KeyDescMap {
@@ -464,20 +518,26 @@ export default class PullRequest extends Mixins(EventEnhancer)
     return unresolved.length;
   }
 
-  private getMetadata(diff: parseDiff.File) {
-    return Object.freeze(getFileMetadata(diff));
-  }
+  private renderPullRequest(prData: PullRequestData): PullRequestChanges {
+    const rendered: PullRequestChanges = {
+      changes: prData.diffs.map(file => {
+        const metadata: FileMetadata = getFileMetadata(file);
+        const data: ChunkData[] = file.chunks.map(chunk => {
+          return {
+            chunk,
+            pairs: renderPairs(zipChangePairs(chunk))
+          };
+        });
 
-  private renderChunkData(diff: parseDiff.File): ChunkData[] {
-    const data = diff.chunks.map(chunk => {
-      return {
-        chunk,
-        // TODO: Render and zip all at once
-        pairs: renderPairs(zipChangePairs(chunk))
-      };
-    });
+        return {
+          file,
+          metadata,
+          data
+        };
+      })
+    };
 
-    return freezeArray(data);
+    return Object.freeze(rendered);
   }
 }
 </script>

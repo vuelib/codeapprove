@@ -17,20 +17,19 @@ export interface PullRequestData {
 }
 
 export class Github {
-  private unauthed: Octokit = new Octokit({ previews: PREVIEWS });
-  private authed: Octokit;
+  private octokit: Octokit;
 
   constructor(token: string | null) {
     // TODO: What about token refresh?
     if (token != null) {
-      this.authed = new Octokit({ auth: token, previews: PREVIEWS });
+      this.octokit = new Octokit({ auth: token, previews: PREVIEWS });
     } else {
-      this.authed = new Octokit({ previews: PREVIEWS });
+      this.octokit = new Octokit({ previews: PREVIEWS });
     }
   }
 
   async me(): Promise<UsersGetAuthenticatedResponseData> {
-    const res = await this.authed.users.getAuthenticated();
+    const res = await this.octokit.users.getAuthenticated();
     return res.data;
   }
 
@@ -40,7 +39,7 @@ export class Github {
     prefix: string
   ): Promise<SearchUsersResponseData> {
     // TODO: Prefer users from the same repo!
-    const res = await this.unauthed.search.users({
+    const res = await this.octokit.search.users({
       q: prefix
     });
 
@@ -52,7 +51,7 @@ export class Github {
     repo: string,
     pull_number: number
   ): Promise<PullRequestData> {
-    const pr = await this.authed.pulls.get({
+    const pr = await this.octokit.pulls.get({
       owner,
       repo,
       pull_number
@@ -65,13 +64,13 @@ export class Github {
       pr.data.head.ref
     );
 
-    const commits = await this.unauthed.pulls.listCommits({
+    const commits = await this.octokit.pulls.listCommits({
       owner,
       repo,
       pull_number
     });
 
-    // Diff should be separate
+    // TODO: Diff should be separate
     return {
       pr: Object.freeze(pr.data),
       commits: freezeArray(commits.data),
@@ -85,7 +84,7 @@ export class Github {
     base: string,
     head: string
   ): Promise<parseDiff.File[]> {
-    const res = await this.unauthed.repos.compareCommits({
+    const res = await this.octokit.repos.compareCommits({
       owner,
       repo,
       base,

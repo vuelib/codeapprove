@@ -110,15 +110,15 @@ import * as events from "../../plugins/events";
 })
 export default class CommentThread extends Mixins(EventEnhancer) {
   @Prop() side!: Side;
-  @Prop() line!: number;
   @Prop() threadId!: string | null;
-
-  comments: Comment[] = [];
+  @Prop() line!: number;
+  @Prop() content!: string;
 
   authModule = getModule(AuthModule, this.$store);
   reviewModule = getModule(ReviewModule, this.$store);
 
   thread: Thread | null = null;
+  comments: Comment[] = [];
 
   focused = false;
   forceExpand = false;
@@ -158,6 +158,11 @@ export default class CommentThread extends Mixins(EventEnhancer) {
 
   get typing() {
     return this.textFocus || this.draftComment.length > 0;
+  }
+
+  // TODO: Don't show if outdated
+  get outdated(): boolean {
+    return this.thread != null && this.thread.lineContent !== this.content;
   }
 
   get resolved(): boolean {

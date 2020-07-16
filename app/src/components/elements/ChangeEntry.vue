@@ -90,16 +90,11 @@ import {
 } from "../../model/review";
 import {
   ChangePair,
-  zipChangePairs,
   RenderedChangePair,
-  FileMetadata
+  FileMetadata,
+  ChunkData
 } from "../../plugins/diff";
 import { KeyMap, CHANGE_ENTRY_KEY_MAP } from "../../plugins/hotkeys";
-
-export interface ChunkData {
-  chunk: parseDiff.Chunk;
-  pairs: RenderedChangePair[];
-}
 
 @Component({
   components: {
