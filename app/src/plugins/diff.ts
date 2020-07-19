@@ -28,6 +28,17 @@ export interface ChangePair {
   right?: parseDiff.Change;
 }
 
+export interface ChunkHeader {
+  start: {
+    left: number;
+    right: number;
+  };
+  length: {
+    left: number;
+    right: number;
+  };
+}
+
 export interface ChunkData {
   chunk: parseDiff.Chunk;
   pairs: RenderedChangePair[];

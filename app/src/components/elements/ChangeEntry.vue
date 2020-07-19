@@ -43,15 +43,13 @@
       v-show="expanded"
       class="bg-dark-4 overflow-hidden"
     >
-      <template v-for="{ chunk, pairs } in chunks">
-        <div
-          class="w-full border-b border-t border-blue-500"
+      <template v-for="({ chunk, pairs }, i) in chunks">
+        <ChunkHeaderBar
           :key="chunk.content"
-        >
-          <pre class="w-full py-1 px-2 bg-dark-3 text-blue-500">{{
-            chunk.content
-          }}</pre>
-        </div>
+          :chunk="chunk"
+          @expand-above="loadLinesAbove(i)"
+          @expand-below="loadLinesBelow(i)"
+        />
 
         <DiffLine
           v-for="(pair, j) in pairs"
@@ -75,8 +73,10 @@ import { ChangeEntryAPI, DiffLineAPI } from "../api";
 import { EventEnhancer } from "../mixins/EventEnhancer";
 
 import DiffLine from "@/components/elements/DiffLine.vue";
+import ChunkHeaderBar from "@/components/elements/ChunkHeaderBar.vue";
 import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
+import { Github } from "../../plugins/github";
 import { AddCommentEvent } from "../../plugins/events";
 import { nextRender, makeTopVisible } from "../../plugins/dom";
 import { getFileLang } from "../../plugins/prism";
@@ -95,10 +95,12 @@ import {
   ChunkData
 } from "../../plugins/diff";
 import { KeyMap, CHANGE_ENTRY_KEY_MAP } from "../../plugins/hotkeys";
+import { freezeArray } from "../../plugins/freeze";
 
 @Component({
   components: {
-    DiffLine
+    DiffLine,
+    ChunkHeaderBar
   }
 })
 export default class ChangeEntry extends Mixins(EventEnhancer)
@@ -115,6 +117,7 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
 
   private authModule = getModule(AuthModule, this.$store);
   private reviewModule = getModule(ReviewModule, this.$store);
+  private github: Github = new Github(this.authModule.assertUser.githubToken);
 
   public getThreads(pair: RenderedChangePair): ThreadPair {
     const leftArgs: ThreadArgs = {
@@ -237,7 +240,78 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     }
   }
 
-  public get langPair() {
+  public async loadLinesAbove(index: number) {
+    const data = this.chunks[index];
+    const chunk = data.chunk;
+
+    const owner = this.reviewModule.review.metadata.owner;
+    const repo = this.reviewModule.review.metadata.repo;
+
+    const leftSha = this.reviewModule.reviewState.base;
+    const rightSha = this.reviewModule.reviewState.head;
+
+    // TODO: What if this range runs into another chunk?
+    const leftStart = Math.max(chunk.oldStart - 50, 1);
+    const leftEnd = Math.max(chunk.oldStart - 1, 1);
+    const leftLines = await this.github.getContentLines(
+      owner,
+      repo,
+      this.meta.from,
+      leftSha,
+      leftStart,
+      leftEnd
+    );
+
+    const rightStart = Math.max(chunk.newStart - 50, 1);
+    const rightEnd = Math.max(chunk.newStart - 1, 1);
+    const rightLines = await this.github.getContentLines(
+      owner,
+      repo,
+      this.meta.to,
+      leftSha,
+      leftStart,
+      leftEnd
+    );
+
+    // TODO: Handle zipping lines of different lengths
+    const pairs: RenderedChangePair[] = [];
+    for (let i = 0; i < leftLines.length; i++) {
+      pairs.push({
+        left: {
+          type: "normal",
+          empty: false,
+          number: leftStart + i,
+          marker: "",
+          content: leftLines[i]
+        },
+        right: {
+          type: "normal",
+          empty: false,
+          number: leftStart + i,
+          marker: "",
+          content: rightLines[i]
+        }
+      });
+    }
+
+    // Freeze pairs and add them to the chunk
+    const frozen = freezeArray(pairs);
+    data.pairs.unshift(...frozen);
+
+    // Change the start/endpoints
+    chunk.oldStart = leftStart;
+    chunk.newStart = rightStart;
+    chunk.oldLines += leftEnd - leftStart;
+    chunk.newLines += rightEnd - rightStart;
+  }
+
+  public async loadLinesBelow(index: number) {
+    const chunk = this.chunks[index].chunk;
+    // TODO
+    console.log("loadLinesBelow", chunk);
+  }
+
+  get langPair() {
     return {
       left: getFileLang(this.meta.from),
       right: getFileLang(this.meta.to)

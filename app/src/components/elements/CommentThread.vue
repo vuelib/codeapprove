@@ -112,6 +112,7 @@ export default class CommentThread extends Mixins(EventEnhancer) {
   @Prop() side!: Side;
   @Prop() threadId!: string | null;
   @Prop() line!: number;
+  // TODO: Do we really need this here?
   @Prop() content!: string;
 
   authModule = getModule(AuthModule, this.$store);

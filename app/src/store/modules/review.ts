@@ -20,6 +20,11 @@ import { NEW_COMMENT_EVENT, AddCommentEvent } from "../../plugins/events";
   name: "review"
 })
 export default class ReviewModule extends VuexModule {
+  public reviewState = {
+    base: "unknown",
+    head: "unknown"
+  };
+
   public review: Review = {
     // TODO: Real
     metadata: {
@@ -110,6 +115,12 @@ export default class ReviewModule extends VuexModule {
   public pushReviewer(opts: { login: string; approved: boolean }) {
     // Makes the new map key reactive
     Vue.set(this.review.reviewers, opts.login, opts.approved);
+  }
+
+  @Mutation
+  public setBaseAndHead(opts: { base: string; head: string }) {
+    this.reviewState.base = opts.base;
+    this.reviewState.head = opts.head;
   }
 
   @Action

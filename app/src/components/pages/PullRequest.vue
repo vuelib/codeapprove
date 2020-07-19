@@ -314,6 +314,11 @@ export default class PullRequest extends Mixins(EventEnhancer)
       this.meta.number
     );
 
+    this.reviewModule.setBaseAndHead({
+      base: this.baseSha(),
+      head: this.headSha()
+    });
+
     this.prChanges = this.renderPullRequest(this.prData);
 
     this.uiModule.endLoading();
@@ -388,6 +393,11 @@ export default class PullRequest extends Mixins(EventEnhancer)
       this.baseSha()
     );
     this.prData!.diffs = freezeArray(diffs);
+    this.reviewModule.setBaseAndHead({
+      base: this.baseSha(),
+      head: this.headSha()
+    });
+
     this.uiModule.endLoading();
   }
 
@@ -525,7 +535,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
         const data: ChunkData[] = file.chunks.map(chunk => {
           return {
             chunk,
-            pairs: renderPairs(zipChangePairs(chunk))
+            pairs: freezeArray(renderPairs(zipChangePairs(chunk)))
           };
         });
 
@@ -537,7 +547,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
       })
     };
 
-    return Object.freeze(rendered);
+    return rendered;
   }
 }
 </script>
