@@ -113,8 +113,8 @@ export class Github {
     const content = await this.getContent(owner, repo, path, ref);
     const lines = content.split("\n");
 
-    // File lines are one-indexed
-    const slice = lines.slice(start - 1, end - 1);
+    // File lines are one-indexed (start - 1) but end is exclusive
+    const slice = lines.slice(start - 1, end);
     return slice;
   }
 

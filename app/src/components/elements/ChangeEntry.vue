@@ -45,10 +45,11 @@
     >
       <template v-for="({ chunk, pairs }, i) in chunks">
         <ChunkHeaderBar
+          v-show="showChunkHeader(i)"
           :key="chunk.content"
+          :prev="getPrevChunk(i)"
           :chunk="chunk"
           @expand-above="loadLinesAbove(i)"
-          @expand-below="loadLinesBelow(i)"
         />
 
         <DiffLine
@@ -92,7 +93,9 @@ import {
   ChangePair,
   RenderedChangePair,
   FileMetadata,
-  ChunkData
+  ChunkData,
+  EMPTY_CHUNK,
+  renderNormalChange
 } from "../../plugins/diff";
 import { KeyMap, CHANGE_ENTRY_KEY_MAP } from "../../plugins/hotkeys";
 import { freezeArray } from "../../plugins/freeze";
@@ -240,6 +243,21 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     }
   }
 
+  public getPrevChunk(index: number): parseDiff.Chunk {
+    const chunk = this.chunks[index].chunk;
+    return index > 0 ? this.chunks[index - 1].chunk : EMPTY_CHUNK;
+  }
+
+  public showChunkHeader(index: number) {
+    const chunk = this.chunks[index].chunk;
+    const prevChunk = this.getPrevChunk(index);
+
+    const prevLeftEnd = prevChunk.oldStart + prevChunk.oldLines - 1;
+
+    // Check if the chunks are directly adjacent
+    return !(chunk.oldStart === prevLeftEnd + 1);
+  }
+
   public async loadLinesAbove(index: number) {
     const data = this.chunks[index];
     const chunk = data.chunk;
@@ -250,8 +268,11 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     const leftSha = this.reviewModule.reviewState.base;
     const rightSha = this.reviewModule.reviewState.head;
 
-    // TODO: What if this range runs into another chunk?
-    const leftStart = Math.max(chunk.oldStart - 50, 1);
+    const prevChunk = this.getPrevChunk(index);
+    const prevLeftEnd = prevChunk.oldStart + prevChunk.oldLines - 1;
+    const prevRightEnd = prevChunk.newStart + prevChunk.newLines - 1;
+
+    const leftStart = Math.max(chunk.oldStart - 20, prevLeftEnd + 1);
     const leftEnd = Math.max(chunk.oldStart - 1, 1);
     const leftLines = await this.github.getContentLines(
       owner,
@@ -262,53 +283,39 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
       leftEnd
     );
 
-    const rightStart = Math.max(chunk.newStart - 50, 1);
+    const rightStart = Math.max(chunk.newStart - 20, prevRightEnd + 1);
     const rightEnd = Math.max(chunk.newStart - 1, 1);
     const rightLines = await this.github.getContentLines(
       owner,
       repo,
       this.meta.to,
-      leftSha,
-      leftStart,
-      leftEnd
+      rightSha,
+      rightStart,
+      rightEnd
     );
 
     // TODO: Handle zipping lines of different lengths
+    if (leftLines.length != rightLines.length) {
+      console.warn("loadLinesAbove: uneven zip");
+    }
+
     const pairs: RenderedChangePair[] = [];
     for (let i = 0; i < leftLines.length; i++) {
       pairs.push({
-        left: {
-          type: "normal",
-          empty: false,
-          number: leftStart + i,
-          marker: "",
-          content: leftLines[i]
-        },
-        right: {
-          type: "normal",
-          empty: false,
-          number: leftStart + i,
-          marker: "",
-          content: rightLines[i]
-        }
+        left: renderNormalChange(leftStart + i, leftLines[i]),
+        right: renderNormalChange(rightStart + i, rightLines[i])
       });
     }
 
-    // Freeze pairs and add them to the chunk
+    // Freeze pairs and add them to the start of the chunk
     const frozen = freezeArray(pairs);
     data.pairs.unshift(...frozen);
 
     // Change the start/endpoints
     chunk.oldStart = leftStart;
+    chunk.oldLines += leftEnd - leftStart + 1;
     chunk.newStart = rightStart;
-    chunk.oldLines += leftEnd - leftStart;
-    chunk.newLines += rightEnd - rightStart;
-  }
-
-  public async loadLinesBelow(index: number) {
-    const chunk = this.chunks[index].chunk;
-    // TODO
-    console.log("loadLinesBelow", chunk);
+    chunk.newLines += rightEnd - rightStart + 1;
   }
 
   get langPair() {

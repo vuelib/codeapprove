@@ -2,12 +2,11 @@
   <div
     class="w-full py-1 px-2 flex items-center text-blue-500 border-b border-t border-blue-500"
   >
-    <pre class="inline bg-dark-3">@@ {{ text }} @@</pre>
+    <pre class="inline bg-dark-3">> {{ text }}</pre>
     <span class="flex-grow"></span>
     <a v-if="showAbove" @click.stop="expandAbove"
-      ><code class="ml-2">+above</code></a
+      ><code class="ml-2">+earlier</code></a
     >
-    <a @click.stop="expandBelow"><code class="ml-2">+below</code></a>
   </div>
 </template>
 
@@ -18,12 +17,17 @@ import * as parseDiff from "parse-diff";
 
 @Component
 export default class ChunkHeaderBar extends Vue {
+  @Prop() prev!: parseDiff.Chunk;
   @Prop() chunk!: parseDiff.Chunk;
 
   get text() {
-    const leftEnd = this.chunk.oldStart + this.chunk.oldLines - 1;
-    const rightEnd = this.chunk.newStart + this.chunk.newLines - 1;
-    return `${this.chunk.oldStart}-${leftEnd}, ${this.chunk.newStart}-${rightEnd}`;
+    const leftStart = this.prev.oldStart + this.prev.oldLines;
+    const leftEnd = this.chunk.oldStart - 1;
+
+    const rightStart = this.prev.newStart + this.prev.newLines;
+    const rightEnd = this.chunk.newStart - 1;
+
+    return `${leftStart}-${leftEnd}, ${rightStart}-${rightEnd}`;
   }
 
   get showAbove() {
@@ -32,10 +36,6 @@ export default class ChunkHeaderBar extends Vue {
 
   public expandAbove() {
     this.$emit("expand-above");
-  }
-
-  public expandBelow() {
-    this.$emit("expand-below");
   }
 }
 </script>

@@ -52,7 +52,16 @@ export interface PullRequestChanges {
   }[];
 }
 
-const EMPTY_RENDERED: RenderedChange = {
+export const EMPTY_CHUNK: parseDiff.Chunk = {
+  content: "",
+  changes: [],
+  oldStart: 0,
+  oldLines: 1,
+  newStart: 0,
+  newLines: 1
+};
+
+export const EMPTY_RENDERED: RenderedChange = {
   type: "normal",
   empty: true,
   number: -1,
@@ -66,6 +75,19 @@ export function getFileMetadata(file: parseDiff.File): FileMetadata {
     to: file.to || "unknown",
     additions: file.additions,
     deletions: file.deletions
+  };
+}
+
+export function renderNormalChange(
+  line: number,
+  content: string
+): RenderedChange {
+  return {
+    type: "normal",
+    empty: false,
+    number: line,
+    marker: "",
+    content: content
   };
 }
 
