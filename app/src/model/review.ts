@@ -26,6 +26,7 @@ export interface ThreadContentArgs {
 
 export interface Thread extends ThreadArgs, ThreadContentArgs {
   id: string;
+  draft: boolean;
   resolved: boolean;
 }
 

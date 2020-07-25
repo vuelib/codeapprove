@@ -24,6 +24,9 @@ const VueHotKey = require("v-hotkey");
 Vue.use(VueHotKey.default);
 
 // Prism syntax highlighting
+const Prism = require("vue-prism-component");
+Vue.component("prism", Prism);
+
 import "prismjs";
 import "prism-themes/themes/prism-atom-dark.css";
 

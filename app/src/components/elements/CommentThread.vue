@@ -1,7 +1,7 @@
 <template>
   <div class="relative z-10 dark-shadow border border-dark-0 bg-dark-6">
     <div v-if="resolved && !forceExpand" class="flex items-center px-2 py-1">
-      <span class="italic flex-grow text-wht-dim">Comment resolved</span>
+      <span class="italic flex-grow text-wht-dim">Thread resolved</span>
       <font-awesome-icon
         @click="forceExpand = true"
         icon="eye"
@@ -9,6 +9,18 @@
       />
     </div>
     <div v-else>
+      <!-- Preview -->
+      <div v-if="mode === 'standalone'" class="bg-dark-3">
+        <div class="px-2 py-1 font-bold border-b border-blue-500">
+          <code>{{ thread.file }}</code>
+        </div>
+        <div class="bg-dark-3">
+          <prism class="code-preview"
+            >{{ thread.line }} {{ thread.lineContent }}</prism
+          >
+        </div>
+      </div>
+
       <!-- Thread -->
       <div v-for="(comment, index) in comments" :key="index" class="flex p-2">
         <img class="flex-none avatar mt-1 mr-4" :src="comment.photoURL" />
@@ -103,12 +115,15 @@ import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
 import * as events from "../../plugins/events";
 
+type Mode = "inline" | "standalone";
+
 @Component({
   components: {
     MarkdownContent
   }
 })
 export default class CommentThread extends Mixins(EventEnhancer) {
+  @Prop({ default: "inline" }) mode!: Mode;
   @Prop() side!: Side;
   @Prop() threadId!: string | null;
   @Prop() line!: number;
@@ -131,7 +146,7 @@ export default class CommentThread extends Mixins(EventEnhancer) {
     events.on(NEW_COMMENT_EVENT, this.onNewComment);
     this.loadComments();
 
-    if (this.comments.length === 0) {
+    if (this.mode === "inline" && this.comments.length === 0) {
       (this.$refs.replyField as HTMLElement).focus();
     }
   }
@@ -178,6 +193,13 @@ export default class CommentThread extends Mixins(EventEnhancer) {
       resolve: resolve
     };
 
+    // In standalone mode all of this will be known
+    if (this.thread) {
+      partialEvt.file = this.thread.file;
+      partialEvt.sha = this.thread.sha;
+      partialEvt.lineContent = this.thread.lineContent;
+    }
+
     this.bubbleUp(partialEvt);
 
     // TODO: Need some kind of "pending" state until the thing hits the server
@@ -206,5 +228,12 @@ export default class CommentThread extends Mixins(EventEnhancer) {
   @apply rounded;
   height: 32px;
   width: 32px;
+}
+
+.code-preview {
+  @apply rounded-none;
+  @apply py-1 px-2;
+  background: unset;
+  margin: 0;
 }
 </style>

@@ -106,6 +106,10 @@ export default class ReviewModule extends VuexModule {
 
   @Mutation
   public removeDraftStatus() {
+    for (const thread of this.review.threads) {
+      thread.draft = false;
+    }
+
     for (const comment of this.review.comments) {
       comment.draft = false;
     }
@@ -129,6 +133,7 @@ export default class ReviewModule extends VuexModule {
     const thread: Thread = {
       id: uuid.v4(),
       resolved: false,
+      draft: true,
       ...opts.args,
       ...opts.ca
     };

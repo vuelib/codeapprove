@@ -99,15 +99,11 @@ import {
 import { AddCommentEvent } from "../../plugins/events";
 import { DiffLineAPI } from "../api";
 
-// TODO: Should I move this out?
-const Prism = require("vue-prism-component");
-
 type Side = "left" | "right";
 
 @Component({
   components: {
-    CommentThread,
-    Prism
+    CommentThread
   }
 })
 export default class DiffLine extends Mixins(EventEnhancer)

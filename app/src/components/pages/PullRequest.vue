@@ -190,18 +190,30 @@
 
     <!-- Comments -->
     <div class="mt-12">
-      <div class="flex flex-row items-center">
-        <span class="font-bold text-lg">Comments</span>
+      <div class="flex flex-row items-center mb-2">
+        <span class="font-bold text-lg mr-2">Comments</span>
+        <LabeledSelect
+          :label="'Filter'"
+          :keys="['all', 'resolved', 'unresolved']"
+          :values="['all', 'resolved', 'unresolved']"
+          @selected="threadFilter = $event.key"
+        />
       </div>
 
       <div v-if="threads.length === 0">
         No comments...
       </div>
 
+      <!-- TODO
+         * Resolved hides this but shouldn;t
+         * Jump to line from preview
+         * Buttons tend to stick around
+      -->
       <CommentThread
         v-for="thread in threads"
         :key="thread.id"
-        class="w-1/2"
+        class="w-1/2 mb-2"
+        :mode="'standalone'"
         :side="thread.side"
         :line="thread.line"
         :content="thread.lineContent"
@@ -258,6 +270,7 @@ import {
 import { ChangeEntryAPI, PullRequestAPI } from "../api";
 import { AddCommentEvent } from "../../plugins/events";
 import { makeTopVisible, makeBottomVisible } from "../../plugins/dom";
+import { resolve } from "dns";
 
 @Component({
   components: {
@@ -291,6 +304,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
   public diffHead: string | null = null;
 
   public activeFileIndex = -1;
+  public threadFilter = "all";
 
   async mounted() {
     this.github = new Github(this.authModule.assertUser.githubToken);
@@ -453,7 +467,14 @@ export default class PullRequest extends Mixins(EventEnhancer)
   }
 
   get threads(): Thread[] {
-    return this.reviewModule.review.threads;
+    let threads = this.reviewModule.review.threads.filter(t => !t.draft);
+
+    if (this.threadFilter !== "all") {
+      const resolvedFilter = this.threadFilter === "resolved";
+      threads = threads.filter(t => t.resolved === resolvedFilter);
+    }
+
+    return threads;
   }
 
   get hotKeyDescriptions(): KeyDescMap {
