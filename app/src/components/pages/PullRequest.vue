@@ -336,6 +336,12 @@ export default class PullRequest extends Mixins(EventEnhancer)
     this.prChanges = this.renderPullRequest(this.prData);
 
     this.uiModule.endLoading();
+
+    // TODO: Remove this once they do it
+    this.uiModule.addMessage({
+      type: "alert",
+      text: "Pro tip: press 'Alt + /' to see keyboard shortcuts"
+    });
   }
 
   public setMyApproval(approved: boolean) {

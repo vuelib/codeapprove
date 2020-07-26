@@ -4,7 +4,10 @@
     class="flex items-center dark-shadow text-purple-300 font-bold py-4 px-8 bg-dark-2"
   >
     <font-awesome-icon icon="code-branch" size="lg" class="mr-4" />
-    <span class="text-xl flex-grow">CodeApprove</span>
+    <span class="text-xl">CodeApprove</span>
+
+    <span class="flex-grow"><!-- spacer --></span>
+
     <router-link v-if="!signedIn" to="/signin" exact-active-class="hidden"
       ><span class="text-md">Sign In</span>
     </router-link>
