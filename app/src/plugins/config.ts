@@ -19,5 +19,5 @@ if (process.env.NODE_ENV !== "production") {
 } else {
   // PROD CONFIG
   config.github.client_id = "Iv1.6163c34dcb65f972";
-  config.github.redirect = "https://diffmachine.com/oauth";
+  config.github.redirect = "https://codeapprove.com/oauth";
 }
