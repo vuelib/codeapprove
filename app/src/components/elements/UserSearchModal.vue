@@ -59,7 +59,7 @@ export default class UserSearchModal extends Vue {
   private searchFn: Function = () => {};
 
   mounted() {
-    this.github = new Github(this.authModule.assertUser.githubToken);
+    this.github = new Github(this.authModule);
 
     (this.$refs.searchField as any).focus();
 

@@ -303,7 +303,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
   public threadFilter = "all";
 
   async mounted() {
-    this.github = new Github(this.authModule.assertUser.githubToken);
+    this.github = new Github(this.authModule);
     this.uiModule.beginLoading();
 
     // TODO: Need to watch for route changes

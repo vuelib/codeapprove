@@ -1,8 +1,17 @@
 import * as firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
 
 export function auth(): firebase.auth.Auth {
   return app().auth();
+}
+
+export function functions(): firebase.functions.Functions {
+  const functions = app().functions();
+  if (process.env.NODE_ENV !== "production") {
+    functions.useFunctionsEmulator("http://localhost:5001");
+  }
+  return functions;
 }
 
 function app(): firebase.app.App {

@@ -2,9 +2,11 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as axios from "axios";
 
+import * as github from "./github";
+import * as users from "./users";
+
 admin.initializeApp();
 
-const config = functions.config();
 const ax = axios.default;
 const qs = require("querystring");
 
@@ -23,28 +25,41 @@ export const githubWebhook = functions.https.onRequest(
   }
 );
 
+export const getGithubToken = functions.https.onCall(async (data, ctx) => {
+  if (!(ctx.auth && ctx.auth.uid)) {
+    throw new Error("Unauthenticated");
+  }
+
+  const user = await users.getUser(ctx.auth.uid);
+  const token = await github.exchangeRefreshToken(user.refresh_token);
+
+  // Save updated token to the database
+  await users.saveUser(
+    ctx.auth.uid,
+    user.login,
+    token.refresh_token,
+    token.refresh_token_expires_in
+  );
+
+  return {
+    access_token: token.access_token,
+    // String, in seconds
+    expires_in: token.expires_in,
+  };
+});
+
 /**
  * TODO: actually deploy the client secret
  */
 export const oauth = functions.https.onRequest(async (request, response) => {
-  const ghConfig = config.github;
-  const code = request.query.code;
+  const code = request.query.code as string;
 
   console.log("Getting access tokens...");
-  const tokenRes = await ax.post(
-    `https://github.com/login/oauth/access_token?${qs.stringify({
-      client_id: ghConfig.client_id,
-      client_secret: ghConfig.client_secret,
-      code,
-    })}`,
-    {
-      headers: {
-        Accept: "application/json",
-      },
-    }
-  );
-
-  const { access_token, expires_in } = qs.parse(tokenRes.data);
+  const {
+    access_token,
+    refresh_token,
+    refresh_token_expires_in,
+  } = await github.exchangeCode(code);
 
   const userRes = await ax.get(`https://api.github.com/user`, {
     headers: {
@@ -62,13 +77,12 @@ export const oauth = functions.https.onRequest(async (request, response) => {
 
   await admin.auth().updateUser(userId, {
     displayName: login,
-    photoURL: avatar_url
+    photoURL: avatar_url,
   });
 
-  // TODO: Store the refresh token(s) and expiry info in the database
+  await users.saveUser(userId, login, refresh_token, refresh_token_expires_in);
+
   const res = {
-    access_token,
-    expires_in,
     custom_token,
   };
 

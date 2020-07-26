@@ -8,6 +8,7 @@ import {
 import parseDiff from "parse-diff";
 import * as octocache from "./octocache";
 import { freezeArray } from "./freeze";
+import AuthModule from "@/store/modules/auth";
 
 const PREVIEWS = ["machine-man-preview"];
 
@@ -20,12 +21,20 @@ export interface PullRequestData {
 export class Github {
   private octokit: Octokit;
 
-  constructor(token: string | null) {
-    // TODO: What about token refresh?
-    if (token != null) {
-      this.octokit = new Octokit({ auth: token, previews: PREVIEWS });
-    } else {
-      this.octokit = new Octokit({ previews: PREVIEWS });
+  constructor(private authModule: AuthModule) {
+    const token = authModule.assertUser.githubToken;
+    this.octokit = new Octokit({ auth: token, previews: PREVIEWS });
+  }
+
+  async assertAuth(): Promise<void> {
+    const now = new Date().getTime();
+    const until = this.authModule.assertUser.githubExpiry - now;
+
+    console.log("expiresIn (ms)", until);
+
+    const hourMs = 60 * 60 * 1000;
+    if (until < hourMs) {
+      this.authModule.refreshGithubAuth();
     }
   }
 
@@ -39,6 +48,8 @@ export class Github {
     repo: string,
     prefix: string
   ): Promise<SearchUsersResponseData> {
+    this.assertAuth();
+
     // TODO: Prefer users from the same repo!
     const res = await this.octokit.search.users({
       q: prefix
@@ -52,6 +63,8 @@ export class Github {
     repo: string,
     pull_number: number
   ): Promise<PullRequestData> {
+    this.assertAuth();
+
     const pr = await this.octokit.pulls.get({
       owner,
       repo,
@@ -85,6 +98,8 @@ export class Github {
     base: string,
     head: string
   ): Promise<parseDiff.File[]> {
+    this.assertAuth();
+
     const res = await this.octokit.repos.compareCommits({
       owner,
       repo,
@@ -108,6 +123,8 @@ export class Github {
     start: number,
     end: number
   ): Promise<string[]> {
+    this.assertAuth();
+
     console.log(`getContentLines(${path}@${ref}, ${start}, ${end})`);
 
     const content = await this.getContent(owner, repo, path, ref);
@@ -124,6 +141,8 @@ export class Github {
     path: string,
     ref: string
   ): Promise<string> {
+    this.assertAuth();
+
     const data = await octocache.call(
       "repos.getContent",
       this.octokit.repos.getContent,

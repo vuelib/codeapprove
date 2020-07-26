@@ -1,8 +1,6 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { auth } from "../../plugins/firebase";
-import { User } from "../../model/auth";
-
-import * as firebase from "firebase/app";
+import { auth, functions } from "../../plugins/firebase";
+import { User, updateGithubToken } from "../../model/auth";
 
 // TODO: Namespacing?
 @Module({
@@ -53,5 +51,18 @@ export default class AuthModule extends VuexModule {
   @Action
   async startSignOut() {
     await auth().signOut();
+  }
+
+  @Action
+  async refreshGithubAuth() {
+    console.log("refreshGithubAuth");
+    const tokenRes = await functions().httpsCallable("getGithubToken")();
+    const access_token = tokenRes.data.access_token;
+    const expires_in = Number.parseInt(tokenRes.data.expires_in) * 1000;
+
+    const currentUser = this.user!;
+    const newUser = updateGithubToken(currentUser, access_token, expires_in);
+
+    this.context.commit("setUser", newUser);
   }
 }

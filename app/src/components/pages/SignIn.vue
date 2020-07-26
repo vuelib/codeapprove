@@ -33,7 +33,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 
 import * as firebase from "firebase/app";
 import { config } from "../../plugins/config";
-import { auth } from "../../plugins/firebase";
+import { auth, functions } from "../../plugins/firebase";
 
 import { getModule } from "vuex-module-decorators";
 
@@ -51,20 +51,22 @@ export default class SignIn extends Vue {
 
   async mounted() {
     if (this.$route.query.custom_token) {
-      this.signInCustom(
-        this.$route.query.custom_token as string,
-        this.$route.query.access_token as string
-      );
+      this.signInCustom(this.$route.query.custom_token as string);
     }
   }
 
-  private async signInCustom(customToken: string, accessToken: string) {
+  private async signInCustom(customToken: string) {
     this.uiModule.beginLoading();
     try {
       const result = await auth().signInWithCustomToken(customToken);
+      const tokenRes = await functions().httpsCallable("getGithubToken")();
+
+      // TODO: Store the expiry
+      const access_token = tokenRes.data.access_token;
+      const expires_in = Number.parseInt(tokenRes.data.expires_in) * 1000;
+
       if (result.user) {
-        // TODO: Store the expiry
-        const user: User = createUser(result.user, accessToken);
+        const user: User = createUser(result.user, access_token, expires_in);
         this.authModule.setUser(user);
 
         // TODO: Real routing after sign-in
