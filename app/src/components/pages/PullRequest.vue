@@ -204,11 +204,6 @@
         No comments...
       </div>
 
-      <!-- TODO
-         * Resolved hides this but shouldn;t
-         * Jump to line from preview
-         * Buttons tend to stick around
-      -->
       <CommentThread
         v-for="thread in threads"
         :key="thread.id"

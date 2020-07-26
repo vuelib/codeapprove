@@ -46,7 +46,7 @@ export default class HotkeyModal extends Vue {
 
   public renderKey(key: string) {
     let res = key.toUpperCase();
-    res = res.replace("+", " + ");
+    res = res.split("+").join(" + ");
     return res;
   }
 

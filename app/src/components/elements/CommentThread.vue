@@ -1,6 +1,9 @@
 <template>
   <div class="relative z-10 dark-shadow border border-dark-0 bg-dark-6">
-    <div v-if="resolved && !forceExpand" class="flex items-center px-2 py-1">
+    <div
+      v-if="mode === 'inline' && resolved && !forceExpand"
+      class="flex items-center px-2 py-1"
+    >
       <span class="italic flex-grow text-wht-dim">Thread resolved</span>
       <font-awesome-icon
         @click="forceExpand = true"
@@ -11,8 +14,17 @@
     <div v-else>
       <!-- Preview -->
       <div v-if="mode === 'standalone'" class="bg-dark-3">
-        <div class="px-2 py-1 font-bold border-b border-blue-500">
+        <div
+          class="flex items-center pl-2 pr-1 py-2 font-bold border-b border-blue-500"
+        >
           <code>{{ thread.file }}</code>
+          <span class="flex-grow"><!-- spacer --></span>
+          <div
+            v-if="resolved"
+            class="text-sm rounded border border-gray-500 px-1"
+          >
+            <code class="italic text-gray-500">resolved</code>
+          </div>
         </div>
         <div class="bg-dark-3">
           <prism class="code-preview"
@@ -37,7 +49,7 @@
 
       <!-- Form -->
       <!-- TODO: Handle focus out -->
-      <div @focusin="focused = true">
+      <div @focusin="focused = true" @focusout="unfocus">
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="photoURL" />
           <div class="flex-grow relative rounded bg-dark-7">
@@ -237,6 +249,7 @@ export default class CommentThread extends Mixins(EventEnhancer)
 
   private unfocus() {
     this.focused = false;
+    this.textFocus = false;
     const field = this.$refs.replyField as HTMLElement | undefined;
     if (field) {
       field.blur();
