@@ -28,7 +28,7 @@ export default class UIModule extends VuexModule {
 
   @Mutation
   addMessage(message: Message) {
-    if (this.messages.indexOf(message) > 0) {
+    if (this.messages.some(m => m.text === message.text)) {
       return;
     }
 

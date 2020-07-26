@@ -264,7 +264,8 @@ import {
   combineHotkeys,
   PULL_REQUEST_KEY_DESC,
   PULL_REQUEST_KEY_MAP,
-  CHANGE_ENTRY_KEY_DESC
+  CHANGE_ENTRY_KEY_DESC,
+  COMMENT_THREAD_KEY_DESC
 } from "../../plugins/hotkeys";
 
 import { ChangeEntryAPI, PullRequestAPI } from "../api";
@@ -484,7 +485,11 @@ export default class PullRequest extends Mixins(EventEnhancer)
   }
 
   get hotKeyDescriptions(): KeyDescMap {
-    return combineHotkeys(PULL_REQUEST_KEY_DESC, CHANGE_ENTRY_KEY_DESC);
+    return combineHotkeys(
+      PULL_REQUEST_KEY_DESC,
+      CHANGE_ENTRY_KEY_DESC,
+      COMMENT_THREAD_KEY_DESC
+    );
   }
 
   get hotKeyMap(): KeyMap {

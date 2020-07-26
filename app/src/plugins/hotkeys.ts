@@ -1,4 +1,8 @@
-import { ChangeEntryAPI, PullRequestAPI } from "../components/api";
+import {
+  ChangeEntryAPI,
+  PullRequestAPI,
+  CommentThreadAPI
+} from "../components/api";
 
 export type KeyActionMap = Record<string, KeyAction>;
 export type KeyDescMap = Record<string, KeyDesc>;
@@ -69,6 +73,28 @@ export const CHANGE_ENTRY_KEY_MAP = (instance: ChangeEntryAPI) => {
   };
 
   return zip(CHANGE_ENTRY_KEY_DESC, actionMap);
+};
+
+export const COMMENT_THREAD_KEY_DESC: KeyDescMap = {
+  "alt+enter": {
+    desc: "Save comment."
+  },
+  "alt+shift+enter": {
+    desc: "Save comment and resolve thread."
+  }
+};
+
+export const COMMENT_THREAD_KEY_MAP = (instance: CommentThreadAPI) => {
+  const actionMap: KeyActionMap = {
+    "alt+enter": {
+      keydown: () => instance.addComment(undefined)
+    },
+    "alt+shift+enter": {
+      keydown: () => instance.addComment(true)
+    }
+  };
+
+  return zip(COMMENT_THREAD_KEY_DESC, actionMap);
 };
 
 export function combineHotkeys(...maps: KeyDescMap[]): KeyDescMap {

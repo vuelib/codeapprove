@@ -68,6 +68,9 @@
           v-show="focused || comments.length === 0"
           class="flex flex-row-reverse px-2 pb-2"
         >
+          <!-- Bind hotkeys when active -->
+          <div v-hotkey="hotKeyMap" />
+
           <button
             v-if="!resolved"
             class="ml-2 btn btn-green"
@@ -114,6 +117,8 @@ import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
 import * as events from "../../plugins/events";
+import { CommentThreadAPI } from "../api";
+import { KeyMap, COMMENT_THREAD_KEY_MAP } from "../../plugins/hotkeys";
 
 type Mode = "inline" | "standalone";
 
@@ -122,7 +127,8 @@ type Mode = "inline" | "standalone";
     MarkdownContent
   }
 })
-export default class CommentThread extends Mixins(EventEnhancer) {
+export default class CommentThread extends Mixins(EventEnhancer)
+  implements CommentThreadAPI {
   @Prop({ default: "inline" }) mode!: Mode;
   @Prop() side!: Side;
   @Prop() threadId!: string | null;
@@ -147,12 +153,19 @@ export default class CommentThread extends Mixins(EventEnhancer) {
     this.loadComments();
 
     if (this.mode === "inline" && this.comments.length === 0) {
-      (this.$refs.replyField as HTMLElement).focus();
+      const field = this.$refs.replyField as HTMLElement | undefined;
+      if (field) {
+        field.focus();
+      }
     }
   }
 
   destroyed() {
     events.off(NEW_COMMENT_EVENT, this.onNewComment);
+  }
+
+  get hotKeyMap(): KeyMap {
+    return COMMENT_THREAD_KEY_MAP(this);
   }
 
   private loadComments() {
@@ -186,6 +199,7 @@ export default class CommentThread extends Mixins(EventEnhancer) {
   }
 
   public async addComment(resolve?: boolean) {
+    console.log(`CommendThread#addComment(${resolve})`);
     const partialEvt: Partial<AddCommentEvent> = {
       content: this.draftComment,
       side: this.side,
@@ -207,7 +221,7 @@ export default class CommentThread extends Mixins(EventEnhancer) {
     // Reset local state
     this.draftComment = "";
     this.renderDraft = false;
-    this.focused = false;
+    this.unfocus();
     if (resolve === true) {
       this.forceExpand = false;
     }
@@ -215,9 +229,17 @@ export default class CommentThread extends Mixins(EventEnhancer) {
 
   public onCancel() {
     if (this.comments.length > 0) {
-      this.focused = false;
+      this.unfocus();
     } else {
       this.$emit("cancel");
+    }
+  }
+
+  private unfocus() {
+    this.focused = false;
+    const field = this.$refs.replyField as HTMLElement | undefined;
+    if (field) {
+      field.blur();
     }
   }
 }

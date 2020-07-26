@@ -24,3 +24,7 @@ export type DiffLineAPI = Vue & {
   deactivate(): void;
   addComment(): void;
 };
+
+export type CommentThreadAPI = Vue & {
+  addComment(resolve?: boolean): Promise<any>;
+};
