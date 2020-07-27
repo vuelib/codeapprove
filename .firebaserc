@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "diff-machine"
+    "default": "codeapprove-dev",
+    "prod": "codeapprove-prod"
   }
 }

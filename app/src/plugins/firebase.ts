@@ -15,16 +15,31 @@ export function functions(): firebase.functions.Functions {
 }
 
 function app(): firebase.app.App {
+  const devConfig = {
+    apiKey: "AIzaSyD4q0LrrYH6MTq3YQTqBKyrSiDlkwXEMgg",
+    authDomain: "codeapprove-dev.firebaseapp.com",
+    databaseURL: "https://codeapprove-dev.firebaseio.com",
+    projectId: "codeapprove-dev",
+    storageBucket: "codeapprove-dev.appspot.com",
+    messagingSenderId: "533117593232",
+    appId: "1:533117593232:web:2a88fbd5279226937b9a15",
+    measurementId: "G-ZDHW48NFJY"
+  };
+
+  const prodConfig = {
+    apiKey: "AIzaSyCbvfm75CxBT13fSDSa4GQN3o_LLzVKJO0",
+    authDomain: "codeapprove-prod.firebaseapp.com",
+    databaseURL: "https://codeapprove-prod.firebaseio.com",
+    projectId: "codeapprove-prod",
+    storageBucket: "codeapprove-prod.appspot.com",
+    messagingSenderId: "433773763706",
+    appId: "1:433773763706:web:a8a422eacff49dea72afc3",
+    measurementId: "G-5DQ43FZZ3R"
+  };
+
   if (firebase.apps.length === 0) {
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmH_WRBDxaY80B_aNNEG1S2UTmZFl6uUY",
-      authDomain: "diff-machine.firebaseapp.com",
-      databaseURL: "https://diff-machine.firebaseio.com",
-      projectId: "diff-machine",
-      storageBucket: "diff-machine.appspot.com",
-      messagingSenderId: "1094714775999",
-      appId: "1:1094714775999:web:94f80e1047609bb9a0e90a"
-    };
+    const firebaseConfig =
+      process.env.NODE_ENV === "production" ? prodConfig : devConfig;
     firebase.initializeApp(firebaseConfig);
   }
 

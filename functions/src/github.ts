@@ -24,6 +24,10 @@ export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
   );
 
   const res = qs.parse(tokenRes.data);
+  if (res.error) {
+    throw new Error(`Error: ${res.error} - ${res.error_description}`);
+  }
+
   return res as AccessTokenResponse;
 }
 
@@ -42,5 +46,9 @@ export async function exchangeRefreshToken(
   );
 
   const res = qs.parse(tokenRes.data);
+  if (res.error) {
+    throw new Error(`Error: ${res.error} - ${res.error_description}`);
+  }
+
   return res as AccessTokenResponse;
 }

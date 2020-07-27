@@ -24,16 +24,3 @@ export function createUser(
     githubExpiry
   };
 }
-
-export function updateGithubToken(
-  user: User,
-  githubToken: string,
-  expiresIn: number
-): User {
-  const githubExpiry = new Date().getTime() + expiresIn;
-
-  user.githubToken = githubToken;
-  user.githubExpiry = githubExpiry;
-
-  return user;
-}

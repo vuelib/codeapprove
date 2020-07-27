@@ -68,16 +68,34 @@ export const oauth = functions.https.onRequest(async (request, response) => {
   });
 
   const { id, login, avatar_url } = userRes.data;
-  console.log("signed in as ", id, login);
+  console.log("Github user:", id, login);
 
   const userId = `${id}`;
+
+  console.log("Firebase user:", userId);
+  let userExists = false;
+  try {
+    await admin.auth().getUser(userId);
+    userExists = true;
+  } catch (e) {
+    userExists = false;
+  }
+
+  if (userExists) {
+    await admin.auth().updateUser(userId, {
+      displayName: login,
+      photoURL: avatar_url,
+    });
+  } else {
+    await admin.auth().createUser({
+      uid: userId,
+      displayName: login,
+      photoURL: avatar_url,
+    });
+  }
+
   const custom_token = await admin.auth().createCustomToken(userId, {
     login,
-  });
-
-  await admin.auth().updateUser(userId, {
-    displayName: login,
-    photoURL: avatar_url,
   });
 
   await users.saveUser(userId, login, refresh_token, refresh_token_expires_in);

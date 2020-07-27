@@ -1,6 +1,6 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import { auth, functions } from "../../plugins/firebase";
-import { User, updateGithubToken } from "../../model/auth";
+import { User } from "../../model/auth";
 
 // TODO: Namespacing?
 @Module({
@@ -39,6 +39,14 @@ export default class AuthModule extends VuexModule {
     localStorage.setItem("user", JSON.stringify(this.user));
   }
 
+  @Mutation
+  updateGithubToken(opts: { githubToken: string; expiresIn: number }) {
+    console.log("updateGithubToken", `expiresIn=${opts.expiresIn}`);
+    const githubExpiry = new Date().getTime() + opts.expiresIn;
+    this.user!.githubToken = opts.githubToken;
+    this.user!.githubExpiry = githubExpiry;
+  }
+
   get assertUser(): User {
     return this.user!;
   }
@@ -59,10 +67,9 @@ export default class AuthModule extends VuexModule {
     const tokenRes = await functions().httpsCallable("getGithubToken")();
     const access_token = tokenRes.data.access_token;
     const expires_in = Number.parseInt(tokenRes.data.expires_in) * 1000;
-
-    const currentUser = this.user!;
-    const newUser = updateGithubToken(currentUser, access_token, expires_in);
-
-    this.context.commit("setUser", newUser);
+    this.context.commit("updateGithubToken", {
+      githubToken: access_token,
+      expiresIn: expires_in
+    });
   }
 }

@@ -30,11 +30,9 @@ export class Github {
     const now = new Date().getTime();
     const until = this.authModule.assertUser.githubExpiry - now;
 
-    console.log("expiresIn (ms)", until);
-
     const hourMs = 60 * 60 * 1000;
     if (until < hourMs) {
-      this.authModule.refreshGithubAuth();
+      await this.authModule.refreshGithubAuth();
     }
   }
 
@@ -48,7 +46,7 @@ export class Github {
     repo: string,
     prefix: string
   ): Promise<SearchUsersResponseData> {
-    this.assertAuth();
+    await this.assertAuth();
 
     // TODO: Prefer users from the same repo!
     const res = await this.octokit.search.users({
@@ -63,7 +61,7 @@ export class Github {
     repo: string,
     pull_number: number
   ): Promise<PullRequestData> {
-    this.assertAuth();
+    await this.assertAuth();
 
     const pr = await this.octokit.pulls.get({
       owner,
@@ -98,7 +96,7 @@ export class Github {
     base: string,
     head: string
   ): Promise<parseDiff.File[]> {
-    this.assertAuth();
+    await this.assertAuth();
 
     const res = await this.octokit.repos.compareCommits({
       owner,
@@ -123,7 +121,7 @@ export class Github {
     start: number,
     end: number
   ): Promise<string[]> {
-    this.assertAuth();
+    await this.assertAuth();
 
     console.log(`getContentLines(${path}@${ref}, ${start}, ${end})`);
 
@@ -141,7 +139,7 @@ export class Github {
     path: string,
     ref: string
   ): Promise<string> {
-    this.assertAuth();
+    await this.assertAuth();
 
     const data = await octocache.call(
       "repos.getContent",

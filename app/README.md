@@ -1,4 +1,4 @@
-# diff-machine
+# codeapproves
 
 ## Project setup
 ```
