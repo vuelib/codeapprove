@@ -1,7 +1,6 @@
-import * as functions from "firebase-functions";
 import * as axios from "axios";
+import * as config from "./config";
 
-const config = functions.config();
 const ax = axios.default;
 const qs = require("querystring");
 
@@ -13,12 +12,10 @@ export interface AccessTokenResponse {
 }
 
 export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
-  const ghConfig = config.github;
-
   const tokenRes = await ax.post(
     `https://github.com/login/oauth/access_token?${qs.stringify({
-      client_id: ghConfig.client_id,
-      client_secret: ghConfig.client_secret,
+      client_id: config.github().client_id,
+      client_secret: config.github().client_secret,
       code,
     })}`
   );
@@ -34,12 +31,10 @@ export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
 export async function exchangeRefreshToken(
   refresh_token: string
 ): Promise<AccessTokenResponse> {
-  const ghConfig = config.github;
-
   const tokenRes = await ax.post(
     `https://github.com/login/oauth/access_token?${qs.stringify({
-      client_id: ghConfig.client_id,
-      client_secret: ghConfig.client_secret,
+      client_id: config.github().client_id,
+      client_secret: config.github().client_secret,
       grant_type: "refresh_token",
       refresh_token,
     })}`

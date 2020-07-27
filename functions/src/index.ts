@@ -2,29 +2,35 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as axios from "axios";
 
+import * as config from "./config";
 import * as github from "./github";
 import * as users from "./users";
 
-admin.initializeApp();
+import { serverless, ProbotConfig } from "./probot-serverless-gcf";
+import { bot } from "./bot";
 
 const ax = axios.default;
 const qs = require("querystring");
 
+admin.initializeApp();
+
+// TODO: Get the probot private key deployed
+const probotConfig: ProbotConfig = {
+  id: config.github().app_id,
+  webhookSecret: config.github().webhook_secret,
+  privateKey: "TODO",
+};
+
 /**
- * TODO: This needs security
+ * Probot app
  */
 export const githubWebhook = functions.https.onRequest(
-  async (request, response) => {
-    console.log(`Incoming ${request.method} request`);
-    console.log(`Headers`, JSON.stringify(request.headers));
-    console.log(`Body`, JSON.stringify(request.body));
-
-    // Event is in x-github-event
-
-    response.send("Done");
-  }
+  serverless(probotConfig, bot)
 );
 
+/**
+ * Exchange a Firebase Auth token for a github access token
+ */
 export const getGithubToken = functions.https.onCall(async (data, ctx) => {
   if (!(ctx.auth && ctx.auth.uid)) {
     throw new Error("Unauthenticated");
@@ -49,6 +55,8 @@ export const getGithubToken = functions.https.onCall(async (data, ctx) => {
 });
 
 /**
+ * GitHub OAuth handler.
+ *
  * TODO: actually deploy the client secret
  */
 export const oauth = functions.https.onRequest(async (request, response) => {
