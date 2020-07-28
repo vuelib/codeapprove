@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as axios from "axios";
+import * as qs from "querystring";
 
 import * as config from "./config";
 import * as github from "./github";
@@ -10,7 +11,6 @@ import { serverless, ProbotConfig } from "./probot-serverless-gcf";
 import { bot } from "./bot";
 
 const ax = axios.default;
-const qs = require("querystring");
 
 admin.initializeApp();
 
@@ -114,6 +114,6 @@ export const oauth = functions.https.onRequest(async (request, response) => {
   };
 
   // TODO: There should probably be a special path here like /customauth
-  // TODO: Don't hardcode the host
-  response.redirect(`http://localhost:8080/signin?${qs.stringify(res)}`);
+  const baseUrl = config.baseUrl();
+  response.redirect(`${baseUrl}/signin?${qs.stringify(res)}`);
 });

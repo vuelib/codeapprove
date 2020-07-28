@@ -1,14 +1,28 @@
 import * as axios from "axios";
+import * as qs from "querystring";
+
 import * as config from "./config";
 
 const ax = axios.default;
-const qs = require("querystring");
 
 export interface AccessTokenResponse {
   access_token: string;
   expires_in: string;
   refresh_token: string;
   refresh_token_expires_in: string;
+}
+
+function queryToTokenResponse(res: qs.ParsedUrlQuery): AccessTokenResponse {
+  if (res.error) {
+    throw new Error(`Error: ${res.error} - ${res.error_description}`);
+  }
+
+  return {
+    access_token: res.access_token as string,
+    expires_in: res.expires_in as string,
+    refresh_token: res.refresh_token as string,
+    refresh_token_expires_in: res.refresh_token as string,
+  };
 }
 
 export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
@@ -21,11 +35,7 @@ export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
   );
 
   const res = qs.parse(tokenRes.data);
-  if (res.error) {
-    throw new Error(`Error: ${res.error} - ${res.error_description}`);
-  }
-
-  return res as AccessTokenResponse;
+  return queryToTokenResponse(res);
 }
 
 export async function exchangeRefreshToken(
@@ -41,9 +51,5 @@ export async function exchangeRefreshToken(
   );
 
   const res = qs.parse(tokenRes.data);
-  if (res.error) {
-    throw new Error(`Error: ${res.error} - ${res.error_description}`);
-  }
-
-  return res as AccessTokenResponse;
+  return queryToTokenResponse(res);
 }
