@@ -3,6 +3,7 @@
  */
 import * as functions from "firebase-functions";
 import { createProbot, Application, Probot } from "probot";
+import { findPrivateKey } from "probot/lib/private-key";
 
 export interface ProbotConfig {
   id: number;
@@ -14,11 +15,13 @@ let probot: Probot | undefined;
 type ProbotFn = (app: Application) => any;
 
 function loadProbot(config: ProbotConfig, appFn: ProbotFn): Probot {
+  process.env.PRIVATE_KEY = config.privateKey;
   const probot = createProbot({
     id: config.id,
     secret: config.webhookSecret,
-    cert: config.privateKey,
+    cert: findPrivateKey() || undefined,
   });
+  delete process.env.PRIVATE_KEY;
 
   probot.load(appFn);
   return probot;
@@ -29,14 +32,13 @@ export function serverless(config: ProbotConfig, appFn: ProbotFn) {
     request: functions.https.Request,
     response: functions.Response
   ) => {
-    // 🤖 A friendly homepage if there isn't a payload
+    probot = probot || loadProbot(config, appFn);
+
+    // 🤖 A friendly message
     if (request.method === "GET" && request.path === "/probot") {
       response.status(200).send({ message: "Hello from Probot!" });
       return;
     }
-
-    // Otherwise let's listen handle the payload
-    probot = probot || loadProbot(config, appFn);
 
     // Determine incoming webhook event type
     const name = request.get("x-github-event") || request.get("X-GitHub-Event");

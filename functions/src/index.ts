@@ -14,11 +14,10 @@ const qs = require("querystring");
 
 admin.initializeApp();
 
-// TODO: Get the probot private key deployed
 const probotConfig: ProbotConfig = {
   id: config.github().app_id,
   webhookSecret: config.github().webhook_secret,
-  privateKey: "TODO",
+  privateKey: config.github().private_key_encoded,
 };
 
 /**
