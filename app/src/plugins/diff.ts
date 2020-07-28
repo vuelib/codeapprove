@@ -21,6 +21,7 @@ export interface RenderedChange {
 export interface RenderedChangePair {
   left: RenderedChange;
   right: RenderedChange;
+  commentsEnabled: boolean;
 }
 
 export interface ChangePair {
@@ -78,7 +79,7 @@ export function getFileMetadata(file: parseDiff.File): FileMetadata {
   };
 }
 
-export function renderNormalChange(
+export function renderLoadedLineChange(
   line: number,
   content: string
 ): RenderedChange {
@@ -95,7 +96,8 @@ export function renderPairs(pairs: ChangePair[]): RenderedChangePair[] {
   const rps = pairs.map(p => {
     return {
       left: renderChange(p.left, "left"),
-      right: renderChange(p.right, "right")
+      right: renderChange(p.right, "right"),
+      commentsEnabled: true
     };
   });
 

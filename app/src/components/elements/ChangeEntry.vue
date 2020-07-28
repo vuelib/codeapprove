@@ -53,9 +53,11 @@
         />
 
         <DiffLine
-          v-for="(pair, j) in pairs"
+          v-for="pair in pairs"
           ref="difflines"
-          :key="`${chunk.content}-pair-${j}`"
+          :key="
+            `${chunk.content}-pair-${pair.left.number}-${pair.right.number}`
+          "
           :rendered="pair"
           :langs="langPair"
           :threads="getThreads(pair)"
@@ -95,7 +97,7 @@ import {
   FileMetadata,
   ChunkData,
   EMPTY_CHUNK,
-  renderNormalChange
+  renderLoadedLineChange
 } from "../../plugins/diff";
 import { KeyMap, CHANGE_ENTRY_KEY_MAP } from "../../plugins/hotkeys";
 import { freezeArray } from "../../plugins/freeze";
@@ -302,8 +304,9 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     const pairs: RenderedChangePair[] = [];
     for (let i = 0; i < leftLines.length; i++) {
       pairs.push({
-        left: renderNormalChange(leftStart + i, leftLines[i]),
-        right: renderNormalChange(rightStart + i, rightLines[i])
+        left: renderLoadedLineChange(leftStart + i, leftLines[i]),
+        right: renderLoadedLineChange(rightStart + i, rightLines[i]),
+        commentsEnabled: false
       });
     }
 
@@ -316,6 +319,9 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     chunk.oldLines += leftEnd - leftStart + 1;
     chunk.newStart = rightStart;
     chunk.newLines += rightEnd - rightStart + 1;
+
+    // Deactivate active line
+    this.setActiveDiffLine(-1);
   }
 
   get langPair() {

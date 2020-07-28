@@ -16,7 +16,7 @@
       }}</prism>
 
       <button
-        v-show="!rendered.left.empty && hovered.left && !showComments('left')"
+        v-show="showCommentButton('left')"
         @click="drafting.left = true"
         class="comment-button"
       >
@@ -51,9 +51,7 @@
       }}</prism>
 
       <button
-        v-show="
-          !rendered.right.empty && hovered.right && !showComments('right')
-        "
+        v-show="showCommentButton('right')"
         @click="drafting.right = true"
         class="comment-button"
       >
@@ -154,6 +152,10 @@ export default class DiffLine extends Mixins(EventEnhancer)
   }
 
   public addComment() {
+    if (!this.rendered.commentsEnabled) {
+      return;
+    }
+
     const hasRight = !this.rendered.right.empty;
     if (hasRight) {
       this.drafting.right = true;
@@ -173,6 +175,18 @@ export default class DiffLine extends Mixins(EventEnhancer)
     return this.drafting[side] || this.comments[side].length > 0;
   }
 
+  public showCommentButton(side: Side) {
+    if (!this.rendered.commentsEnabled) {
+      return false;
+    }
+
+    return (
+      !this.rendered[side].empty &&
+      this.hovered[side] &&
+      !this.showComments(side)
+    );
+  }
+
   public getComments(side: Side) {
     const threadId = this.getThreadId(side);
     if (threadId != null) {
@@ -188,6 +202,11 @@ export default class DiffLine extends Mixins(EventEnhancer)
   }
 
   public bgClass(change: RenderedChange): string {
+    if (!this.rendered.commentsEnabled) {
+      // TODO: This color is meh
+      return "bg-indigo-900";
+    }
+
     switch (change.type) {
       case "del":
         return "bg-red-700";
