@@ -70,3 +70,4 @@ export function nextRender(callback: FrameRequestCallback) {
     requestAnimationFrame(callback);
   });
 }
+
