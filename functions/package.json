@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
-    "format": "prettier --write src/*.ts",
+    "format": "prettier --write src/*.ts src/**/*.ts",
     "serve": "concurrently 'npm run build:watch' 'firebase emulators:start --only hosting,functions'",
     "deploy": "firebase deploy --only functions"
   },
@@ -22,8 +22,10 @@
     "@types/node": "^14.0.26",
     "concurrently": "^5.2.0",
     "firebase-functions-test": "^0.2.0",
+    "firebase-tools": "^8.6.0",
     "prettier": "^2.0.5",
     "smee-client": "^1.1.0",
+    "ts-node": "^8.10.2",
     "typescript": "^3.8.0"
   },
   "private": true

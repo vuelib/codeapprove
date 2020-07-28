@@ -14,17 +14,19 @@ const qs = require("querystring");
 
 admin.initializeApp();
 
-const probotConfig: ProbotConfig = {
-  id: config.github().app_id,
-  webhookSecret: config.github().webhook_secret,
-  privateKey: config.github().private_key_encoded,
-};
+function getProbotConfig(): ProbotConfig {
+  return {
+    id: config.github().app_id,
+    webhookSecret: config.github().webhook_secret,
+    privateKey: config.github().private_key_encoded,
+  };
+}
 
 /**
  * Probot app
  */
 export const githubWebhook = functions.https.onRequest(
-  serverless(probotConfig, bot)
+  serverless(getProbotConfig(), bot)
 );
 
 /**
