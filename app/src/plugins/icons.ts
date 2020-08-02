@@ -24,7 +24,9 @@ import {
   faTimes,
   faDoorOpen,
   faExclamationCircle,
-  faBell
+  faBell,
+  faTasks,
+  faMoon
 } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -57,6 +59,8 @@ export function initIconLibrary() {
     faDoorOpen,
     faExclamationCircle,
     faBell,
+    faTasks,
+    faMoon,
 
     // Brand icons
     faGithub

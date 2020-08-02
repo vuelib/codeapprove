@@ -27,7 +27,9 @@
           </div>
         </div>
         <div class="bg-dark-3">
-          <prism class="code-preview"
+          <prism
+            class="code-preview hover:underline cursor-pointer"
+            @click="goToLine()"
             >{{ thread.line }} {{ thread.lineContent }}</prism
           >
         </div>
@@ -245,6 +247,10 @@ export default class CommentThread extends Mixins(EventEnhancer)
     } else {
       this.$emit("cancel");
     }
+  }
+
+  public goToLine() {
+    this.$emit("goto");
   }
 
   private unfocus() {

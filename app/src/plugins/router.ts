@@ -5,6 +5,7 @@ Vue.use(VueRouter);
 import { getModule } from "vuex-module-decorators";
 import AuthModule from "@/store/modules/auth";
 
+import Home from "@/components/pages/Home.vue";
 import PullRequest from "@/components/pages/PullRequest.vue";
 import SignIn from "@/components/pages/SignIn.vue";
 
@@ -16,6 +17,7 @@ authModule.restoreFromLocalStorage();
 const router = new VueRouter({
   mode: "history",
   routes: [
+    { path: "/", component: Home },
     {
       path: "/pr/:owner/:repo/:number",
       component: PullRequest,

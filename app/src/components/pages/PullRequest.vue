@@ -3,6 +3,7 @@
     <!-- Includes descriptions for children -->
     <HotkeyModal :map="hotKeyDescriptions" />
 
+    <!-- Title of PR, branches, etc -->
     <div class="mb-4 flex flex-row items-center">
       <div>
         <h3 class="font-bold text-xl">
@@ -42,6 +43,7 @@
       </button>
     </div>
 
+    <!-- Send drafts buttons -->
     <div
       v-if="drafts.length"
       class="flex flex-row items-center rounded border border-dark-0 bg-dark-3 dark-shadow my-4 py-3"
@@ -147,7 +149,7 @@
     </div>
 
     <!-- Changes -->
-    <div class="mt-12" v-click-outside="() => setActiveChangeEntry(-1)">
+    <div class="mt-12">
       <div class="flex flex-row items-center">
         <span class="font-bold text-lg">Changes</span>
         <span class="flex-grow"><!-- spacer --></span>
@@ -213,6 +215,7 @@
         :line="thread.line"
         :content="thread.lineContent"
         :threadId="thread.id"
+        @goto="goToThread(thread)"
       />
     </div>
   </div>
@@ -430,6 +433,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
   }
 
   public setActiveChangeEntry(index: number) {
+    console.log(`setActiveChangeEntry(${index})`);
     const curr = this.getCurrentChangeEntry();
     if (curr) {
       curr.deactivate();
@@ -439,25 +443,53 @@ export default class PullRequest extends Mixins(EventEnhancer)
     const next = this.getCurrentChangeEntry();
     if (next) {
       next.activate();
+    } else {
+      console.warn(`setActiveChangeEntry: could not activate ${index}`);
     }
+  }
+
+  public scrollToActive() {
+    makeTopVisible(this.getCurrentChangeEntry()!.$el, 200);
   }
 
   public onNextFile() {
     this.setActiveChangeEntry(
       Math.min(this.activeFileIndex + 1, this.prData!.diffs.length - 1)
     );
-    makeTopVisible(this.getCurrentChangeEntry()!.$el, 200);
+    this.scrollToActive();
   }
 
   public onPrevFile() {
     this.setActiveChangeEntry(Math.max(this.activeFileIndex - 1, 0));
-    makeTopVisible(this.getCurrentChangeEntry()!.$el, 200);
+    this.scrollToActive();
   }
 
   public onToggleFile() {
     const ce = this.getCurrentChangeEntry()!;
     ce.toggle();
     ce.activate();
+  }
+
+  public goToThread(thread: Thread) {
+    console.log("goToThread", thread.side, thread.file, thread.line);
+
+    const changes = this.prChanges!.changes;
+    for (let i = 0; i < changes.length; i++) {
+      const change = changes[i];
+
+      const match =
+        (thread.side === "left" && change.file.from === thread.file) ||
+        (thread.side === "right" && change.file.to === thread.file);
+
+      // TODO: Jump to specific file
+      if (match) {
+        console.log(`goToThread: jumping to index ${i}`);
+        this.setActiveChangeEntry(i);
+        this.getCurrentChangeEntry()!.expand();
+        this.scrollToActive();
+        return;
+      }
+    }
   }
 
   private getCurrentChangeEntry(): ChangeEntryAPI | undefined {

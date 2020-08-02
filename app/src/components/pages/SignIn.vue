@@ -69,8 +69,8 @@ export default class SignIn extends Vue {
         const user: User = createUser(result.user, access_token, expires_in);
         this.authModule.setUser(user);
 
-        // TODO: Real routing after sign-in
-        this.$router.push("/pr/hatboysam/codeapprove/5");
+        // TODO: Maybe route to some kind of inbox?
+        this.$router.push("/");
       } else {
         this.authModule.setUser(null);
       }

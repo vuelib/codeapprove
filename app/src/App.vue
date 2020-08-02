@@ -8,10 +8,7 @@
 
     <!-- Page body from router -->
     <div class="grid grid-cols-12">
-      <router-view
-        :key="$route.fullPath"
-        class="mt-24 col-start-2 col-span-10"
-      />
+      <router-view :key="$route.fullPath" :class="bodyClasses" />
     </div>
 
     <!-- Errors -->
@@ -52,16 +49,26 @@ export default class App extends Vue {
   destroyed() {
     this.authUnsub && this.authUnsub();
   }
+
+  get bodyClasses() {
+    if (this.$route.fullPath === "/") {
+      return ["mt-24", "col-span-12"];
+    } else {
+      return ["mt-24", "col-start-2", "col-span-10"];
+    }
+  }
 }
 </script>
 
 <style lang="postcss">
+@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+
 body {
   @apply text-wht-brt bg-dark-1;
 }
 
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: "Lato", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: 100px;
@@ -96,6 +103,14 @@ input:focus {
   padding-bottom: 1px;
 }
 
+.btn-cta {
+  @apply font-bold;
+  @apply rounded-lg border-4;
+  @apply flex flex-row items-center;
+  @apply text-4xl;
+  @apply px-6 py-3;
+}
+
 .btn:hover {
   @apply bg-dark-5;
 }
@@ -122,5 +137,13 @@ input:focus {
 
 .btn-green:hover {
   @apply border-green-400 text-green-400;
+}
+
+.btn-purple {
+  @apply border-purple-300 text-purple-300;
+}
+
+.btn-purple:hover {
+  @apply border-purple-200 text-purple-200;
 }
 </style>
