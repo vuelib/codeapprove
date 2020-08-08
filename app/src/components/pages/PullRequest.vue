@@ -43,7 +43,7 @@
       </button>
     </div>
 
-    <!-- Send drafts buttons -->
+    <!-- Send drafts bar -->
     <div
       v-if="drafts.length"
       class="flex flex-row items-center rounded border border-dark-0 bg-dark-3 dark-shadow my-4 py-3"
@@ -607,6 +607,32 @@ export default class PullRequest extends Mixins(EventEnhancer)
     };
 
     return rendered;
+  }
+
+  beforeMount() {
+    window.addEventListener("beforeunload", this.preventNav);
+  }
+
+  beforeDestroy() {
+    window.removeEventListener("beforeunload", this.preventNav);
+  }
+
+  beforeRouteLeave(to: any, from: any, next: any) {
+    if (this.drafts.length) {
+      if (!window.confirm("You have unsent drafts. Leave without saving?")) {
+        return;
+      }
+    }
+    next();
+  }
+
+  private preventNav(e: BeforeUnloadEvent) {
+    if (!this.drafts.length) {
+      return;
+    }
+
+    e.preventDefault();
+    e.returnValue = "";
   }
 }
 </script>

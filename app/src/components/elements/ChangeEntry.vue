@@ -257,7 +257,12 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     const prevLeftEnd = prevChunk.oldStart + prevChunk.oldLines - 1;
 
     // Check if the chunks are directly adjacent
-    return !(chunk.oldStart === prevLeftEnd + 1);
+    const adjacentToPrev = chunk.oldStart === prevLeftEnd + 1;
+
+    // Check if the chunk starts the file
+    const bothAtStart = chunk.oldStart <= 1 && chunk.newStart <= 1;
+
+    return !(adjacentToPrev || bothAtStart);
   }
 
   public async loadLinesAbove(index: number) {

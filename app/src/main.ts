@@ -1,6 +1,11 @@
-import Vue from "vue";
-import App from "./App.vue";
+// Register the router hooks for components (the docs say to do this first)
+import { Component } from "vue-property-decorator";
+Component.registerHooks(["beforeRouteEnter", "beforeRouteLeave"]);
 
+// Vue!
+import Vue from "vue";
+
+// Base styles
 import "./assets/styles/index.css";
 
 // Store
@@ -23,10 +28,11 @@ Vue.use(vClickOutside);
 const VueHotKey = require("v-hotkey");
 Vue.use(VueHotKey.default);
 
-// Prism syntax highlighting
+// Prism component
 const Prism = require("vue-prism-component");
 Vue.component("prism", Prism);
 
+// Prism JS and themes
 import "prismjs";
 import "prism-themes/themes/prism-atom-dark.css";
 
@@ -38,6 +44,8 @@ if (process.env.NODE_ENV !== "production") {
   Vue.config.performance = true;
 }
 
+// Import app and initialize
+import App from "./App.vue";
 new Vue({
   render: h => h(App),
   router,

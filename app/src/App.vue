@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- Page Header -->
-    <div class="w-full fixed z-20">
+    <div class="w-full z-20 sticky top-0 shadow dark-shadow">
       <HeaderBar />
       <ProgressBar />
     </div>
@@ -52,9 +52,9 @@ export default class App extends Vue {
 
   get bodyClasses() {
     if (this.$route.fullPath === "/") {
-      return ["mt-24", "col-span-12"];
+      return ["col-span-12"];
     } else {
-      return ["mt-24", "col-start-2", "col-span-10"];
+      return ["col-start-2", "col-span-10"];
     }
   }
 }
@@ -84,6 +84,7 @@ input:focus {
   outline: none;
 }
 
+// TODO: This should be a postcss extension
 .dark-shadow {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }

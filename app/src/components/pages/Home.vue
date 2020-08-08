@@ -17,12 +17,14 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-3 px-16">
-      <div class="col-span-2 m-16 dark-shadow border-dark-0 rounded">
+    <div class="grid grid-cols-3 my-8 px-16">
+      <div
+        class="col-span-2 m-12 shadow dark-shadow border border-dark-0 rounded"
+      >
         <img src="@/assets/hero.png" />
       </div>
 
-      <div class="flex flex-col justify-center m-16">
+      <div class="flex flex-col justify-center m-12">
         <span class="text-purple-300 text-3xl"
           ><font-awesome-icon icon="keyboard" class="mr-3" />Fast</span
         >
@@ -32,27 +34,31 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-3 px-16">
-      <div class="flex flex-col justify-center m-16 text-right">
+    <div class="grid grid-cols-3 my-8 px-16">
+      <div class="flex flex-col justify-center m-12 text-right">
         <span class="text-purple-300 text-3xl"
           ><font-awesome-icon icon="moon" class="mr-3" />Beautiful</span
         >
         <p class="text-2xl">
-          Eye-saving dark theme looks great<br />next to your favorite editor.
+          Crisp dark theme looks great<br />next to your favorite editor.
         </p>
       </div>
 
-      <div class="col-span-2 m-16 dark-shadow border-dark-0 rounded">
+      <div
+        class="col-span-2 m-12 shadow dark-shadow border border-dark-0 rounded"
+      >
         <img src="@/assets/hero.png" />
       </div>
     </div>
 
-    <div class="grid grid-cols-3 px-16">
-      <div class="col-span-2 m-16 dark-shadow border-dark-0 rounded">
+    <div class="grid grid-cols-3 my-8 px-16">
+      <div
+        class="col-span-2 m-12 shadow dark-shadow border border-dark-0 rounded"
+      >
         <img src="@/assets/hero.png" />
       </div>
 
-      <div class="flex flex-col justify-center m-16">
+      <div class="flex flex-col justify-center m-12">
         <span class="text-purple-300 text-3xl"
           ><font-awesome-icon icon="tasks" class="mr-3" />Focused</span
         >

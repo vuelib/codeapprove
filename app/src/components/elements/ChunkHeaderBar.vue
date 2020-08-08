@@ -2,7 +2,7 @@
   <div
     class="w-full py-1 px-2 flex items-center text-blue-500 border-b border-t border-blue-500"
   >
-    <pre class="inline bg-dark-3">> {{ text }}</pre>
+    <pre class="inline bg-dark-3">{{ text }}</pre>
     <span class="flex-grow"></span>
     <a v-if="showAbove" @click.stop="expandAbove"
       ><code class="ml-2">+earlier</code></a
@@ -21,13 +21,22 @@ export default class ChunkHeaderBar extends Vue {
   @Prop() chunk!: parseDiff.Chunk;
 
   get text() {
-    const leftStart = this.prev.oldStart + this.prev.oldLines;
-    const leftEnd = this.chunk.oldStart - 1;
+    let leftText = "none";
+    if (this.chunk.oldStart > 1) {
+      const leftStart = this.prev.oldStart + this.prev.oldLines;
+      const leftEnd = this.chunk.oldStart - 1;
 
-    const rightStart = this.prev.newStart + this.prev.newLines;
-    const rightEnd = this.chunk.newStart - 1;
+      leftText = `${leftStart}-${leftEnd}`;
+    }
 
-    return `${leftStart}-${leftEnd}, ${rightStart}-${rightEnd}`;
+    let rightText = "none";
+    if (this.chunk.newStart > 1) {
+      const rightStart = this.prev.newStart + this.prev.newLines;
+      const rightEnd = this.chunk.newStart - 1;
+      rightText = `${rightStart}-${rightEnd}`;
+    }
+
+    return `> hidden: ${leftText}, ${rightText}`;
   }
 
   get showAbove() {

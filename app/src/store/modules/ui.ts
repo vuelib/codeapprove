@@ -27,6 +27,11 @@ export default class UIModule extends VuexModule {
   }
 
   @Mutation
+  clearMessages() {
+    this.messages = [];
+  }
+
+  @Mutation
   addMessage(message: Message) {
     if (this.messages.some(m => m.text === message.text)) {
       return;
