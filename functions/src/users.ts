@@ -1,5 +1,7 @@
 import * as admin from "firebase-admin";
 
+import * as github from "./github";
+
 export interface User {
   login: string;
   refresh_token: string;
@@ -12,8 +14,7 @@ export async function saveUser(
   refresh_token: string,
   refresh_token_expires_in: string
 ) {
-  const refresh_token_expires =
-    new Date().getTime() + Number.parseInt(refresh_token_expires_in) * 1000;
+  const refresh_token_expires = github.getExpiryDate(refresh_token_expires_in);
   const user: User = {
     login,
     refresh_token,

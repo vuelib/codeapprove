@@ -11,10 +11,8 @@ export interface User {
 export function createUser(
   u: firebase.User,
   githubToken: string,
-  expiresIn: number
+  githubExpiry: number
 ): User {
-  const githubExpiry = new Date().getTime() + expiresIn;
-
   return {
     uid: u.uid,
     username: u.displayName!,

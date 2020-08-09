@@ -21,8 +21,12 @@ function queryToTokenResponse(res: qs.ParsedUrlQuery): AccessTokenResponse {
     access_token: res.access_token as string,
     expires_in: res.expires_in as string,
     refresh_token: res.refresh_token as string,
-    refresh_token_expires_in: res.refresh_token as string,
+    refresh_token_expires_in: res.refresh_token_expires_in as string,
   };
+}
+
+export function getExpiryDate(expires_in_seconds: string): number {
+  return new Date().getTime() + Number.parseInt(expires_in_seconds) * 1000;
 }
 
 export async function exchangeCode(code: string): Promise<AccessTokenResponse> {

@@ -33,6 +33,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  uiModule.endLoading();
   uiModule.clearMessages();
 
   if (to.meta && to.meta.auth && !authModule.signedIn) {

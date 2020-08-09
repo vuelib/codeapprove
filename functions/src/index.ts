@@ -6,6 +6,7 @@ import * as qs from "querystring";
 import * as config from "./config";
 import * as github from "./github";
 import * as users from "./users";
+import * as log from "./logger";
 
 import { serverless, ProbotConfig } from "./probot-serverless-gcf";
 import { bot } from "./bot";
@@ -38,7 +39,11 @@ export const getGithubToken = functions.https.onCall(async (data, ctx) => {
   }
 
   const user = await users.getUser(ctx.auth.uid);
+  log.debug("uid", ctx.auth.uid);
+  log.secret("user", user);
+
   const token = await github.exchangeRefreshToken(user.refresh_token);
+  log.secret("token", token);
 
   // Save updated token to the database
   await users.saveUser(
@@ -50,25 +55,25 @@ export const getGithubToken = functions.https.onCall(async (data, ctx) => {
 
   return {
     access_token: token.access_token,
-    // String, in seconds
-    expires_in: token.expires_in,
+    access_token_expires: github.getExpiryDate(token.expires_in),
   };
 });
 
 /**
  * GitHub OAuth handler.
- *
- * TODO: actually deploy the client secret
  */
 export const oauth = functions.https.onRequest(async (request, response) => {
   const code = request.query.code as string;
 
-  console.log("Getting access tokens...");
+  log.debug("oauth", "Getting access tokens...");
   const {
     access_token,
     refresh_token,
     refresh_token_expires_in,
   } = await github.exchangeCode(code);
+
+  log.secret("refresh_token", refresh_token);
+  log.secret("refresh_token_expires_in", refresh_token_expires_in);
 
   const userRes = await ax.get(`https://api.github.com/user`, {
     headers: {
@@ -77,11 +82,11 @@ export const oauth = functions.https.onRequest(async (request, response) => {
   });
 
   const { id, login, avatar_url } = userRes.data;
-  console.log("Github user:", id, login);
+  log.debug("Github user:", id, login);
 
   const userId = `${id}`;
 
-  console.log("Firebase user:", userId);
+  log.debug("Firebase user:", userId);
   let userExists = false;
   try {
     await admin.auth().getUser(userId);

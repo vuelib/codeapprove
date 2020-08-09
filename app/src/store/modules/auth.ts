@@ -40,11 +40,10 @@ export default class AuthModule extends VuexModule {
   }
 
   @Mutation
-  updateGithubToken(opts: { githubToken: string; expiresIn: number }) {
-    console.log("updateGithubToken", `expiresIn=${opts.expiresIn}`);
-    const githubExpiry = new Date().getTime() + opts.expiresIn;
+  updateGithubToken(opts: { githubToken: string; githubExpiry: number }) {
+    console.log("updateGithubToken", `expiry=${opts.githubExpiry}`);
     this.user!.githubToken = opts.githubToken;
-    this.user!.githubExpiry = githubExpiry;
+    this.user!.githubExpiry = opts.githubExpiry;
   }
 
   get assertUser(): User {
@@ -66,10 +65,10 @@ export default class AuthModule extends VuexModule {
     console.log("refreshGithubAuth");
     const tokenRes = await functions().httpsCallable("getGithubToken")();
     const access_token = tokenRes.data.access_token;
-    const expires_in = Number.parseInt(tokenRes.data.expires_in) * 1000;
+    const access_token_expires = tokenRes.data.access_token_expires;
     this.context.commit("updateGithubToken", {
       githubToken: access_token,
-      expiresIn: expires_in
+      githubExpiry: access_token_expires
     });
   }
 }

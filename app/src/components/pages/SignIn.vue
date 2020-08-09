@@ -61,12 +61,15 @@ export default class SignIn extends Vue {
       const result = await auth().signInWithCustomToken(customToken);
       const tokenRes = await functions().httpsCallable("getGithubToken")();
 
-      // TODO: Store the expiry
       const access_token = tokenRes.data.access_token;
-      const expires_in = Number.parseInt(tokenRes.data.expires_in) * 1000;
+      const access_token_expires = tokenRes.data.access_token_expires;
 
       if (result.user) {
-        const user: User = createUser(result.user, access_token, expires_in);
+        const user: User = createUser(
+          result.user,
+          access_token,
+          access_token_expires
+        );
         this.authModule.setUser(user);
 
         // TODO: Maybe route to some kind of inbox?
