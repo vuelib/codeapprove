@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest";
+import { graphql } from "@octokit/graphql";
 import {
   SearchUsersResponseData,
   UsersGetAuthenticatedResponseData,
@@ -19,11 +20,21 @@ export interface PullRequestData {
 }
 
 export class Github {
-  private octokit: Octokit;
+  private octokit!: Octokit;
+  private gql!: typeof graphql;
 
   constructor(private authModule: AuthModule) {
     const token = authModule.assertUser.githubToken;
+    this.applyAuth(token);
+  }
+
+  private applyAuth(token: string) {
     this.octokit = new Octokit({ auth: token, previews: PREVIEWS });
+    this.gql = graphql.defaults({
+      headers: {
+        authorization: `token ${token}`
+      }
+    });
   }
 
   async assertAuth(): Promise<void> {
@@ -31,8 +42,11 @@ export class Github {
     const until = this.authModule.assertUser.githubExpiry - now;
 
     const hourMs = 60 * 60 * 1000;
+
+    // Refresh if it will expire in the next hour
     if (until < hourMs) {
       await this.authModule.refreshGithubAuth();
+      this.applyAuth(this.authModule.assertUser.githubToken);
     }
   }
 
@@ -158,5 +172,40 @@ export class Github {
 
     console.warn("Unknown encoding :" + data.encoding);
     return "";
+  }
+
+  async getAssignedPulls() {
+    await this.assertAuth();
+
+    // TODO: Should be a gql variable but can't figure it out
+    const login = "hatboysam";
+
+    // TODO: This doesn't work for reviewed-by ...
+    const res = await this.gql({
+      query: `query pulls {
+        search(query: "is:pull-request review-requested:${login}", type: ISSUE, last: 100) {
+          edges {
+            node {
+              ... on PullRequest {
+                title
+                number
+                repository {
+                  owner {
+                    login
+                  }
+                  name
+                },
+                closed
+                merged
+                updatedAt
+              }
+            }
+          }
+        }
+      }`
+    });
+
+    // Need more types
+    return (res as any).search.edges.map((e: any) => e.node);
   }
 }

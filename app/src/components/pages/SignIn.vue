@@ -71,9 +71,7 @@ export default class SignIn extends Vue {
           access_token_expires
         );
         this.authModule.setUser(user);
-
-        // TODO: Maybe route to some kind of inbox?
-        this.$router.push("/");
+        this.$router.push("/inbox");
       } else {
         this.authModule.setUser(null);
       }

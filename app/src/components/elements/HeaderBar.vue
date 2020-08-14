@@ -24,6 +24,9 @@
         class="dropdown absolute mt-2 rounded dark-shadow border border-dark-0 bg-dark-3 rounded whitespace-no-wrap text-md text-white-brt"
       >
         <li class="block px-4 py-2 text-wht-brt">{{ username }}</li>
+        <li class="block px-4 py-2 dropdown-item" @click="toInbox()">
+          <font-awesome-icon icon="tasks" class="pr-1" /> Inbox
+        </li>
         <li class="block px-4 py-2 dropdown-item" @click="signOut()">
           <font-awesome-icon icon="door-open" class="pr-1" /> Sign Out
         </li>
@@ -68,6 +71,11 @@ export default class HeaderBar extends Vue {
     this.showDropdown = false;
     await this.authModule.startSignOut();
     this.$router.push("/signin");
+  }
+
+  public async toInbox() {
+    this.showDropdown = false;
+    this.$router.push("/inbox");
   }
 }
 </script>

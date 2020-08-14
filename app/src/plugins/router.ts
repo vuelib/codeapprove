@@ -7,8 +7,9 @@ import AuthModule from "@/store/modules/auth";
 import UIModule from "@/store/modules/ui";
 
 import Home from "@/components/pages/Home.vue";
-import PullRequest from "@/components/pages/PullRequest.vue";
 import SignIn from "@/components/pages/SignIn.vue";
+import PullRequest from "@/components/pages/PullRequest.vue";
+import Inbox from "@/components/pages/Inbox.vue";
 
 import store from "@/store";
 
@@ -21,6 +22,7 @@ const router = new VueRouter({
   mode: "history",
   routes: [
     { path: "/", component: Home },
+    { path: "/signin", component: SignIn },
     {
       path: "/pr/:owner/:repo/:number",
       component: PullRequest,
@@ -28,7 +30,13 @@ const router = new VueRouter({
         auth: true
       }
     },
-    { path: "/signin", component: SignIn }
+    {
+      path: "/inbox",
+      component: Inbox,
+      meta: {
+        auth: true
+      }
+    }
   ]
 });
 
