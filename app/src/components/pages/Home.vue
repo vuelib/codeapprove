@@ -6,10 +6,11 @@
           Faster, better code review <br />for teams on GitHub
         </h1>
 
-        <!-- TODO: This should do something -->
-        <button class="my-8 btn btn-cta btn-purple self-center">
-          Get Started
-        </button>
+        <router-link to="/signin"
+          ><button class="my-8 btn btn-cta btn-purple self-center">
+            Get Started
+          </button></router-link
+        >
       </div>
 
       <div class="p-16">
@@ -70,11 +71,12 @@
     </div>
 
     <div class="flex flex-col items-center justify-center my-8">
-      <!-- TODO: This should do something -->
       <span class="text-4xl mb-8">Ready to get started?</span>
-      <button class="btn btn-cta btn-purple">
-        Sign Up Now
-      </button>
+      <router-link to="/signin"
+        ><button class="btn btn-cta btn-purple">
+          Sign Up Now
+        </button></router-link
+      >
     </div>
   </div>
 </template>

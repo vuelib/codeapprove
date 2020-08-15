@@ -1,7 +1,7 @@
 <template>
   <!-- TODO: Some of these classes should be outside -->
   <div
-    class="w-2/3 flex items-center bg-dark-3 px-4 py-2 mb-4 border-dark-0 shadow dark-shadow rounded"
+    class="flex items-center bg-dark-3 px-4 py-2 mb-4 border-dark-0 shadow dark-shadow rounded"
   >
     <router-link :to="`/pr/${item.owner}/${item.repo}/${item.number}`">
       <span

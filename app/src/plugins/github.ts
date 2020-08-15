@@ -7,9 +7,11 @@ import {
   PullsListCommitsResponseData
 } from "@octokit/types";
 import parseDiff from "parse-diff";
+
+import AuthModule from "@/store/modules/auth";
 import * as octocache from "./octocache";
 import { freezeArray } from "./freeze";
-import AuthModule from "@/store/modules/auth";
+import { config } from "./config";
 
 const PREVIEWS = ["machine-man-preview"];
 
@@ -31,6 +33,25 @@ export interface PullRequestNode {
   closed: boolean;
   merged: boolean;
   updatedAt: string;
+}
+
+export type InstallationStatus =
+  | NoInstallationStatus
+  | SuccessfulInstallationStatus;
+
+export interface NoInstallationStatus {
+  installed: false;
+}
+
+export interface SuccessfulInstallationStatus {
+  installed: true;
+  installation: {
+    id: number;
+    url: string;
+  };
+  repositories: {
+    full_name: string;
+  }[];
 }
 
 export class Github {
@@ -186,6 +207,40 @@ export class Github {
 
     console.warn("Unknown encoding :" + data.encoding);
     return "";
+  }
+
+  async getInstallations(): Promise<InstallationStatus> {
+    await this.assertAuth();
+
+    const installRes = await this.octokit.apps.listInstallationsForAuthenticatedUser();
+    const installation = installRes.data.installations.find(
+      i => i.app_id === config.github.app_id
+    );
+
+    if (!installation) {
+      return {
+        installed: false
+      };
+    }
+
+    const repoRes = await this.octokit.apps.listInstallationReposForAuthenticatedUser(
+      {
+        installation_id: installation.id
+      }
+    );
+
+    const res = {
+      installed: true,
+      installation: {
+        id: installation.id,
+        url: installation.html_url
+      },
+      repositories: repoRes.data.repositories.map(r => {
+        return { full_name: r.full_name };
+      })
+    };
+
+    return res;
   }
 
   async getAssignedPulls(login: string) {
