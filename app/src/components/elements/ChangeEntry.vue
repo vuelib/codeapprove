@@ -6,6 +6,7 @@
     <!-- Bind hotkeys when active -->
     <div v-if="active && expanded" v-hotkey="hotKeyMap" />
 
+    <!-- Change header -->
     <div
       @click="toggle"
       class="flex p-2 font-bold items-center bg-dark-3 border-b border-dark-0"
@@ -35,11 +36,18 @@
         ></div>
       </div>
     </div>
+
+    <!-- Placeholder while loading -->
     <div v-if="loading" class="text-lg text-center bg-dark-2 text-brt-dim p-4">
-      Loading...
+      <span v-if="tooBig"
+        >This diff is too large to render, please view it locally.</span
+      >
+      <span v-else>Loading...</span>
     </div>
+
+    <!-- Expanded Change -->
     <div
-      v-if="loaded || expanded"
+      v-else-if="loaded || expanded"
       v-show="expanded"
       class="bg-dark-4 overflow-hidden"
     >
@@ -150,6 +158,10 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
     this.bubbleUp(e);
   }
 
+  get tooBig() {
+    return this.meta.additions + this.meta.deletions >= 1500;
+  }
+
   get hotKeyMap(): KeyMap {
     return CHANGE_ENTRY_KEY_MAP(this);
   }
@@ -179,11 +191,19 @@ export default class ChangeEntry extends Mixins(EventEnhancer)
   }
 
   public collapse() {
+    this.loading = false;
     this.expanded = false;
   }
 
   public expand() {
     if (this.loaded) {
+      this.expanded = true;
+      return;
+    }
+
+    // Change is too large to display, so just infinite-load
+    if (this.tooBig) {
+      this.loading = true;
       this.expanded = true;
       return;
     }

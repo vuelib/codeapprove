@@ -19,9 +19,23 @@ export interface PullRequestData {
   diffs: parseDiff.File[];
 }
 
+export interface PullRequestNode {
+  title: string;
+  number: number;
+  repository: {
+    owner: {
+      login: string;
+    };
+    name: string;
+  };
+  closed: boolean;
+  merged: boolean;
+  updatedAt: string;
+}
+
 export class Github {
   private octokit!: Octokit;
-  private gql!: typeof graphql;
+  private gql: typeof graphql = graphql;
 
   constructor(private authModule: AuthModule) {
     const token = authModule.assertUser.githubToken;
@@ -30,7 +44,7 @@ export class Github {
 
   private applyAuth(token: string) {
     this.octokit = new Octokit({ auth: token, previews: PREVIEWS });
-    this.gql = graphql.defaults({
+    this.gql = this.gql.defaults({
       headers: {
         authorization: `token ${token}`
       }
@@ -174,16 +188,39 @@ export class Github {
     return "";
   }
 
-  async getAssignedPulls() {
+  async getAssignedPulls(login: string) {
+    await this.assertAuth;
+    return this.getPulls("review-requested", login);
+  }
+
+  async getOutgoingPulls(login: string) {
+    await this.assertAuth();
+    return this.getPulls("author", login);
+  }
+
+  async executeGql(req: ReturnType<typeof graphql>) {
+    try {
+      // TODO: Types!
+      return await req;
+    } catch (e) {
+      if (e.data) {
+        console.warn(`Partial GraphQL response: ${e.message}`);
+        console.warn(e.request);
+        return e.data;
+      }
+
+      throw e;
+    }
+  }
+
+  // TODO: These params should be GQL variables not format strings...
+  async getPulls(filter: "review-requested" | "author", login: string) {
     await this.assertAuth();
 
-    // TODO: Should be a gql variable but can't figure it out
-    const login = "hatboysam";
-
-    // TODO: This doesn't work for reviewed-by ...
-    const res = await this.gql({
-      query: `query pulls {
-        search(query: "is:pull-request review-requested:${login}", type: ISSUE, last: 100) {
+    const res = await this.executeGql(
+      this.gql({
+        query: `query pulls {
+        search(query: "is:pull-request is:open ${filter}:${login}", type: ISSUE, last: 25) {
           edges {
             node {
               ... on PullRequest {
@@ -203,9 +240,13 @@ export class Github {
           }
         }
       }`
-    });
+      })
+    );
 
-    // Need more types
-    return (res as any).search.edges.map((e: any) => e.node);
+    const nodes = (res as any).search.edges
+      .filter((e: any) => e != null)
+      .map((e: any) => e.node);
+
+    return nodes as PullRequestNode[];
   }
 }
