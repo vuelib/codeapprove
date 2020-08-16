@@ -30,7 +30,7 @@
         @click="setMyApproval(true)"
       >
         Quick Approve
-        <font-awesome-icon icon="check" />
+        <font-awesome-icon icon="check" class="ml-1" />
       </button>
 
       <button
@@ -39,7 +39,7 @@
         @click="setMyApproval(false)"
       >
         Undo Approval
-        <font-awesome-icon icon="times" />
+        <font-awesome-icon icon="times" class="ml-1" />
       </button>
     </div>
 
@@ -433,7 +433,6 @@ export default class PullRequest extends Mixins(EventEnhancer)
   }
 
   public setActiveChangeEntry(index: number) {
-    console.log(`setActiveChangeEntry(${index})`);
     const curr = this.getCurrentChangeEntry();
     if (curr) {
       curr.deactivate();

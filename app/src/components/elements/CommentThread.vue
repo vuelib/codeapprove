@@ -13,7 +13,7 @@
     </div>
     <div v-else>
       <!-- Preview -->
-      <div v-if="mode === 'standalone'" class="bg-dark-3">
+      <div v-if="mode === 'standalone' && thread" class="bg-dark-3">
         <div
           class="flex items-center pl-2 pr-1 py-2 font-bold border-b border-blue-500"
         >
@@ -50,13 +50,13 @@
       </div>
 
       <!-- Form -->
-      <!-- TODO: Handle focus out -->
-      <div @focusin="focused = true" @focusout="unfocus">
+      <div>
+        <!-- Text entry -->
         <div class="flex p-2">
           <img class="flex-none avatar mr-4" :src="photoURL" />
           <div class="flex-grow relative rounded bg-dark-7">
             <font-awesome-icon
-              v-show="typing"
+              v-show="hasDraft"
               @click="renderDraft = !renderDraft"
               :icon="renderDraft ? 'keyboard' : 'magic'"
               class="absolute m-1 right-0 text-wht-med hover:text-wht-brt cursor-pointer"
@@ -78,11 +78,13 @@
             />
           </div>
         </div>
+
+        <!-- Button row -->
         <div
-          v-show="focused || comments.length === 0"
+          v-show="textFocus || hasDraft || noComments"
           class="flex flex-row-reverse px-2 pb-2"
         >
-          <!-- Bind hotkeys when active -->
+          <!-- Bind hotkeys when text entry is active -->
           <div v-hotkey="hotKeyMap" />
 
           <button
@@ -131,6 +133,7 @@ import AuthModule from "../../store/modules/auth";
 import ReviewModule from "../../store/modules/review";
 import { auth } from "../../plugins/firebase";
 import * as events from "../../plugins/events";
+import * as dom from "../../plugins/dom";
 import { CommentThreadAPI } from "../api";
 import { KeyMap, COMMENT_THREAD_KEY_MAP } from "../../plugins/hotkeys";
 
@@ -156,7 +159,6 @@ export default class CommentThread extends Mixins(EventEnhancer)
   thread: Thread | null = null;
   comments: Comment[] = [];
 
-  focused = false;
   forceExpand = false;
   textFocus = false;
   renderDraft = false;
@@ -166,7 +168,7 @@ export default class CommentThread extends Mixins(EventEnhancer)
     events.on(NEW_COMMENT_EVENT, this.onNewComment);
     this.loadComments();
 
-    if (this.mode === "inline" && this.comments.length === 0) {
+    if (this.mode === "inline" && this.noComments) {
       const field = this.$refs.replyField as HTMLElement | undefined;
       if (field) {
         field.focus();
@@ -200,7 +202,11 @@ export default class CommentThread extends Mixins(EventEnhancer)
   }
 
   get typing() {
-    return this.textFocus || this.draftComment.length > 0;
+    return this.textFocus || this.hasDraft;
+  }
+
+  get hasDraft() {
+    return this.draftComment.length > 0;
   }
 
   // TODO: Don't show if outdated
@@ -210,6 +216,10 @@ export default class CommentThread extends Mixins(EventEnhancer)
 
   get resolved(): boolean {
     return this.thread != null && this.thread.resolved;
+  }
+
+  get noComments(): boolean {
+    return this.comments.length === 0;
   }
 
   public async addComment(resolve?: boolean) {
@@ -242,7 +252,8 @@ export default class CommentThread extends Mixins(EventEnhancer)
   }
 
   public onCancel() {
-    if (this.comments.length > 0) {
+    this.draftComment = "";
+    if (!this.noComments) {
       this.unfocus();
     } else {
       this.$emit("cancel");
@@ -254,7 +265,6 @@ export default class CommentThread extends Mixins(EventEnhancer)
   }
 
   private unfocus() {
-    this.focused = false;
     this.textFocus = false;
     const field = this.$refs.replyField as HTMLElement | undefined;
     if (field) {

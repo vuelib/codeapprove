@@ -14,7 +14,7 @@ export interface AccessTokenResponse {
 
 function queryToTokenResponse(res: qs.ParsedUrlQuery): AccessTokenResponse {
   if (res.error) {
-    throw new Error(`Error: ${res.error} - ${res.error_description}`);
+    throw new Error(`${res.error} - ${res.error_description}`);
   }
 
   return {
