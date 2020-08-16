@@ -1,9 +1,11 @@
 <template>
   <div>
-    <div class="grid grid-cols-2 px-16">
-      <div class="flex inline-flex flex-col justify-center items-center p-16">
-        <h1 class="text-6xl font-bold text-center">
-          Faster, better code review <br />for teams on GitHub
+    <div class="grid grid-cols-1 lg:grid-cols-2 px-4 lg:px-16">
+      <div
+        class="inline-flex flex-col justify-center items-center px-4 py-8 lg:py-16 lg:px-16"
+      >
+        <h1 class="text-2xl md:text-4xl xl:text-6xl font-bold text-center">
+          Faster, better code review <br class="lg:hidden" />for teams on GitHub
         </h1>
 
         <router-link to="/signin"
@@ -13,65 +15,70 @@
         >
       </div>
 
-      <div class="p-16">
+      <div class="flex-lg lg:p-16 lg:flex lg:flex-col lg:justify-center">
         <img src="@/assets/undraw_code_review_l1q9.svg" />
       </div>
     </div>
 
-    <div class="grid grid-cols-3 my-8 px-16">
+    <div class="grid grid-cols-1 lg:grid-cols-3 my-4 lg:my-8 px-4 lg:px-16">
       <div
-        class="col-span-2 m-12 shadow dark-shadow border border-dark-0 rounded"
+        class="row-start-1 lg:col-start-1 col-span-2 lg:m-12 shadow dark-shadow border border-dark-0 rounded"
       >
         <img src="@/assets/hero.png" />
       </div>
 
-      <div class="flex flex-col justify-center m-12">
-        <span class="text-purple-300 text-3xl"
+      <div
+        class="row-start-2 lg:row-start-1 lg:col-start-3 flex flex-col justify-center m-8 lg:m-12 text-center lg:text-left"
+      >
+        <span class="text-purple-300 text-xl md:text-3xl"
           ><font-awesome-icon icon="keyboard" class="mr-3" />Fast</span
         >
-        <p class="text-2xl">
-          Navigate files and leave comments<br />with keyboard shortcuts.
+        <p class="text-lg md:text-2xl">
+          Navigate files and leave comments with keyboard shortcuts.
         </p>
       </div>
     </div>
 
-    <div class="grid grid-cols-3 my-8 px-16">
-      <div class="flex flex-col justify-center m-12 text-right">
-        <span class="text-purple-300 text-3xl"
+    <div class="grid grid-cols-1 lg:grid-cols-3 my-4 lg:my-8 px-4 lg:px-16">
+      <div
+        class="row-start-1 lg:col-start-2 col-span-2 lg:m-12 shadow dark-shadow border border-dark-0 rounded"
+      >
+        <img src="@/assets/hero.png" />
+      </div>
+
+      <div
+        class="row-start-2 lg:row-start-1 flex flex-col justify-center m-8 lg:m-12 text-center lg:text-right lg:col-start-1"
+      >
+        <span class="text-purple-300 text-xl md:text-3xl"
           ><font-awesome-icon icon="moon" class="mr-3" />Beautiful</span
         >
-        <p class="text-2xl">
-          Crisp dark theme looks great<br />next to your favorite editor.
+        <p class="text-lg md:text-2xl">
+          Crisp dark theme looks great next to your favorite editor.
         </p>
-      </div>
-
-      <div
-        class="col-span-2 m-12 shadow dark-shadow border border-dark-0 rounded"
-      >
-        <img src="@/assets/hero.png" />
       </div>
     </div>
 
-    <div class="grid grid-cols-3 my-8 px-16">
+    <div class="grid grid-cols-1 lg:grid-cols-3 my-4 lg:my-8 px-4 lg:px-16">
       <div
-        class="col-span-2 m-12 shadow dark-shadow border border-dark-0 rounded"
+        class="row-start-1 lg:col-start-1 col-span-2 lg:m-12 shadow dark-shadow border border-dark-0 rounded"
       >
         <img src="@/assets/hero.png" />
       </div>
 
-      <div class="flex flex-col justify-center m-12">
-        <span class="text-purple-300 text-3xl"
+      <div
+        class="lg:col-start-3 row-start-2 lg:row-start-1 flex flex-col justify-center m-8 lg:m-12 text-center lg:text-left"
+      >
+        <span class="text-purple-300 text-xl md:text-3xl"
           ><font-awesome-icon icon="tasks" class="mr-3" />Focused</span
         >
-        <p class="text-2xl">
-          Easily track which threads are resolved<br />and which are still
-          pending.
+        <p class="text-lg md:text-2xl">
+          Easily track which threads are resolved and which are still pending.
         </p>
       </div>
     </div>
 
     <div class="flex flex-col items-center justify-center my-8">
-      <span class="text-4xl mb-8">Ready to get started?</span>
+      <span class="text-2xl lg:text-4xl mb-8">Ready to get started?</span>
       <router-link to="/signin"
         ><button class="btn btn-cta btn-purple">
           Sign Up Now
@@ -92,4 +99,14 @@ export default class Home extends Vue {
 }
 </script>
 
-<style lang="postcss"></style>
+<style lang="postcss">
+.flex-lg {
+  @apply hidden;
+}
+
+@screen lg {
+  .flex-lg {
+    display: flex;
+  }
+}
+</style>

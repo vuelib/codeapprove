@@ -106,10 +106,25 @@ input:focus {
 
 .btn-cta {
   @apply font-bold;
-  @apply rounded-lg border-4;
+  @apply rounded border-2;
   @apply flex flex-row items-center;
-  @apply text-4xl;
-  @apply px-6 py-3;
+  @apply text-2xl;
+  @apply px-2 py-1;
+}
+
+@screen lg {
+  .btn-cta {
+    @apply text-3xl;
+    @apply px-4 py-2;
+  }
+}
+
+@screen xl {
+  .btn-cta {
+    @apply rounded-lg border-4;
+    @apply text-4xl;
+    @apply px-6 py-3;
+  }
 }
 
 .btn:hover {
