@@ -1,9 +1,10 @@
-import * as axios from "axios";
 import * as qs from "querystring";
 
+import * as api from "./api";
 import * as config from "./config";
+import * as logger from "./logger";
 
-const ax = axios.default;
+const ax = api.getAxios();
 
 export interface AccessTokenResponse {
   access_token: string;
@@ -30,6 +31,7 @@ export function getExpiryDate(expires_in_seconds: string): number {
 }
 
 export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
+  logger.debug('github.exchangeCode');
   const tokenRes = await ax.post(
     `https://github.com/login/oauth/access_token?${qs.stringify({
       client_id: config.github().client_id,
@@ -45,6 +47,7 @@ export async function exchangeCode(code: string): Promise<AccessTokenResponse> {
 export async function exchangeRefreshToken(
   refresh_token: string
 ): Promise<AccessTokenResponse> {
+  logger.debug('github.exchangeRefreshToken');
   const tokenRes = await ax.post(
     `https://github.com/login/oauth/access_token?${qs.stringify({
       client_id: config.github().client_id,

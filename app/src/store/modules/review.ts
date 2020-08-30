@@ -122,6 +122,12 @@ export default class ReviewModule extends VuexModule {
   }
 
   @Mutation
+  public removeReviewer(opts: { login: string }) {
+    // Makes the removed map key reactive
+    Vue.delete(this.review.reviewers, opts.login);
+  }
+
+  @Mutation
   public setBaseAndHead(opts: { base: string; head: string }) {
     this.reviewState.base = opts.base;
     this.reviewState.head = opts.head;

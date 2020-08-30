@@ -1,8 +1,8 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import * as axios from "axios";
 import * as qs from "querystring";
 
+import * as api from "./api";
 import * as config from "./config";
 import * as github from "./github";
 import * as users from "./users";
@@ -11,7 +11,7 @@ import * as log from "./logger";
 import { serverless, ProbotConfig } from "./probot-serverless-gcf";
 import { bot } from "./bot";
 
-const ax = axios.default;
+const ax = api.getAxios();
 
 admin.initializeApp();
 

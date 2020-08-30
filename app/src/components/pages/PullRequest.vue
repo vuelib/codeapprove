@@ -108,15 +108,11 @@
                 <div>
                   <p v-for="reviewer in reviewers" :key="reviewer">
                     {{ reviewer }}
-                    <font-awesome-icon
-                      :icon="didApprove(reviewer) ? 'check' : 'circle'"
-                      :class="
-                        didApprove(reviewer)
-                          ? 'text-green-500'
-                          : 'text-yellow-500'
-                      "
+                    <UserReviewIcon
                       class="ml-1"
-                      size="xs"
+                      :approved="didApprove(reviewer)"
+                      :canRemove="canRemoveReviewer(reviewer)"
+                      @remove-clicked="removeReviewer(reviewer)"
                     />
                   </p>
                   <a
@@ -129,6 +125,8 @@
                   class="absolute"
                   v-if="usersearching"
                   v-click-outside="() => (usersearching = false)"
+                  :owner="meta.owner"
+                  :repo="meta.repo"
                   @selected="onReviewerSelected"
                 />
               </td>
@@ -235,6 +233,7 @@ import MarkdownContent from "@/components/elements/MarkdownContent.vue";
 import UserSearchModal from "@/components/elements/UserSearchModal.vue";
 import HotkeyModal from "@/components/elements/HotkeyModal.vue";
 import LabeledSelect from "@/components/elements/LabeledSelect.vue";
+import UserReviewIcon from "@/components/elements/UserReviewIcon.vue";
 
 import { Github, PullRequestData } from "../../plugins/github";
 import { freezeArray } from "../../plugins/freeze";
@@ -278,7 +277,8 @@ import { resolve } from "dns";
     MarkdownContent,
     UserSearchModal,
     HotkeyModal,
-    LabeledSelect
+    LabeledSelect,
+    UserReviewIcon
   }
 })
 export default class PullRequest extends Mixins(EventEnhancer)
@@ -564,6 +564,26 @@ export default class PullRequest extends Mixins(EventEnhancer)
 
   public didApprove(login: string): boolean {
     return this.reviewModule.review.reviewers[login] || false;
+  }
+
+  public canRemoveReviewer(login: string): boolean {
+    const myLogin = this.authModule.assertUser.username;
+
+    // Users can remove themselves
+    if (login === myLogin) {
+      return true;
+    }
+
+    // The PR author can remove reviewers
+    if (myLogin === this.prData!.pr.user.login) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public removeReviewer(login: string) {
+    this.reviewModule.removeReviewer({ login });
   }
 
   get loaded() {

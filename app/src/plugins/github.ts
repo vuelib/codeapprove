@@ -54,6 +54,13 @@ export interface SuccessfulInstallationStatus {
   }[];
 }
 
+export interface UserSearchItem {
+  login: string;
+  avatar_url: string;
+  collaborator: boolean;
+  access_level: "admin" | "write" | "read" | "none";
+}
+
 export class Github {
   private octokit!: Octokit;
   private gql: typeof graphql = graphql;
@@ -94,15 +101,55 @@ export class Github {
     owner: string,
     repo: string,
     prefix: string
-  ): Promise<SearchUsersResponseData> {
+  ): Promise<UserSearchItem[]> {
     await this.assertAuth();
 
-    // TODO: Prefer users from the same repo!
-    const res = await this.octokit.search.users({
-      q: prefix
+    // List users from the repo
+    const collabs = await this.octokit.repos.listCollaborators({
+      owner,
+      repo
     });
 
-    return res.data;
+    // Filter users for the prefix
+    const collabsFiltered = collabs.data.filter(x => x.login.includes(prefix));
+
+    // List random GitHub users
+    const random = await this.octokit.search.users({
+      q: prefix,
+      per_page: 5
+    });
+
+    const res: UserSearchItem[] = [];
+
+    for (const c of collabsFiltered) {
+      const access_level = c.permissions.admin
+        ? "admin"
+        : c.permissions.push
+        ? "write"
+        : c.permissions.pull
+        ? "read"
+        : "none";
+
+      res.push({
+        login: c.login,
+        avatar_url: c.avatar_url,
+        collaborator: true,
+        access_level
+      });
+    }
+
+    for (const c of random.data.items) {
+      if (!res.some(x => x.login === c.login)) {
+        res.push({
+          login: c.login,
+          avatar_url: c.avatar_url,
+          collaborator: false,
+          access_level: "none"
+        });
+      }
+    }
+
+    return res;
   }
 
   async getPullRequest(

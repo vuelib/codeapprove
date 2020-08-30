@@ -29,11 +29,17 @@
           @mouseover="activeIndex = index"
           @click.prevent="selectItem(index)"
         >
-          <div class="py-1 px-1">
+          <div class="py-1 px-1 flex flex-row">
             <img
               :src="item.avatar_url"
               class="rounded-full inline avatar mr-2"
             /><span>{{ item.login }}</span>
+            <span class="flex-grow"><!-- spacer --></span>
+            <span
+              v-if="item.collaborator"
+              class="rounded-full px-2 py-1 text-xs bg-dark-7 text-gray-400"
+              >{{ item.access_level }}</span
+            >
           </div>
         </li>
       </ul>
@@ -50,6 +56,9 @@ import AuthModule from "../../store/modules/auth";
 
 @Component
 export default class UserSearchModal extends Vue {
+  @Prop() owner!: string;
+  @Prop() repo!: string;
+
   public query: string = "";
   public activeIndex = 0;
   public items: any[] = [];
@@ -68,9 +77,13 @@ export default class UserSearchModal extends Vue {
         return;
       }
 
-      const res = await this.github.searchUsers("", "", this.query);
+      const res = await this.github.searchUsers(
+        this.owner,
+        this.repo,
+        this.query
+      );
 
-      this.items = res.items.slice(0, 10);
+      this.items = res.slice(0, 10);
       this.activeIndex = 0;
     }, 300);
   }
