@@ -44,6 +44,9 @@ export default class AuthModule extends VuexModule {
     console.log("updateGithubToken", `expiry=${opts.githubExpiry}`);
     this.user!.githubToken = opts.githubToken;
     this.user!.githubExpiry = opts.githubExpiry;
+
+    // TODO: Could I just call setUser?
+    localStorage.setItem("user", JSON.stringify(this.user));
   }
 
   get assertUser(): User {
