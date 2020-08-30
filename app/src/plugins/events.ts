@@ -23,6 +23,11 @@ export interface NewCommentEvent {
   threadId: string;
 }
 
+export const PAGE_VISIBILITY_EVENT = "page-visibility";
+export interface PageVisibilityEvent {
+  visible: boolean;
+}
+
 export function emit<T>(event: string, data: T) {
   BUS.$emit(event, data);
 }

@@ -24,8 +24,12 @@ import HeaderBar from "@/components/elements/HeaderBar.vue";
 import ProgressBar from "@/components/elements/ProgressBar.vue";
 import MessageStack from "@/components/elements/MessageStack.vue";
 
-import { auth } from "./plugins/firebase";
+import { auth, remoteConfig } from "./plugins/firebase";
+import { config } from "./plugins/config";
+import * as events from "./plugins/events";
+
 import AuthModule from "./store/modules/auth";
+import UIModule from "./store/modules/ui";
 
 @Component({
   components: {
@@ -36,6 +40,8 @@ import AuthModule from "./store/modules/auth";
 })
 export default class App extends Vue {
   authModule = getModule(AuthModule, this.$store);
+  uiModule = getModule(UIModule, this.$store);
+
   authUnsub?: firebase.Unsubscribe = undefined;
 
   created() {
@@ -44,6 +50,25 @@ export default class App extends Vue {
         this.authModule.setUser(null);
       }
     });
+
+    events.on(
+      events.PAGE_VISIBILITY_EVENT,
+      (evt: events.PageVisibilityEvent) => {
+        if (evt.visible) {
+          const rc = remoteConfig();
+          rc.fetchAndActivate().then(() => {
+            const minVersion = rc.getNumber("min_version");
+            if (config.version < minVersion) {
+              this.uiModule.addMessage({
+                type: "error",
+                text:
+                  "There is a newer version of CodeApprove available, please refresh"
+              });
+            }
+          });
+        }
+      }
+    );
   }
 
   destroyed() {

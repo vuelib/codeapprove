@@ -89,7 +89,6 @@
           :class="isApproved ? 'text-green-400' : 'text-yellow-400'"
           class="flex items-center px-4 py-1 bg-dark-3 font-bold border-dark-0 border-b"
         >
-          <!-- TODO: Variable icon and styling -->
           <font-awesome-icon
             :icon="isApproved ? 'check' : 'pause-circle'"
             class="mr-2"

@@ -38,6 +38,9 @@ import "prism-themes/themes/prism-atom-dark.css";
 
 Vue.config.productionTip = false;
 
+// Track page visibility
+import * as pagevis from "./plugins/pagevis";
+
 // Enable performance tracing in dev
 if (process.env.NODE_ENV !== "production") {
   Vue.config.devtools = true;
@@ -47,6 +50,9 @@ if (process.env.NODE_ENV !== "production") {
 // Import app and initialize
 import App from "./App.vue";
 new Vue({
+  created: () => {
+    pagevis.trackVisibility();
+  },
   render: h => h(App),
   router,
   store

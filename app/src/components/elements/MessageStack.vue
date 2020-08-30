@@ -3,7 +3,7 @@
     <div
       v-for="msg in messages"
       :key="msg.text"
-      class="bubble border-dark-0 bg-dark-5 text-purple-300 dark-shadow"
+      class="bubble border-dark-0 bg-dark-5 dark-shadow"
       :class="classObj(msg)"
     >
       <font-awesome-icon

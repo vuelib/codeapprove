@@ -81,12 +81,17 @@ export class Github {
 
   async assertAuth(): Promise<void> {
     const now = new Date().getTime();
-    const until = this.authModule.assertUser.githubExpiry - now;
+    const expires = this.authModule.assertUser.githubExpiry;
+    const until = expires - now;
 
     const hourMs = 60 * 60 * 1000;
 
+    // TODO: This does not seem to save the expiry!
     // Refresh if it will expire in the next hour
     if (until < hourMs) {
+      console.log(
+        `Token expires in ${expires} - ${now} = ${until}ms, refreshing authentication`
+      );
       await this.authModule.refreshGithubAuth();
       this.applyAuth(this.authModule.assertUser.githubToken);
     }
