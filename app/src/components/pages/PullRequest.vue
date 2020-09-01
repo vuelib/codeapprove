@@ -17,8 +17,8 @@
           >)
         </h3>
         <p>
-          merge <code>{{ prData.pr.head.ref }}</code> into
-          <code>{{ prData.pr.base.ref }}</code>
+          merge <code>{{ prData.pr.head.label }}</code> into
+          <code>{{ prData.pr.base.label }}</code>
         </p>
       </div>
 
@@ -153,6 +153,7 @@
 
         <!-- Select base commit -->
         <LabeledSelect
+          v-if="!isFromFork()"
           class="mr-2"
           label="Base"
           :keys="[prData.pr.base.ref, ...prData.commits.map(c => c.sha)]"
@@ -165,6 +166,7 @@
 
         <!-- Select head commit -->
         <LabeledSelect
+          v-if="!isFromFork()"
           class="mr-2"
           label="Head"
           :keys="prData.commits.map(c => c.sha).reverse()"
@@ -392,6 +394,10 @@ export default class PullRequest extends Mixins(EventEnhancer)
     this.reloadDiff();
   }
 
+  public isFromFork() {
+    return this.prData!.pr.head.user.login !== this.prData!.pr.base.user.login;
+  }
+
   public headSha() {
     return this.diffHead || this.prData!.pr.head.ref;
   }
@@ -400,6 +406,7 @@ export default class PullRequest extends Mixins(EventEnhancer)
     return this.diffBase || this.prData!.pr.base.ref;
   }
 
+  // TODO: This whole thing doesn't work for forks!
   public async reloadDiff() {
     this.uiModule.beginLoading();
     this.collapseAll();
@@ -407,10 +414,13 @@ export default class PullRequest extends Mixins(EventEnhancer)
     const diffs = await this.github.getDiff(
       this.meta.owner,
       this.meta.repo,
-      this.headSha(),
-      this.baseSha()
+      this.baseSha(),
+      this.headSha()
     );
+
     this.prData!.diffs = freezeArray(diffs);
+    this.prChanges = this.renderPullRequest(this.prData!);
+
     this.reviewModule.setBaseAndHead({
       base: this.baseSha(),
       head: this.headSha()

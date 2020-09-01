@@ -170,11 +170,12 @@ export class Github {
       pull_number
     });
 
+    // The label is "owner:branch" so that this works with forks as well
     const diffs = await this.getDiff(
       owner,
       repo,
-      pr.data.base.ref,
-      pr.data.head.ref
+      pr.data.base.label,
+      pr.data.head.label
     );
 
     const commits = await this.octokit.pulls.listCommits({
